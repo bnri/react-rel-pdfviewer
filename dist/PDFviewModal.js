@@ -39,7 +39,7 @@ var Loading = function Loading(_ref) {
   }, "ReadersEye"));
 };
 
-var PDFviewModal = function PDFviewModal(_ref2) {
+var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {
   var props = _extends({}, _ref2);
 
   var path = props.path,
@@ -47,7 +47,8 @@ var PDFviewModal = function PDFviewModal(_ref2) {
       showViewMode = props.showViewMode,
       viewpercent = props.viewpercent,
       set_viewpercent = props.set_viewpercent,
-      scrollCallback = props.scrollCallback; // console.log("path",path);
+      scrollCallback = props.scrollCallback,
+      pageCallback = props.pageCallback; // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -130,6 +131,12 @@ var PDFviewModal = function PDFviewModal(_ref2) {
   //wrapperRef
 
 
+  _react.default.useEffect(function () {
+    if (pageNumber && pageCallback) {
+      pageCallback(pageNumber);
+    }
+  }, [pageNumber, pageCallback]);
+
   var handleWrapperScroll = _react.default.useCallback(function (e) {
     // console.log(e.target.scrollTop,"스크롤위치");
     // console.log("scrollCallback",scrollCallback);
@@ -150,6 +157,17 @@ var PDFviewModal = function PDFviewModal(_ref2) {
       _React$useState10 = _slicedToArray(_React$useState9, 2),
       viewPercent = _React$useState10[0],
       set_viewPercent = _React$useState10[1];
+
+  _react.default.useImperativeHandle(ref, function () {
+    return {
+      set_pageNumber: function set_pageNumber(val) {
+        setPageNumber(val);
+      },
+      set_scrollTop: function set_scrollTop(val) {
+        wrapperRef.current.scrollTop = val;
+      }
+    };
+  }, []);
 
   var option = _react.default.useMemo(function () {
     return {
@@ -345,7 +363,7 @@ var PDFviewModal = function PDFviewModal(_ref2) {
       alert('Rendered the page!');
     }
   }))));
-};
+});
 
 var _default = PDFviewModal;
 exports.default = _default;

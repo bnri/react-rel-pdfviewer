@@ -39,7 +39,7 @@ function App() {
   }
 
 
-
+  const pdfviewref=  React.useRef();
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
@@ -74,10 +74,17 @@ function App() {
     set_previewURL(logoURL);
 
   }
-  const handleScrollCallback = (a)=>{
-    console.log("콜백",a);
-    
+  const handleScrollCallback = (s)=>{
+    console.log("s콜백",s);    
   }
+
+  const handlePageCallback = (p)=>{
+    console.log("p콜백",p)
+  }
+
+
+  //
+
 
   return (
     <div className="App">
@@ -101,10 +108,21 @@ function App() {
           미리보기
         </button>
       </div>
+      
+      <button onClick={()=>{
+        console.log(pdfviewref);
+        pdfviewref.current.set_pageNumber(2);
+      }}>page 2</button>
+      
+      <button onClick={()=>{
+        console.log(pdfviewref);
+        pdfviewref.current.set_scrollTop(100);
+      }}>scroll100</button>
 
       {previewURL &&
         <div className="PDFpreView">
           <PDFviewModal
+          ref={pdfviewref}
             path={previewURL}
             showViewMode={true}
             viewpercent={viewpercent}
@@ -117,6 +135,8 @@ function App() {
 
             }}
             scrollCallback={handleScrollCallback}
+            pageCallback={handlePageCallback}
+            
           />
         </div>
       }

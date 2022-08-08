@@ -21,8 +21,8 @@ const Loading = ({ ...props }) => {
 }
 
 
-const PDFviewModal = ({ ...props }) => {
-    const { path, onClose, showViewMode, viewpercent, set_viewpercent ,scrollCallback} = props;
+const PDFviewModal = React.forwardRef(({ ...props },ref) => {
+    const { path, onClose, showViewMode, viewpercent, set_viewpercent ,scrollCallback , pageCallback} = props;
 
     // console.log("path",path);
 
@@ -42,6 +42,8 @@ const PDFviewModal = ({ ...props }) => {
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
     }
+
+
 
     function onDocumentRenderSuccess() {
         // console.log("확인좀",some);
@@ -90,9 +92,15 @@ const PDFviewModal = ({ ...props }) => {
         };
     }, [handleKeyDown]);
 
+
     //스크롤이벤트
     //wrapperRef
 
+    React.useEffect(()=>{
+        if(pageNumber&&pageCallback){
+            pageCallback(pageNumber);
+        }
+    },[pageNumber,pageCallback])
 
     const handleWrapperScroll = React.useCallback((e) => {
 
@@ -116,7 +124,17 @@ const PDFviewModal = ({ ...props }) => {
     const modalref = React.useRef();
 
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
-
+ 
+ 
+    React.useImperativeHandle(ref, () => ({
+        set_pageNumber(val) {
+            setPageNumber(val);
+        },
+        set_scrollTop:(val)=>{
+            wrapperRef.current.scrollTop=val;
+        }
+        
+    }),[]);
 
 
     const option = React.useMemo(() => {
@@ -335,6 +353,6 @@ const PDFviewModal = ({ ...props }) => {
 
 
     </div>)
-}
+});
 
 export default PDFviewModal;
