@@ -46,7 +46,8 @@ var PDFviewModal = function PDFviewModal(_ref2) {
       onClose = props.onClose,
       showViewMode = props.showViewMode,
       viewpercent = props.viewpercent,
-      set_viewpercent = props.set_viewpercent; // console.log("path",path);
+      set_viewpercent = props.set_viewpercent,
+      scrollCallback = props.scrollCallback; // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -129,9 +130,14 @@ var PDFviewModal = function PDFviewModal(_ref2) {
   //wrapperRef
 
 
-  var handleWrapperScroll = function handleWrapperScroll(e) {// console.log(e.target.scrollTop,"스크롤위치");
-    //사실은 이때랑 같이 이동
-  }; // 0.4 ~ 0.9
+  var handleWrapperScroll = _react.default.useCallback(function (e) {
+    // console.log(e.target.scrollTop,"스크롤위치");
+    // console.log("scrollCallback",scrollCallback);
+    if (scrollCallback) {
+      scrollCallback(e.target.scrollTop);
+    } //사실은 이때랑 같이 이동
+
+  }, [scrollCallback]); // 0.4 ~ 0.9
   //       100%
   // + -  1% 씩 조정
   //

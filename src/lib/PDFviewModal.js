@@ -22,7 +22,7 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = ({ ...props }) => {
-    const { path, onClose, showViewMode, viewpercent, set_viewpercent } = props;
+    const { path, onClose, showViewMode, viewpercent, set_viewpercent ,scrollCallback} = props;
 
     // console.log("path",path);
 
@@ -94,14 +94,17 @@ const PDFviewModal = ({ ...props }) => {
     //wrapperRef
 
 
-    const handleWrapperScroll = (e) => {
+    const handleWrapperScroll = React.useCallback((e) => {
 
         // console.log(e.target.scrollTop,"스크롤위치");
-
+        // console.log("scrollCallback",scrollCallback);
+        if(scrollCallback){
+            scrollCallback(e.target.scrollTop);
+        }
 
         //사실은 이때랑 같이 이동
 
-    }
+    },[scrollCallback]);
     // 0.4 ~ 0.9
     //       100%
     // + -  1% 씩 조정

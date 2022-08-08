@@ -74,6 +74,10 @@ function App() {
     set_previewURL(logoURL);
 
   }
+  const handleScrollCallback = (a)=>{
+    console.log("콜백",a);
+    
+  }
 
   return (
     <div className="App">
@@ -112,6 +116,7 @@ function App() {
               set_previewURL(null);
 
             }}
+            scrollCallback={handleScrollCallback}
           />
         </div>
       }
