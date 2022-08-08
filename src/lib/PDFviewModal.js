@@ -47,7 +47,7 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
 
     function onDocumentRenderSuccess() {
         // console.log("확인좀",some);
-        // console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
+        console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
         // set_pdfWidth({
         //     width: canvasRef.current.width,
         //     height: canvasRef.current.height

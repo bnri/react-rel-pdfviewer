@@ -87,11 +87,11 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
   function onDocumentRenderSuccess() {
     // console.log("확인좀",some);
-    // console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
-    // set_pdfWidth({
+    console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height); // set_pdfWidth({
     //     width: canvasRef.current.width,
     //     height: canvasRef.current.height
     // })
+
     set_pdfWidth(canvasRef.current.width);
     set_pdfHeight(canvasRef.current.height);
     wrapperRef.current.scrollTop = 0;
