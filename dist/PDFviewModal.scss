@@ -1,0 +1,240 @@
+.PDFviewModal {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 20000;
+    background: black;
+    display: flex;
+    align-items: center;
+    // font-size:0.5vw;
+
+    .PDF-wrapper {
+
+        // align-items: center;
+        // display:flex;
+        // margin:auto;
+        position: absolute;
+        left: 5%;
+        top: 0;
+        background: gray;
+    }
+
+    .PDF-document {
+        margin: auto;
+
+    }
+
+    .PDF-page {
+        margin: auto;
+        // display:flex;
+        // justify-content: center;
+        // align-items: center;
+    }
+
+    .react-pdf__Page__canvas {
+        margin: auto;
+    }
+
+
+    .PageInform {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        color: white;
+        // background: green;
+        // background: gray;
+        width: 5%;
+        height: 5%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size:20px;
+        // background: green;
+    }
+
+    .closeTab {
+        position: absolute;
+        top: 1%;
+        right: 0;
+        color: white;
+        // background: green;
+        width: 5%;
+        height: 5%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .closePDFbtn{
+        
+            border:none;
+            outline:none;
+            cursor:pointer;
+            background-color: transparent;
+            color:white;
+            top:7px;
+            &:hover{
+                color:red;
+            }
+            &:active{
+                top:8px;
+            }
+        }
+    }
+
+    .PageViewPercentWrap{
+        position: absolute;
+        right: 0px;
+        top: 10%;
+        width: 5%;
+        height: 25%;      
+        // background:red;  
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        .relativewrap{
+            position:relative;
+            width:100%;
+            height:100%;
+            left:0;
+            top:0;
+            display:block;
+            // background:red;
+            .row{
+                height:16%;
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                box-sizing: border-box;
+                // border-bottom:1px solid green;
+            }
+            .wraplabel{
+                color:white;
+                font-size:17px;
+
+            }
+            .viewPercent{
+                width:80%;
+                height:70%;
+
+                outline:none;
+                text-align: center;
+                font-size: 22px;
+                font-weight:700;
+                border:none;
+                border-radius: 4px;
+                border:1px solid gray;
+            }
+            .resizebtn{
+                width:80%;
+                height:90%;
+                font-size:22px;
+                background:white;
+                border:none;
+                border-radius: 4px;
+                border:1px solid gray;
+                box-sizing: border-box;
+                // box-shadow: 1px 1px 1px 1px;
+                
+                &:hover{
+                    cursor:pointer;
+                    background:rgb(230,230,230);
+                }
+            }
+
+        }
+
+    }
+    .PageController-left {
+        position: absolute;
+        left: 0px;
+        top: 35%;
+        width: 5%;
+        height: 30%;
+        // background:blue;
+    }
+
+    .PageController-right {
+        position: absolute;
+        right: 0px;
+        top: 35%;
+        width: 5%;
+        height: 30%;
+        // background:blue;
+    }
+
+    .page-btn {
+        width: 90%;
+        height: 100%;
+        font-size: 33px;
+        font-weight: 700;
+        background: black;
+        // border:1px solid white;
+        color: white;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+
+        // height:5%;
+        &:hover {
+            cursor: pointer;
+            font-size: 45px;
+            // background:rgb(20,20,20);
+            color:red;
+        }
+    }
+}
+
+.PDF-loading {
+    width: 100%;
+    height: 100%;
+    background: white;
+    // color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .Loading {
+        width: 100%;
+        height: 100%;
+        min-width: 260px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+
+        .text {
+            position: relative;
+            display: inline-block;
+            font-size:44px;
+            font-weight: 700;
+            color: #7367f0;
+            overflow: hidden;
+            background: linear-gradient(to right, midnightblue, midnightblue 50%, #7367f0 50%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 100%;
+            background-position: 100%;
+            transition: background-position 275ms ease;
+            text-decoration: none; // text decorations are clipped in WebKit browsers\
+
+            animation: textgrowth 0.7s infinite alternate;
+
+        }
+    }
+
+}
+
+
+
+@keyframes textgrowth {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+
+        background-position: 0 100%;
+    }
+}

@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+public 폴더에  
+pdf.worker.js  
+pdf.worker.js.map  
+pdf.worker.min.js 
+복사 필요
+```
+import React from "react";
+import './App.scss';
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+import PDFviewModal from './lib/PDFviewModal';
 
-## Available Scripts
 
-In the project directory, you can run:
+function App() {
 
-### `npm start`
+  const [viewpercent, set_viewpercent] = React.useState(100);
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  const openFullscreen = () => {
+    var elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari & Opera 
+      elem.webkitRequestFullscreen();
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    } else if (elem.mozRequestFullScreen) { // Firefox 
 
-### `npm test`
+      elem.mozRequestFullScreen();
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    } else if (elem.msRequestFullscreen) { // IE/Edge 
+      elem.msRequestFullscreen();
 
-### `npm run build`
+    }
+  }
+  const cancelFullScreen = () => {
+    var el = document;
+    var requestMethod = el.cancelFullScreen || el.webkitCancelFullScreen || el.mozCancelFullScreen || el.exitFullscreen || el.webkitExitFullscreen;
+    if (requestMethod) { // cancel full screen.
+      requestMethod.call(el);
+    }
+    // } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+    //   var wscript = new ActiveXObject("WScript.Shell");
+    //   if (wscript !== null) {
+    //     wscript.SendKeys("{F11}");
+    //   }
+    // }
+  }
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  const fileRef = React.useRef();
+  const [previewURL, set_previewURL] = React.useState("");
+  const [file, set_file] = React.useState(null);
+  const handleAddFile = (e) => {
 
-### `npm run eject`
+    console.log(e.target.files[0]);
+    //if (!e.target.files[0]) return;
+    if (e.target.files[0].type !== 'application/pdf') {
+      // Swal.fire("지원하지 않는 확장자 입니다");
+      return;
+    }
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    if (previewURL) {
+      console.log("메모리해제");
+      window.URL.revokeObjectURL(previewURL);
+      console.log("메모리끝");
+    }
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    let tmpfile = e.target.files[0];
+    set_file(tmpfile);
+  }
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  const handleOpenPreview = () => {
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    if (!file) return;
+    // console.log("파일", file);
+    let logoURL = window.URL.createObjectURL(file);
+    // console.log(logoURL);
+    openFullscreen();
+    set_previewURL(logoURL);
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  }
 
-### Code Splitting
+  return (
+    <div className="App">
+      <div className="tempFileZone">
+        {file && <> {`임시파일이름 : ${file.name}`} <button className="deletefilebtn" onClick={() => set_file(null)}>삭제</button></>}
+        <input ref={fileRef} style={{ display: 'none' }}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+          // accept=".pdf"
+          accept="application/pdf"
 
-### Analyzing the Bundle Size
+          type="file" onChange={handleAddFile} />
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+        <button
+          className="btn"
+          onClick={() => {
+            fileRef.current.value = "";
+            fileRef.current.click();
 
-### Making a Progressive Web App
+          }}>내컴퓨터에서 찾기</button>
+        <button onClick={handleOpenPreview}>
+          미리보기
+        </button>
+      </div>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+      {previewURL &&
+        <div className="PDFpreView">
+          <PDFviewModal
+            path={previewURL}
+            showViewMode={true}
+            viewpercent={viewpercent}
+            set_viewpercent={set_viewpercent}
+            onClose={() => {
+              cancelFullScreen();
+              // console.log("메모리해제")
+              window.URL.revokeObjectURL(previewURL);
+              set_previewURL(null);
 
-### Advanced Configuration
+            }}
+          />
+        </div>
+      }
+    </div>
+  );
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default App;
+```

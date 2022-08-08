@@ -1,0 +1,24 @@
+.App {
+    text-align: center;
+  }
+  html,body,#root,.App{
+    height:100%;
+    width:100%;
+    margin:0;
+    padding:0;
+  }
+  
+  .PDFpreView{
+    position:fixed;
+    width:100%;
+    height:100%;
+    left:0;
+    top:0;
+    
+    // width:1920px;
+    // height:1080px;
+    // left:200px;
+    // top:200px;
+    // transform:scale(0.5);
+    // transform-origin: left top;
+}
