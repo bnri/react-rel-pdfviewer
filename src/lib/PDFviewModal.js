@@ -7,6 +7,7 @@ import {
 } from 'react-pdf';
 // import React from 'react';
 import NumberFormat from 'react-number-format';
+import { Scrollbars } from "react-custom-scrollbars";
 
 
 const Loading = ({ ...props }) => {
@@ -21,8 +22,8 @@ const Loading = ({ ...props }) => {
 }
 
 
-const PDFviewModal = React.forwardRef(({ ...props },ref) => {
-    const { path, onClose, showViewMode, viewpercent, set_viewpercent ,scrollCallback , pageCallback} = props;
+const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
+    const { path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback } = props;
 
     // console.log("path",path);
 
@@ -47,16 +48,32 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
 
     function onDocumentRenderSuccess() {
         // console.log("확인좀",some);
-        console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
+        // console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
         // set_pdfWidth({
         //     width: canvasRef.current.width,
         //     height: canvasRef.current.height
         // })
+        if (pdfSizeCallback) {
 
+            pdfSizeCallback({
+                width: canvasRef.current.width,
+                height: canvasRef.current.height
+            });
+        }
         set_pdfWidth(canvasRef.current.width);
         set_pdfHeight(canvasRef.current.height);
 
-        wrapperRef.current.scrollTop = 0;
+        //원래 스크롤
+        // wrapperRef.current.scrollTop = 0;
+        // prettyscrollref.current.scrollTop=0;
+        prettyscrollref.current.scrollTop(0);
+        
+
+        console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
+        //PDF view Modal 의 껍데기도 필요함
+
+        console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
+
 
     }
 
@@ -96,23 +113,23 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
     //스크롤이벤트
     //wrapperRef
 
-    React.useEffect(()=>{
-        if(pageNumber&&pageCallback){
+    React.useEffect(() => {
+        if (pageNumber && pageCallback) {
             pageCallback(pageNumber);
         }
-    },[pageNumber,pageCallback])
+    }, [pageNumber, pageCallback])
 
     const handleWrapperScroll = React.useCallback((e) => {
 
         // console.log(e.target.scrollTop,"스크롤위치");
         // console.log("scrollCallback",scrollCallback);
-        if(scrollCallback){
+        if (scrollCallback) {
             scrollCallback(e.target.scrollTop);
         }
 
         //사실은 이때랑 같이 이동
 
-    },[scrollCallback]);
+    }, [scrollCallback]);
     // 0.4 ~ 0.9
     //       100%
     // + -  1% 씩 조정
@@ -122,19 +139,27 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
 
 
     const modalref = React.useRef();
+    const prettyscrollref = React.useRef();
 
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
- 
- 
+
+
+    //
     React.useImperativeHandle(ref, () => ({
         set_pageNumber(val) {
             setPageNumber(val);
         },
-        set_scrollTop:(val)=>{
-            wrapperRef.current.scrollTop=val;
+        set_scrollTop: (val) => {
+            wrapperRef.current.scrollTop = val;
+        },
+        get_pdfSize: () => {
+            return {
+                width: pdfWidth,
+                height: pdfHeight,
+            }
         }
-        
-    }),[]);
+
+    }), [pdfWidth, pdfHeight]);
 
 
     const option = React.useMemo(() => {
@@ -156,8 +181,8 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
     //     return window.screen.width * p - 18;
     // }, [viewPercent])
 
-    
-        const [pageWidth, set_pageWidth] = React.useState(0);
+
+    const [pageWidth, set_pageWidth] = React.useState(0);
     React.useEffect(() => {
         if (viewPercent) {
             if (!modalref || !modalref.current) return;
@@ -166,10 +191,10 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
 
             // console.log("modalref", modalref.current);
 
-            set_pageWidth(modalref.current.clientWidth * p - 18);
+            set_pageWidth(modalref.current.clientWidth * p);
         }
     }, [viewPercent])
-    
+
 
     return (<div className="PDFviewModal no-drag" ref={modalref}>
 
@@ -199,10 +224,10 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
                             PDF 사이즈
                         </div>
                         <div className="row">
-                            <button className="resizebtn"onClick={() => set_viewPercent(option.max)}>최대</button>
+                            <button className="resizebtn" onClick={() => set_viewPercent(option.max)}>최대</button>
                         </div>
                         <div className="row">
-                            <button className="resizebtn"onClick={() => {
+                            <button className="resizebtn" onClick={() => {
                                 set_viewPercent((v) => {
                                     // console.log("v",v)
                                     if (v > option.max) return option.max * 1;
@@ -228,7 +253,7 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
                             />
                         </div>
                         <div className="row">
-                            <button className="resizebtn"onClick={() => {
+                            <button className="resizebtn" onClick={() => {
                                 set_viewPercent((v) => {
                                     // console.log("v",v)
                                     if (v < option.min) return option.min * 1;
@@ -237,7 +262,7 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
                             }}>-</button>
                         </div>
                         <div className="row">
-                            <button className="resizebtn"onClick={() => set_viewPercent(option.min * 1)}>
+                            <button className="resizebtn" onClick={() => set_viewPercent(option.min * 1)}>
                                 최소
                             </button>
                         </div>
@@ -267,6 +292,11 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
                             set_viewpercent(viewPercent);
                         }
 
+                        if (pdfSizeCallback) {
+                            //#@!
+                        }
+
+
                         onClose();
                     }}>  <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -288,11 +318,7 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
         }
 
 
-
         <div ref={wrapperRef} className="PDF-wrapper"
-
-            onScroll={handleWrapperScroll}
-
 
             style={{
                 // outline: '1px solid red',
@@ -303,52 +329,58 @@ const PDFviewModal = React.forwardRef(({ ...props },ref) => {
                 height: '100%',
 
                 display: pdfWidth && pdfHeight ? 'flex' : 'none',
-                overflow: 'auto'
+                // overflow: 'auto'
                 // ,overflow:'auto'
             }}>
-
-
-            <Document
-                className="PDF-document"
-                options={{
-                    cMapUrl: 'cmaps/',
-                    cMapPacked: true,
-                    standardFontDataUrl: 'standard_fonts/',
-                    workerSrc: "pdf.worker.js"
-                }}
-
-                file={filepath}
-                // width={window.screen.width * 0.9}
-                // loading={<div>
-                //     갸갸갸갸갸
-                // </div>}
-                onLoadSuccess={onDocumentLoadSuccess}
-
+            <Scrollbars
+               ref={prettyscrollref}
+                onScroll={handleWrapperScroll}
+                renderThumbHorizontal={(props) => <div {...props}
+                    className="thumb-horizontal"
+                    style={{ display: "none" }} />}
             >
 
-
-                <Page
-                    // canvasBackground={"red"}
-                    // loading={"asfasfasfasf"}
-                    canvasRef={canvasRef}
-                    className="PDF-page"
-                    pageNumber={pageNumber}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                    // height={window.screen.height*0.9}
-                    width={pageWidth}
-                    // scale={1}
-                    // rotate={90}
-                    onRenderSuccess={onDocumentRenderSuccess}
-                    onRenderError={() => {
-                        console.log("랜더에러")
-                        alert('Rendered the page!')
+                <Document
+                    className="PDF-document"
+                    options={{
+                        cMapUrl: 'cmaps/',
+                        cMapPacked: true,
+                        standardFontDataUrl: 'standard_fonts/',
+                        workerSrc: "pdf.worker.js"
                     }}
-                />
+
+                    file={filepath}
+                    // width={window.screen.width * 0.9}
+                    // loading={<div>
+                    //     갸갸갸갸갸
+                    // </div>}
+                    onLoadSuccess={onDocumentLoadSuccess}
+
+                >
 
 
-            </Document>
+                    <Page
+                        // canvasBackground={"red"}
+                        // loading={"asfasfasfasf"}
+                        canvasRef={canvasRef}
+                        className="PDF-page"
+                        pageNumber={pageNumber}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        // height={window.screen.height*0.9}
+                        width={pageWidth}
+                        // scale={1}
+                        // rotate={90}
+                        onRenderSuccess={onDocumentRenderSuccess}
+                        onRenderError={() => {
+                            console.log("랜더에러")
+                            alert('Rendered the page!')
+                        }}
+                    />
 
+
+                </Document>
+            </Scrollbars>
         </div>
 
 

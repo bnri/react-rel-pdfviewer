@@ -13,6 +13,8 @@ var _reactPdf = require("react-pdf");
 
 var _reactNumberFormat = _interopRequireDefault(require("react-number-format"));
 
+var _reactCustomScrollbars = require("react-custom-scrollbars");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -48,7 +50,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       viewpercent = props.viewpercent,
       set_viewpercent = props.set_viewpercent,
       scrollCallback = props.scrollCallback,
-      pageCallback = props.pageCallback; // console.log("path",path);
+      pageCallback = props.pageCallback,
+      pdfSizeCallback = props.pdfSizeCallback; // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -87,14 +90,27 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
   function onDocumentRenderSuccess() {
     // console.log("확인좀",some);
-    console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height); // set_pdfWidth({
+    // console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
+    // set_pdfWidth({
     //     width: canvasRef.current.width,
     //     height: canvasRef.current.height
     // })
+    if (pdfSizeCallback) {
+      pdfSizeCallback({
+        width: canvasRef.current.width,
+        height: canvasRef.current.height
+      });
+    }
 
     set_pdfWidth(canvasRef.current.width);
-    set_pdfHeight(canvasRef.current.height);
-    wrapperRef.current.scrollTop = 0;
+    set_pdfHeight(canvasRef.current.height); //원래 스크롤
+    // wrapperRef.current.scrollTop = 0;
+    // prettyscrollref.current.scrollTop=0;
+
+    prettyscrollref.current.scrollTop(0);
+    console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight); //PDF view Modal 의 껍데기도 필요함
+
+    console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
   }
 
   var handleKeyDown = _react.default.useCallback(function (e) {
@@ -153,10 +169,13 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
   var modalref = _react.default.useRef();
 
+  var prettyscrollref = _react.default.useRef();
+
   var _React$useState9 = _react.default.useState(viewpercent ? viewpercent : 100),
       _React$useState10 = _slicedToArray(_React$useState9, 2),
       viewPercent = _React$useState10[0],
-      set_viewPercent = _React$useState10[1];
+      set_viewPercent = _React$useState10[1]; //
+
 
   _react.default.useImperativeHandle(ref, function () {
     return {
@@ -165,9 +184,15 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       },
       set_scrollTop: function set_scrollTop(val) {
         wrapperRef.current.scrollTop = val;
+      },
+      get_pdfSize: function get_pdfSize() {
+        return {
+          width: pdfWidth,
+          height: pdfHeight
+        };
       }
     };
-  }, []);
+  }, [pdfWidth, pdfHeight]);
 
   var option = _react.default.useMemo(function () {
     return {
@@ -192,7 +217,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       if (!modalref || !modalref.current) return;
       var p = (viewPercent - 10) / 100; // console.log("modalref", modalref.current);
 
-      set_pageWidth(modalref.current.clientWidth * p - 18);
+      set_pageWidth(modalref.current.clientWidth * p);
     }
   }, [viewPercent]);
 
@@ -295,6 +320,9 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
         set_viewpercent(viewPercent);
       }
 
+      if (pdfSizeCallback) {//#@!
+      }
+
       onClose();
     }
   }, "  ", /*#__PURE__*/_react.default.createElement("svg", {
@@ -320,16 +348,26 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   }))))), /*#__PURE__*/_react.default.createElement("div", {
     ref: wrapperRef,
     className: "PDF-wrapper",
-    onScroll: handleWrapperScroll,
     style: {
       // outline: '1px solid red',
       // width: pdfWidth ? `${pdfWidth.width}px` : 'auto',
       // height: pdfWidth ? `${pdfWidth.height}px` : '500px',
       width: '90%',
       height: '100%',
-      display: pdfWidth && pdfHeight ? 'flex' : 'none',
-      overflow: 'auto' // ,overflow:'auto'
+      display: pdfWidth && pdfHeight ? 'flex' : 'none' // overflow: 'auto'
+      // ,overflow:'auto'
 
+    }
+  }, /*#__PURE__*/_react.default.createElement(_reactCustomScrollbars.Scrollbars, {
+    ref: prettyscrollref,
+    onScroll: handleWrapperScroll,
+    renderThumbHorizontal: function renderThumbHorizontal(props) {
+      return /*#__PURE__*/_react.default.createElement("div", _extends({}, props, {
+        className: "thumb-horizontal",
+        style: {
+          display: "none"
+        }
+      }));
     }
   }, /*#__PURE__*/_react.default.createElement(_reactPdf.Document, {
     className: "PDF-document",
@@ -362,7 +400,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       console.log("랜더에러");
       alert('Rendered the page!');
     }
-  }))));
+  })))));
 });
 
 var _default = PDFviewModal;

@@ -84,7 +84,12 @@ function App() {
 
 
   //
+  const handlePDFCallback = (d)=>{
+    console.log("pdf사이즈콜백",d)
+  }
 
+
+  
 
   return (
     <div className="App">
@@ -117,7 +122,13 @@ function App() {
       <button onClick={()=>{
         console.log(pdfviewref);
         pdfviewref.current.set_scrollTop(100);
-      }}>scroll100</button>
+      }}>scroll100</button> 
+
+      <button onClick={()=>{
+                
+                console.log("사이즈",pdfviewref.current.get_pdfSize());
+
+      }}>pdfsize콜백</button>
 
       {previewURL &&
         <div className="PDFpreView">
@@ -127,6 +138,7 @@ function App() {
             showViewMode={true}
             viewpercent={viewpercent}
             set_viewpercent={set_viewpercent}
+         
             onClose={() => {
               cancelFullScreen();
               // console.log("메모리해제")
@@ -134,9 +146,10 @@ function App() {
               set_previewURL(null);
 
             }}
-            scrollCallback={handleScrollCallback}
-            pageCallback={handlePageCallback}
-            
+
+            scrollCallback={handleScrollCallback} //스크롤 바뀔때 콜백
+            pageCallback={handlePageCallback} //page 바뀔때 콜백
+            pdfSizeCallback={handlePDFCallback} //PDF 사이즈 바뀔때 콜백
           />
         </div>
       }

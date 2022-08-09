@@ -12,6 +12,7 @@
   "module": "dist/PDFviewModal.js",
   "main": "dist/PDFviewModal.js",
   "dependencies": {
+    "react-custom-scrollbars": "^4.2.1",
     "react-number-format": "^4.9.3",
     "react-pdf": "^5.7.2"
   },

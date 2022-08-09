@@ -18,12 +18,15 @@
         position: absolute;
         left: 5%;
         top: 0;
-        background: gray;
+        background: rgb(180,180,180);
     }
 
     .PDF-document {
         margin: auto;
-
+        height:100%;
+        display:flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .PDF-page {
