@@ -75,11 +75,11 @@ function App() {
 
   }
   const handleScrollCallback = (s)=>{
-    console.log("s콜백",s);    
+    // console.log("s콜백",s);    
   }
 
   const handlePageCallback = (p)=>{
-    console.log("p콜백",p)
+    // console.log("p콜백",p)
   }
 
 
@@ -129,7 +129,41 @@ function App() {
                 console.log("사이즈",pdfviewref.current.get_pdfSize());
 
       }}>pdfsize콜백</button>
+      <button onClick={()=>{
+        let sizeobj = pdfviewref.current.get_pdfSize();
 
+        let canvasref =pdfviewref.current.get_canvasRef();
+        let canvas = canvasref.current;
+        console.log(canvas);
+
+        let rctx = canvas.getContext('2d');
+        let cw = sizeobj.PDF.width * 1;
+        let ch = sizeobj.PDF.height * 1;
+        let r = sizeobj.PDF.width * 0.01 * 1;
+        rctx.clearRect(0, 0, cw, ch);
+
+
+        rctx.beginPath();
+        rctx.lineWidth = 0.5;
+        rctx.strokeStyle = 'rgb(255,0,0,0.3)';
+        rctx.fillStyle = 'rgb(255,0,0,0.3)';
+        rctx.arc((0.1) * cw,(0.1) * ch,  r , 0, Math.PI * 2);
+        rctx.fill();
+
+
+        rctx.beginPath();
+        rctx.lineWidth = 0.5;
+        rctx.strokeStyle = 'rgb(255,0,0,0.3)';
+        rctx.fillStyle = 'rgb(255,0,0,0.3)';
+        rctx.arc((0.2) * cw,(0.1) * ch,  r , 0, Math.PI * 2);
+        rctx.fill();
+
+        
+        rctx.stroke();
+
+
+
+      }}>canvas위에그리기</button>
       {previewURL &&
         <div className="PDFpreView">
           <PDFviewModal

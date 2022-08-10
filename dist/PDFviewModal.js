@@ -62,6 +62,12 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
   var wrapperRef = _react.default.useRef();
 
+  var modalref = _react.default.useRef();
+
+  var prettyscrollref = _react.default.useRef();
+
+  var gazecanvasref = _react.default.useRef();
+
   var _React$useState = _react.default.useState(null),
       _React$useState2 = _slicedToArray(_React$useState, 2),
       pdfWidth = _React$useState2[0],
@@ -80,13 +86,38 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   var _React$useState7 = _react.default.useState(1),
       _React$useState8 = _slicedToArray(_React$useState7, 2),
       pageNumber = _React$useState8[0],
-      setPageNumber = _React$useState8[1]; // const [pdfScale, set_pdfScale] = React.useState(1);
+      setPageNumber = _React$useState8[1];
+
+  var _React$useState9 = _react.default.useState(viewpercent ? viewpercent : 100),
+      _React$useState10 = _slicedToArray(_React$useState9, 2),
+      viewPercent = _React$useState10[0],
+      set_viewPercent = _React$useState10[1];
+
+  var _React$useState11 = _react.default.useState(0),
+      _React$useState12 = _slicedToArray(_React$useState11, 2),
+      pageWidth = _React$useState12[0],
+      set_pageWidth = _React$useState12[1];
+
+  var option = _react.default.useMemo(function () {
+    return {
+      max: 100,
+      min: 40
+    };
+  }, []); // const [pdfScale, set_pdfScale] = React.useState(1);
 
 
   function onDocumentLoadSuccess(_ref3) {
     var numPages = _ref3.numPages;
     setNumPages(numPages);
   }
+
+  var _React$useState13 = _react.default.useState({
+    height: 0,
+    width: 0
+  }),
+      _React$useState14 = _slicedToArray(_React$useState13, 2),
+      canvasSize = _React$useState14[0],
+      set_canavasSize = _React$useState14[1];
 
   function onDocumentRenderSuccess() {
     // console.log("확인좀",some);
@@ -95,22 +126,44 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     //     width: canvasRef.current.width,
     //     height: canvasRef.current.height
     // })
+    set_canavasSize({
+      width: canvasRef.current.width,
+      height: canvasRef.current.height
+    });
+
     if (pdfSizeCallback) {
+      //canvasRef.current 는 실제 PDF의 크기를 의미합니다
+      //wrapperRef.current 는 PDF wrapper 의 크기를 의미합니다
+      //modalref.current 는 실제 스크린의 크기를 의미합니다.
       pdfSizeCallback({
-        width: canvasRef.current.width,
-        height: canvasRef.current.height
+        PDF: {
+          width: canvasRef.current.width,
+          height: canvasRef.current.height
+        },
+        PDFwrap: {
+          width: canvasRef.current.width,
+          height: modalref.current.clientHeight
+        },
+        SCRwrap: {
+          width: modalref.current.clientWidth,
+          height: modalref.current.clientHeight
+        } // Scrollwrap:{
+        //     width:prettyscrollref.current.clientWidth,
+        //     height:prettyscrollref.current.clientHeight,
+        // }
+
       });
-    }
+    } // console.log("확인용",prettyscrollref.current.getClientWidth(),'랑',prettyscrollref.current.getClientHeight())
+
 
     set_pdfWidth(canvasRef.current.width);
     set_pdfHeight(canvasRef.current.height); //원래 스크롤
     // wrapperRef.current.scrollTop = 0;
     // prettyscrollref.current.scrollTop=0;
 
-    prettyscrollref.current.scrollTop(0);
-    console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight); //PDF view Modal 의 껍데기도 필요함
-
-    console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
+    prettyscrollref.current.scrollTop(0); // console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
+    // //PDF view Modal 의 껍데기도 필요함
+    // console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
   }
 
   var handleKeyDown = _react.default.useCallback(function (e) {
@@ -144,7 +197,6 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       window.removeEventListener("keydown", handleKeyDown, false);
     };
   }, [handleKeyDown]); //스크롤이벤트
-  //wrapperRef
 
 
   _react.default.useEffect(function () {
@@ -160,21 +212,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       scrollCallback(e.target.scrollTop);
     } //사실은 이때랑 같이 이동
 
-  }, [scrollCallback]); // 0.4 ~ 0.9
-  //       100%
-  // + -  1% 씩 조정
-  //
-  // 
-
-
-  var modalref = _react.default.useRef();
-
-  var prettyscrollref = _react.default.useRef();
-
-  var _React$useState9 = _react.default.useState(viewpercent ? viewpercent : 100),
-      _React$useState10 = _slicedToArray(_React$useState9, 2),
-      viewPercent = _React$useState10[0],
-      set_viewPercent = _React$useState10[1]; //
+  }, [scrollCallback]); //
 
 
   _react.default.useImperativeHandle(ref, function () {
@@ -185,21 +223,33 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       set_scrollTop: function set_scrollTop(val) {
         wrapperRef.current.scrollTop = val;
       },
-      get_pdfSize: function get_pdfSize() {
+      get_pdfSize2: function get_pdfSize2() {
         return {
           width: pdfWidth,
           height: pdfHeight
         };
+      },
+      get_canvasRef: function get_canvasRef() {
+        return gazecanvasref;
+      },
+      get_pdfSize: function get_pdfSize() {
+        return {
+          PDF: {
+            width: canvasRef.current.width,
+            height: canvasRef.current.height
+          },
+          PDFwrap: {
+            width: canvasRef.current.width,
+            height: modalref.current.clientHeight
+          },
+          SCRwrap: {
+            width: modalref.current.clientWidth,
+            height: modalref.current.clientHeight
+          }
+        };
       }
     };
-  }, [pdfWidth, pdfHeight]);
-
-  var option = _react.default.useMemo(function () {
-    return {
-      max: 100,
-      min: 40
-    };
-  }, []); // const pageWidth = React.useMemo(() => {
+  }, [pdfWidth, pdfHeight]); // const pageWidth = React.useMemo(() => {
   //     if (!modalref || !modalref.current ) return;
   //     let p = (viewPercent - 10) / 100;
   //     console.log("modalref", modalref.current);
@@ -207,16 +257,10 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   // }, [viewPercent])
 
 
-  var _React$useState11 = _react.default.useState(0),
-      _React$useState12 = _slicedToArray(_React$useState11, 2),
-      pageWidth = _React$useState12[0],
-      set_pageWidth = _React$useState12[1];
-
   _react.default.useEffect(function () {
     if (viewPercent) {
       if (!modalref || !modalref.current) return;
-      var p = (viewPercent - 10) / 100; // console.log("modalref", modalref.current);
-
+      var p = (viewPercent - 10) / 100;
       set_pageWidth(modalref.current.clientWidth * p);
     }
   }, [viewPercent]);
@@ -349,17 +393,13 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     ref: wrapperRef,
     className: "PDF-wrapper",
     style: {
-      // outline: '1px solid red',
-      // width: pdfWidth ? `${pdfWidth.width}px` : 'auto',
-      // height: pdfWidth ? `${pdfWidth.height}px` : '500px',
-      width: '90%',
-      height: '100%',
-      display: pdfWidth && pdfHeight ? 'flex' : 'none' // overflow: 'auto'
-      // ,overflow:'auto'
-
+      display: pdfWidth && pdfHeight ? 'flex' : 'none'
     }
   }, /*#__PURE__*/_react.default.createElement(_reactCustomScrollbars.Scrollbars, {
-    ref: prettyscrollref,
+    ref: prettyscrollref //    onScrollStop={()=>{
+    //      console.log("onScrollStop@@");
+    //    }}
+    ,
     onScroll: handleWrapperScroll,
     renderThumbHorizontal: function renderThumbHorizontal(props) {
       return /*#__PURE__*/_react.default.createElement("div", _extends({}, props, {
@@ -400,7 +440,12 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       console.log("랜더에러");
       alert('Rendered the page!');
     }
-  })))));
+  }, /*#__PURE__*/_react.default.createElement("canvas", {
+    ref: gazecanvasref,
+    className: "pathwayGazeCanvas",
+    width: canvasSize.width,
+    height: canvasSize.height
+  }))))));
 });
 
 var _default = PDFviewModal;

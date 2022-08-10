@@ -33,18 +33,33 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     }, [path])
     const canvasRef = React.useRef();
     const wrapperRef = React.useRef();
+    const modalref = React.useRef();
+    const prettyscrollref = React.useRef();
+    const gazecanvasref = React.useRef();
 
     const [pdfWidth, set_pdfWidth] = React.useState(null);
     const [pdfHeight, set_pdfHeight] = React.useState(null);
 
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
+    const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
+    
+    const [pageWidth, set_pageWidth] = React.useState(0);
+    const option = React.useMemo(() => {
+        return {
+            max: 100,
+            min: 40
+        }
+    }, []);
     // const [pdfScale, set_pdfScale] = React.useState(1);
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
     }
 
-
+    const [canvasSize,set_canavasSize] = React.useState({
+        height:0,
+        width:0
+    });
 
     function onDocumentRenderSuccess() {
         // console.log("확인좀",some);
@@ -53,13 +68,41 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         //     width: canvasRef.current.width,
         //     height: canvasRef.current.height
         // })
+        set_canavasSize({
+            width: canvasRef.current.width,
+            height: canvasRef.current.height
+        })
+
+
         if (pdfSizeCallback) {
 
+            //canvasRef.current 는 실제 PDF의 크기를 의미합니다
+            //wrapperRef.current 는 PDF wrapper 의 크기를 의미합니다
+            //modalref.current 는 실제 스크린의 크기를 의미합니다.
+
             pdfSizeCallback({
-                width: canvasRef.current.width,
-                height: canvasRef.current.height
+
+                PDF:{
+                    width: canvasRef.current.width,
+                    height: canvasRef.current.height
+                },
+                PDFwrap:{
+                    width: canvasRef.current.width,
+                    height: modalref.current.clientHeight
+                },
+                SCRwrap:{
+                    width: modalref.current.clientWidth,
+                    height: modalref.current.clientHeight
+                },
+                // Scrollwrap:{
+                //     width:prettyscrollref.current.clientWidth,
+                //     height:prettyscrollref.current.clientHeight,
+                // }
+
             });
         }
+
+        // console.log("확인용",prettyscrollref.current.getClientWidth(),'랑',prettyscrollref.current.getClientHeight())
         set_pdfWidth(canvasRef.current.width);
         set_pdfHeight(canvasRef.current.height);
 
@@ -69,10 +112,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         prettyscrollref.current.scrollTop(0);
         
 
-        console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
-        //PDF view Modal 의 껍데기도 필요함
+        // console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
+        // //PDF view Modal 의 껍데기도 필요함
 
-        console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
+        // console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
 
 
     }
@@ -111,8 +154,6 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
 
     //스크롤이벤트
-    //wrapperRef
-
     React.useEffect(() => {
         if (pageNumber && pageCallback) {
             pageCallback(pageNumber);
@@ -130,18 +171,9 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         //사실은 이때랑 같이 이동
 
     }, [scrollCallback]);
-    // 0.4 ~ 0.9
-    //       100%
-    // + -  1% 씩 조정
-    //
-    // 
 
 
 
-    const modalref = React.useRef();
-    const prettyscrollref = React.useRef();
-
-    const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
 
 
     //
@@ -152,22 +184,35 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         set_scrollTop: (val) => {
             wrapperRef.current.scrollTop = val;
         },
-        get_pdfSize: () => {
+        get_pdfSize2: () => {
             return {
                 width: pdfWidth,
                 height: pdfHeight,
             }
+        },
+        get_canvasRef:()=>{
+            return gazecanvasref;
+        },
+        get_pdfSize:()=>{
+            return {
+                PDF:{
+                    width: canvasRef.current.width,
+                    height: canvasRef.current.height
+                },
+                PDFwrap:{
+                    width: canvasRef.current.width,
+                    height: modalref.current.clientHeight
+                },
+                SCRwrap:{
+                    width: modalref.current.clientWidth,
+                    height: modalref.current.clientHeight
+                },
+            };
         }
 
     }), [pdfWidth, pdfHeight]);
 
 
-    const option = React.useMemo(() => {
-        return {
-            max: 100,
-            min: 40
-        }
-    }, []);
 
 
 
@@ -182,18 +227,16 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     // }, [viewPercent])
 
 
-    const [pageWidth, set_pageWidth] = React.useState(0);
     React.useEffect(() => {
         if (viewPercent) {
             if (!modalref || !modalref.current) return;
 
             let p = (viewPercent - 10) / 100;
-
-            // console.log("modalref", modalref.current);
-
             set_pageWidth(modalref.current.clientWidth * p);
         }
-    }, [viewPercent])
+    }, [viewPercent]);
+
+    
 
 
     return (<div className="PDFviewModal no-drag" ref={modalref}>
@@ -319,21 +362,15 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
 
         <div ref={wrapperRef} className="PDF-wrapper"
-
             style={{
-                // outline: '1px solid red',
-
-                // width: pdfWidth ? `${pdfWidth.width}px` : 'auto',
-                // height: pdfWidth ? `${pdfWidth.height}px` : '500px',
-                width: '90%',
-                height: '100%',
-
                 display: pdfWidth && pdfHeight ? 'flex' : 'none',
-                // overflow: 'auto'
-                // ,overflow:'auto'
             }}>
+
             <Scrollbars
                ref={prettyscrollref}
+            //    onScrollStop={()=>{
+            //      console.log("onScrollStop@@");
+            //    }}
                 onScroll={handleWrapperScroll}
                 renderThumbHorizontal={(props) => <div {...props}
                     className="thumb-horizontal"
@@ -376,10 +413,18 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             console.log("랜더에러")
                             alert('Rendered the page!')
                         }}
-                    />
+                    >
+                    <canvas ref={gazecanvasref}  
+                    className="pathwayGazeCanvas"
+                    width={canvasSize.width}
+                    height={canvasSize.height}
+
+                     />
+                    </Page>
 
 
                 </Document>
+             
             </Scrollbars>
         </div>
 
