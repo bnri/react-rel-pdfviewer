@@ -84,10 +84,12 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
                 PDF:{
                     width: canvasRef.current.width,
-                    height: canvasRef.current.height
+                    height: canvasRef.current.height,
+                    leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
+                    topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
                 },
                 PDFwrap:{
-                    width: canvasRef.current.width,
+                    width: modalref.current.clientWidth*0.9,
                     height: modalref.current.clientHeight
                 },
                 SCRwrap:{
@@ -197,7 +199,9 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             return {
                 PDF:{
                     width: canvasRef.current.width,
-                    height: canvasRef.current.height
+                    height: canvasRef.current.height,
+                    leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
+                    topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
                 },
                 PDFwrap:{
                     width: canvasRef.current.width,

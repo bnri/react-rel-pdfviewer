@@ -165,6 +165,7 @@ function App() {
 
       }}>canvas위에그리기</button>
       {previewURL &&
+      <>
         <div className="PDFpreView">
           <PDFviewModal
           ref={pdfviewref}
@@ -186,6 +187,8 @@ function App() {
             pdfSizeCallback={handlePDFCallback} //PDF 사이즈 바뀔때 콜백
           />
         </div>
+            
+              </>
       }
     </div>
   );
