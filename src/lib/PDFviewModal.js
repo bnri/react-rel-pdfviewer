@@ -79,29 +79,34 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             //canvasRef.current 는 실제 PDF의 크기를 의미합니다
             //wrapperRef.current 는 PDF wrapper 의 크기를 의미합니다
             //modalref.current 는 실제 스크린의 크기를 의미합니다.
+            try{
+                pdfSizeCallback({
 
-            pdfSizeCallback({
+                    PDF:{
+                        width: canvasRef.current.width,
+                        height: canvasRef.current.height,
+                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
+                        topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
+                    },
+                    PDFwrap:{
+                        width: modalref.current.clientWidth*0.9,
+                        height: modalref.current.clientHeight
+                    },
+                    SCRwrap:{
+                        width: modalref.current.clientWidth,
+                        height: modalref.current.clientHeight
+                    },
+                    // Scrollwrap:{
+                    //     width:prettyscrollref.current.clientWidth,
+                    //     height:prettyscrollref.current.clientHeight,
+                    // }
+    
+                });
+            }
+            catch(e){
+                console.log("에러",e);
+            }
 
-                PDF:{
-                    width: canvasRef.current.width,
-                    height: canvasRef.current.height,
-                    leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
-                    topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
-                },
-                PDFwrap:{
-                    width: modalref.current.clientWidth*0.9,
-                    height: modalref.current.clientHeight
-                },
-                SCRwrap:{
-                    width: modalref.current.clientWidth,
-                    height: modalref.current.clientHeight
-                },
-                // Scrollwrap:{
-                //     width:prettyscrollref.current.clientWidth,
-                //     height:prettyscrollref.current.clientHeight,
-                // }
-
-            });
         }
 
         // console.log("확인용",prettyscrollref.current.getClientWidth(),'랑',prettyscrollref.current.getClientHeight())
@@ -196,22 +201,30 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             return gazecanvasref;
         },
         get_pdfSize:()=>{
-            return {
-                PDF:{
-                    width: canvasRef.current.width,
-                    height: canvasRef.current.height,
-                    leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
-                    topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
-                },
-                PDFwrap:{
-                    width: canvasRef.current.width,
-                    height: modalref.current.clientHeight
-                },
-                SCRwrap:{
-                    width: modalref.current.clientWidth,
-                    height: modalref.current.clientHeight
-                },
-            };
+            try{
+                let obj={
+                    PDF:{
+                        width: canvasRef.current.width,
+                        height: canvasRef.current.height,
+                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
+                        topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
+                    },
+                    PDFwrap:{
+                        width: canvasRef.current.width,
+                        height: modalref.current.clientHeight
+                    },
+                    SCRwrap:{
+                        width: modalref.current.clientWidth,
+                        height: modalref.current.clientHeight
+                    },                
+                }
+                return obj;
+            }
+            catch(e){
+                console.log("get_pdfSize Error");
+                return null;
+            }
+
         }
 
     }), [pdfWidth, pdfHeight]);
@@ -415,7 +428,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         onRenderSuccess={onDocumentRenderSuccess}
                         onRenderError={() => {
                             console.log("랜더에러")
-                            alert('Rendered the page!')
+                            // alert('Rendered the page!')
                         }}
                     >
                     <canvas ref={gazecanvasref}  
