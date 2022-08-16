@@ -189,7 +189,8 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             setPageNumber(val);
         },
         set_scrollTop: (val) => {
-            wrapperRef.current.scrollTop = val;
+            // wrapperRef.current.scrollTop = val;
+            prettyscrollref.current.scrollTop(val);
         },
         get_pdfSize2: () => {
             return {

@@ -227,7 +227,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
         setPageNumber(val);
       },
       set_scrollTop: function set_scrollTop(val) {
-        wrapperRef.current.scrollTop = val;
+        // wrapperRef.current.scrollTop = val;
+        prettyscrollref.current.scrollTop(val);
       },
       get_pdfSize2: function get_pdfSize2() {
         return {
