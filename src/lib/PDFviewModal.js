@@ -9,7 +9,7 @@ import {
 import NumberFormat from 'react-number-format';
 import { Scrollbars } from "react-custom-scrollbars";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
 
 const Loading = ({ ...props }) => {
     return <div className="Loading">
@@ -398,12 +398,12 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
                 <Document
                     className="PDF-document"
-                    // options={{
-                    //     cMapUrl: 'cmaps/',
-                    //     cMapPacked: true,
-                    //     standardFontDataUrl: 'standard_fonts/',
-                    //     workerSrc: "pdf.worker.js"
-                    // }}
+                    options={{
+                        cMapUrl: 'cmaps/',
+                        cMapPacked: true,
+                        standardFontDataUrl: 'standard_fonts/',
+                        workerSrc: "pdf.worker.js"
+                    }}
 
                     file={filepath}
                     // width={window.screen.width * 0.9}

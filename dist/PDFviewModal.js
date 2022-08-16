@@ -31,8 +31,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-_reactPdf.pdfjs.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/".concat(_reactPdf.pdfjs.version, "/pdf.worker.js;");
-
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
 var Loading = function Loading(_ref) {
   var props = _extends({}, _ref);
 
@@ -427,13 +426,13 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       }));
     }
   }, /*#__PURE__*/_react.default.createElement(_reactPdf.Document, {
-    className: "PDF-document" // options={{
-    //     cMapUrl: 'cmaps/',
-    //     cMapPacked: true,
-    //     standardFontDataUrl: 'standard_fonts/',
-    //     workerSrc: "pdf.worker.js"
-    // }}
-    ,
+    className: "PDF-document",
+    options: {
+      cMapUrl: 'cmaps/',
+      cMapPacked: true,
+      standardFontDataUrl: 'standard_fonts/',
+      workerSrc: "pdf.worker.js"
+    },
     file: filepath // width={window.screen.width * 0.9}
     // loading={<div>
     //     갸갸갸갸갸
