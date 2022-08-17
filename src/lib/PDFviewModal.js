@@ -24,10 +24,10 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback } = props;
+    const { workerSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback } = props;
 
     // console.log("path",path);
-
+    
     const filepath = React.useMemo(() => {
         // console.log("filepath바뀜");
         return path;
@@ -402,7 +402,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         cMapUrl: 'cmaps/',
                         cMapPacked: true,
                         standardFontDataUrl: 'standard_fonts/',
-                        workerSrc: "pdf.worker.js"
+                        workerSrc: `${workerSRC}/pdf.worker.js`
                     }}
 
                     file={filepath}

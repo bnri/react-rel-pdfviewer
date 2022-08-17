@@ -45,7 +45,8 @@ var Loading = function Loading(_ref) {
 var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {
   var props = _extends({}, _ref2);
 
-  var path = props.path,
+  var workerSRC = props.workerSRC,
+      path = props.path,
       onClose = props.onClose,
       showViewMode = props.showViewMode,
       viewpercent = props.viewpercent,
@@ -431,7 +432,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       cMapUrl: 'cmaps/',
       cMapPacked: true,
       standardFontDataUrl: 'standard_fonts/',
-      workerSrc: "pdf.worker.js"
+      workerSrc: "".concat(workerSRC, "/pdf.worker.js")
     },
     file: filepath // width={window.screen.width * 0.9}
     // loading={<div>
