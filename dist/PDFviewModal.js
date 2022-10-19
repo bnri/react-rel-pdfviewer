@@ -53,7 +53,9 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       set_viewpercent = props.set_viewpercent,
       scrollCallback = props.scrollCallback,
       pageCallback = props.pageCallback,
-      pdfSizeCallback = props.pdfSizeCallback; // console.log("path",path);
+      pdfSizeCallback = props.pdfSizeCallback,
+      onConfirm = props.onConfirm,
+      showConfirmBtn = props.showConfirmBtn; // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -373,17 +375,27 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       }); // }
     }
   }, ">")), /*#__PURE__*/_react.default.createElement("div", {
-    className: "closeTab"
+    className: "confirmTab",
+    style: {
+      display: showConfirmBtn ? '' : 'none'
+    }
   }, /*#__PURE__*/_react.default.createElement("button", {
-    className: "closePDFbtn",
+    className: "confirmPDFbtn",
     onClick: function onClick() {
       if (showViewMode) {
         set_viewpercent(viewPercent);
       }
 
-      if (pdfSizeCallback) {//#@!
-      }
-
+      onConfirm();
+    }
+  }, "\uC644\uB8CC")), /*#__PURE__*/_react.default.createElement("div", {
+    className: "closeTab"
+  }, /*#__PURE__*/_react.default.createElement("button", {
+    className: "closePDFbtn",
+    onClick: function onClick() {
+      // if (showViewMode) {
+      //     set_viewpercent(viewPercent);
+      // }
       onClose();
     }
   }, "  ", /*#__PURE__*/_react.default.createElement("svg", {

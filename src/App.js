@@ -173,7 +173,15 @@ function App() {
             showViewMode={true}
             viewpercent={viewpercent}
             set_viewpercent={set_viewpercent}
-         
+            
+            showConfirmBtn={true}
+            onConfirm={()=>{
+              cancelFullScreen();
+              // console.log("메모리해제")
+              window.URL.revokeObjectURL(previewURL);
+              set_previewURL(null);
+            }}
+
             onClose={() => {
               cancelFullScreen();
               // console.log("메모리해제")

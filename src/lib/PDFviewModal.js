@@ -3,7 +3,7 @@ import './PDFviewModal.scss';
 
 import {
     Document, Page
-     ,pdfjs
+    //  ,pdfjs
 } from 'react-pdf';
 // import React from 'react';
 import NumberFormat from 'react-number-format';
@@ -24,7 +24,7 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { workerSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback } = props;
+    const { workerSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn} = props;
 
     // console.log("path",path);
     
@@ -347,16 +347,27 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         // }
                     }}>{`>`}</button>
                 </div>
-                <div className="closeTab">
 
-                    <button className="closePDFbtn" onClick={() => {
+                <div className="confirmTab" style={{display:showConfirmBtn?'':'none'}}>
+                    <button className="confirmPDFbtn" onClick={()=>{
                         if (showViewMode) {
                             set_viewpercent(viewPercent);
                         }
 
-                        if (pdfSizeCallback) {
-                            //#@!
-                        }
+                        onConfirm();
+                    }}>
+                        완료
+                    </button>
+                </div>
+
+                <div className="closeTab">
+
+                    <button className="closePDFbtn" onClick={() => {
+                        // if (showViewMode) {
+                        //     set_viewpercent(viewPercent);
+                        // }
+
+                       
 
 
                         onClose();
