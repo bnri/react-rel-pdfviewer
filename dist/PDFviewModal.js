@@ -304,7 +304,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: "row wraplabel"
-  }, "PDF \uC0AC\uC774\uC988"), /*#__PURE__*/_react.default.createElement("div", {
+  }, "\uBB38\uC11C \uBC30\uC728"), /*#__PURE__*/_react.default.createElement("div", {
     className: "row"
   }, /*#__PURE__*/_react.default.createElement("button", {
     className: "resizebtn",

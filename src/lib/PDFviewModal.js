@@ -283,7 +283,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                 <div className="PageViewPercentWrap">
                     <div className="relativewrap" style={{ display: showViewMode ? 'block' : 'none' }}>
                         <div className="row wraplabel">
-                            PDF 사이즈
+                            문서 배율
                         </div>
                         <div className="row">
                             <button className="resizebtn" onClick={() => set_viewPercent(option.max)}>최대</button>
