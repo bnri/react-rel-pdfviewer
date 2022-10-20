@@ -169,6 +169,11 @@ function App() {
         <div className="PDFpreView">
           <PDFviewModal
           ref={pdfviewref}
+
+            PDFonloadCallback={(pages)=>{
+              console.log("콜백옴 page수",pages);
+            }}
+            
             path={previewURL}
             showViewMode={true}
             viewpercent={viewpercent}

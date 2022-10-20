@@ -24,7 +24,7 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { workerSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn} = props;
+    const { workerSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn , PDFonloadCallback} = props;
 
     // console.log("path",path);
     
@@ -55,6 +55,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     // const [pdfScale, set_pdfScale] = React.useState(1);
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
+        if(PDFonloadCallback){
+            PDFonloadCallback(numPages);
+        }
+
     }
 
     const [canvasSize,set_canavasSize] = React.useState({

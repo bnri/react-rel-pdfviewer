@@ -55,7 +55,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       pageCallback = props.pageCallback,
       pdfSizeCallback = props.pdfSizeCallback,
       onConfirm = props.onConfirm,
-      showConfirmBtn = props.showConfirmBtn; // console.log("path",path);
+      showConfirmBtn = props.showConfirmBtn,
+      PDFonloadCallback = props.PDFonloadCallback; // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -113,6 +114,10 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   function onDocumentLoadSuccess(_ref3) {
     var numPages = _ref3.numPages;
     setNumPages(numPages);
+
+    if (PDFonloadCallback) {
+      PDFonloadCallback(numPages);
+    }
   }
 
   var _React$useState13 = _react.default.useState({
