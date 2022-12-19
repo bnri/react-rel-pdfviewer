@@ -1,14 +1,12 @@
 import React from "react";
 import './PDFviewModal.scss';
 
-import {
-    Document, Page
-    //  ,pdfjs
-} from 'react-pdf';
+import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack5';
 // import React from 'react';
 import NumberFormat from 'react-number-format';
 import { Scrollbars } from "react-custom-scrollbars";
-
+// pdfjs.GlobalWorkerOptions.workerSrc = 'http://localhost:3000/pdf.worker.min.js';
+// pdfjs.GlobalWorkerOptions.workerSrc = 'react-pdf/dist/cjs/pdf.worker.min.js';
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
 
 const Loading = ({ ...props }) => {
@@ -24,7 +22,7 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { WORKERSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn , PDFonloadCallback} = props;
+    const {path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn , PDFonloadCallback} = props;
     // console.log("WORKERSRC",WORKERSRC)
     // console.log("path",path);
     
@@ -417,7 +415,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         cMapUrl: 'cmaps/',
                         cMapPacked: true,
                         standardFontDataUrl: 'standard_fonts/',
-                        workerSrc: `${WORKERSRC}/pdf.worker.js`
+                        // workerSrc: `${WORKERSRC}/pdf.worker.js`
                     }}
 
                     file={filepath}

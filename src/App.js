@@ -173,7 +173,7 @@ function App() {
             PDFonloadCallback={(pages)=>{
               console.log("콜백옴 page수",pages);
             }}
-            WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
+            // WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
             path={previewURL}
             showViewMode={true}
             viewpercent={viewpercent}

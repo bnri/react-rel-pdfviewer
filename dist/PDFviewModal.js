@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 
 require("./PDFviewModal.scss");
 
-var _reactPdf = require("react-pdf");
+var _entry = require("react-pdf/dist/esm/entry.webpack5");
 
 var _reactNumberFormat = _interopRequireDefault(require("react-number-format"));
 
@@ -31,6 +31,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
+// pdfjs.GlobalWorkerOptions.workerSrc = 'http://localhost:3000/pdf.worker.min.js';
+// pdfjs.GlobalWorkerOptions.workerSrc = 'react-pdf/dist/cjs/pdf.worker.min.js';
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
 var Loading = function Loading(_ref) {
   var props = _extends({}, _ref);
@@ -45,8 +47,7 @@ var Loading = function Loading(_ref) {
 var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {
   var props = _extends({}, _ref2);
 
-  var WORKERSRC = props.WORKERSRC,
-      path = props.path,
+  var path = props.path,
       onClose = props.onClose,
       showViewMode = props.showViewMode,
       viewpercent = props.viewpercent,
@@ -444,13 +445,13 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
         }
       }));
     }
-  }, /*#__PURE__*/_react.default.createElement(_reactPdf.Document, {
+  }, /*#__PURE__*/_react.default.createElement(_entry.Document, {
     className: "PDF-document",
     options: {
       cMapUrl: 'cmaps/',
       cMapPacked: true,
-      standardFontDataUrl: 'standard_fonts/',
-      workerSrc: "".concat(WORKERSRC, "/pdf.worker.js")
+      standardFontDataUrl: 'standard_fonts/' // workerSrc: `${WORKERSRC}/pdf.worker.js`
+
     },
     file: filepath // width={window.screen.width * 0.9}
     // loading={<div>
@@ -458,7 +459,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     // </div>}
     ,
     onLoadSuccess: onDocumentLoadSuccess
-  }, /*#__PURE__*/_react.default.createElement(_reactPdf.Page // canvasBackground={"red"}
+  }, /*#__PURE__*/_react.default.createElement(_entry.Page // canvasBackground={"red"}
   // loading={"asfasfasfasf"}
   , {
     canvasRef: canvasRef,
