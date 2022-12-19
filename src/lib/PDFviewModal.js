@@ -1,7 +1,10 @@
 import React from "react";
 import './PDFviewModal.scss';
 
-import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack5';
+
+import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack';
+//	react-pdf/dist/esm/entry.webpack
+
 // import React from 'react';
 import NumberFormat from 'react-number-format';
 import { Scrollbars } from "react-custom-scrollbars";

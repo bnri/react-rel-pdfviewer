@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 
 require("./PDFviewModal.scss");
 
-var _entry = require("react-pdf/dist/esm/entry.webpack5");
+var _entry = require("react-pdf/dist/esm/entry.webpack");
 
 var _reactNumberFormat = _interopRequireDefault(require("react-number-format"));
 
