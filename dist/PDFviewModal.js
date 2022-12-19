@@ -33,7 +33,14 @@ function _extends() { _extends = Object.assign ? Object.assign.bind() : function
 
 // pdfjs.GlobalWorkerOptions.workerSrc = 'http://localhost:3000/pdf.worker.min.js';
 // pdfjs.GlobalWorkerOptions.workerSrc = 'react-pdf/dist/cjs/pdf.worker.min.js';
+var a = "".concat(window.location.origin, "/pdf.worker.min.js");
+console.log("WORKERSRC", a);
+_reactPdf.pdfjs.GlobalWorkerOptions.workerSrc = a; // console.log("pdfjs.GlobalWorkerOptions.workerSrc",+pdfjs.GlobalWorkerOptions.workerSrc)
+// console.log("window",window.location.origin)
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
+// console.log("pdfjs.version",pdfjs.version)
+// pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
+
 var Loading = function Loading(_ref) {
   var props = _extends({}, _ref);
 

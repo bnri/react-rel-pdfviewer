@@ -1,7 +1,7 @@
 import React from "react";
 import './PDFviewModal.scss';
 
-import { Document, Page } from 'react-pdf';
+import { Document, Page ,pdfjs} from 'react-pdf';
 // import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack';
 //	react-pdf/dist/esm/entry.webpack
 
@@ -10,8 +10,17 @@ import NumberFormat from 'react-number-format';
 import { Scrollbars } from "react-custom-scrollbars";
 // pdfjs.GlobalWorkerOptions.workerSrc = 'http://localhost:3000/pdf.worker.min.js';
 // pdfjs.GlobalWorkerOptions.workerSrc = 'react-pdf/dist/cjs/pdf.worker.min.js';
+
+let a = `${window.location.origin}/pdf.worker.min.js`;
+console.log("WORKERSRC",a);
+pdfjs.GlobalWorkerOptions.workerSrc = a;
+
+// console.log("pdfjs.GlobalWorkerOptions.workerSrc",+pdfjs.GlobalWorkerOptions.workerSrc)
+// console.log("window",window.location.origin)
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js;`
 
+// console.log("pdfjs.version",pdfjs.version)
+// pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 const Loading = ({ ...props }) => {
     return <div className="Loading">
 
