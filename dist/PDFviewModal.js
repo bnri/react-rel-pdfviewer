@@ -45,7 +45,7 @@ var Loading = function Loading(_ref) {
 var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {
   var props = _extends({}, _ref2);
 
-  var workerSRC = props.workerSRC,
+  var WORKERSRC = props.WORKERSRC,
       path = props.path,
       onClose = props.onClose,
       showViewMode = props.showViewMode,
@@ -56,7 +56,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       pdfSizeCallback = props.pdfSizeCallback,
       onConfirm = props.onConfirm,
       showConfirmBtn = props.showConfirmBtn,
-      PDFonloadCallback = props.PDFonloadCallback; // console.log("path",path);
+      PDFonloadCallback = props.PDFonloadCallback; // console.log("WORKERSRC",WORKERSRC)
+  // console.log("path",path);
 
   var filepath = _react.default.useMemo(function () {
     // console.log("filepath바뀜");
@@ -449,7 +450,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       cMapUrl: 'cmaps/',
       cMapPacked: true,
       standardFontDataUrl: 'standard_fonts/',
-      workerSrc: "".concat(workerSRC, "/pdf.worker.js")
+      workerSrc: "".concat(WORKERSRC, "/pdf.worker.js")
     },
     file: filepath // width={window.screen.width * 0.9}
     // loading={<div>
