@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 
 require("./PDFviewModal.scss");
 
-var _entry = require("react-pdf/dist/esm/entry.webpack");
+var _reactPdf = require("react-pdf");
 
 var _reactNumberFormat = _interopRequireDefault(require("react-number-format"));
 
@@ -445,7 +445,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
         }
       }));
     }
-  }, /*#__PURE__*/_react.default.createElement(_entry.Document, {
+  }, /*#__PURE__*/_react.default.createElement(_reactPdf.Document, {
     className: "PDF-document",
     options: {
       cMapUrl: 'cmaps/',
@@ -459,7 +459,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     // </div>}
     ,
     onLoadSuccess: onDocumentLoadSuccess
-  }, /*#__PURE__*/_react.default.createElement(_entry.Page // canvasBackground={"red"}
+  }, /*#__PURE__*/_react.default.createElement(_reactPdf.Page // canvasBackground={"red"}
   // loading={"asfasfasfasf"}
   , {
     canvasRef: canvasRef,

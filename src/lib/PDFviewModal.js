@@ -1,8 +1,8 @@
 import React from "react";
 import './PDFviewModal.scss';
 
-
-import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack';
+import { Document, Page } from 'react-pdf';
+// import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack';
 //	react-pdf/dist/esm/entry.webpack
 
 // import React from 'react';
