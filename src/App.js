@@ -169,7 +169,7 @@ function App() {
         <div className="PDFpreView">
           <PDFviewModal
           ref={pdfviewref}
-
+          WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
             PDFonloadCallback={(pages)=>{
               console.log("콜백옴 page수",pages);
             }}
