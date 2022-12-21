@@ -11,9 +11,8 @@ import { Scrollbars } from "react-custom-scrollbars";
 // pdfjs.GlobalWorkerOptions.workerSrc = 'http://localhost:3000/pdf.worker.min.js';
 // pdfjs.GlobalWorkerOptions.workerSrc = 'react-pdf/dist/cjs/pdf.worker.min.js';
 
-let a = `${window.location.origin}/pdf.worker.min.js`;
-console.log("WORKERSRC",a);
-pdfjs.GlobalWorkerOptions.workerSrc = a;
+// console.log("WORKERSRC",a);
+pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.bnr.co.kr/externel_modules/react-pdf/5.7.2/pdf.worker.min.js";
 
 // console.log("pdfjs.GlobalWorkerOptions.workerSrc",+pdfjs.GlobalWorkerOptions.workerSrc)
 // console.log("window",window.location.origin)
