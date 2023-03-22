@@ -47,7 +47,7 @@ var Loading = function Loading(_ref) {
     className: "Loading"
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: "text"
-  }, "ReadersEye"));
+  }, "Loading"));
 };
 
 var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {

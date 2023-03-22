@@ -24,7 +24,7 @@ const Loading = ({ ...props }) => {
     return <div className="Loading">
 
         <div className="text">
-            ReadersEye
+            Loading
         </div>
 
 
