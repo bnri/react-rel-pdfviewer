@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import './PDFviewModal.scss';
 
-import { Document, Page ,pdfjs} from 'react-pdf';
+import { Document, Page, pdfjs } from 'react-pdf';
 // import { Document, Page  } from 'react-pdf/dist/esm/entry.webpack';
 //	react-pdf/dist/esm/entry.webpack
 
@@ -24,7 +24,7 @@ const Loading = ({ ...props }) => {
     return <div className="Loading">
 
         <div className="text">
-            Loading
+            ReadersEye
         </div>
 
 
@@ -33,10 +33,10 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const {WORKERSRC,path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback ,onConfirm ,showConfirmBtn , PDFonloadCallback} = props;
+    const { WORKERSRC, path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // console.log("WORKERSRC",WORKERSRC)
     // console.log("path",path);
-    
+
     const filepath = React.useMemo(() => {
         // console.log("filepath바뀜");
         return path;
@@ -53,7 +53,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
-    
+
     const [pageWidth, set_pageWidth] = React.useState(0);
     const option = React.useMemo(() => {
         return {
@@ -64,15 +64,15 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     // const [pdfScale, set_pdfScale] = React.useState(1);
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
-        if(PDFonloadCallback){
+        if (PDFonloadCallback) {
             PDFonloadCallback(numPages);
         }
 
     }
-
-    const [canvasSize,set_canavasSize] = React.useState({
-        height:0,
-        width:0
+    const [renderDone, set_renderDone] = useState(false);
+    const [canvasSize, set_canavasSize] = React.useState({
+        height: 0,
+        width: 0
     });
 
     function onDocumentRenderSuccess() {
@@ -82,6 +82,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         //     width: canvasRef.current.width,
         //     height: canvasRef.current.height
         // })
+        set_renderDone(true);
         set_canavasSize({
             width: canvasRef.current.width,
             height: canvasRef.current.height
@@ -93,20 +94,20 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             //canvasRef.current 는 실제 PDF의 크기를 의미합니다
             //wrapperRef.current 는 PDF wrapper 의 크기를 의미합니다
             //modalref.current 는 실제 스크린의 크기를 의미합니다.
-            try{
+            try {
                 pdfSizeCallback({
 
-                    PDF:{
+                    PDF: {
                         width: canvasRef.current.width,
                         height: canvasRef.current.height,
-                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
-                        topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
+                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width) / 2,
+                        topPixel: canvasRef.current.height >= modalref.current.clientHeight ? 0 : (modalref.current.clientHeight - canvasRef.current.height) / 2
                     },
-                    PDFwrap:{
-                        width: modalref.current.clientWidth*0.9,
+                    PDFwrap: {
+                        width: modalref.current.clientWidth * 0.9,
                         height: modalref.current.clientHeight
                     },
-                    SCRwrap:{
+                    SCRwrap: {
                         width: modalref.current.clientWidth,
                         height: modalref.current.clientHeight
                     },
@@ -114,11 +115,11 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                     //     width:prettyscrollref.current.clientWidth,
                     //     height:prettyscrollref.current.clientHeight,
                     // }
-    
+
                 });
             }
-            catch(e){
-                console.log("에러",e);
+            catch (e) {
+                console.log("에러", e);
             }
 
         }
@@ -131,7 +132,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         // wrapperRef.current.scrollTop = 0;
         // prettyscrollref.current.scrollTop=0;
         prettyscrollref.current.scrollTop(0);
-        
+
 
         // console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
         // //PDF view Modal 의 껍데기도 필요함
@@ -152,10 +153,12 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
         if (e.key === "ArrowRight") {
             if (pageNumber < numPages) {
+                set_renderDone(false);
                 setPageNumber(p => p + 1);
             }
         } else if (e.key === "ArrowLeft") {
             if (pageNumber > 1) {
+                set_renderDone(false);
                 setPageNumber(p => p - 1);
             }
         }
@@ -200,6 +203,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     //
     React.useImperativeHandle(ref, () => ({
         set_pageNumber(val) {
+            set_renderDone(false);
             setPageNumber(val);
         },
         set_scrollTop: (val) => {
@@ -212,30 +216,30 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                 height: pdfHeight,
             }
         },
-        get_canvasRef:()=>{
+        get_canvasRef: () => {
             return gazecanvasref;
         },
-        get_pdfSize:()=>{
-            try{
-                let obj={
-                    PDF:{
+        get_pdfSize: () => {
+            try {
+                let obj = {
+                    PDF: {
                         width: canvasRef.current.width,
                         height: canvasRef.current.height,
-                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width)/2,
-                        topPixel: canvasRef.current.height>=modalref.current.clientHeight?0:(modalref.current.clientHeight-canvasRef.current.height)/2                    
+                        leftPixel: (modalref.current.clientWidth - canvasRef.current.width) / 2,
+                        topPixel: canvasRef.current.height >= modalref.current.clientHeight ? 0 : (modalref.current.clientHeight - canvasRef.current.height) / 2
                     },
-                    PDFwrap:{
+                    PDFwrap: {
                         width: canvasRef.current.width,
                         height: modalref.current.clientHeight
                     },
-                    SCRwrap:{
+                    SCRwrap: {
                         width: modalref.current.clientWidth,
                         height: modalref.current.clientHeight
-                    },                
+                    },
                 }
                 return obj;
             }
-            catch(e){
+            catch (e) {
                 console.log("get_pdfSize Error");
                 return null;
             }
@@ -268,8 +272,103 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         }
     }, [viewPercent]);
 
-    
 
+
+
+
+    const [drawing, setDrawing] = useState(false);
+
+    const tempDrawedMemory = React.useRef();
+
+    useEffect(() => {
+        tempDrawedMemory.current = {};
+
+    }, [])
+
+    const startDrawing = (e) => {
+        const { offsetX, offsetY } = e.nativeEvent;
+
+        const canvas = gazecanvasref.current;
+        const context = canvas.getContext('2d');
+
+        if (!tempDrawedMemory.current[pageNumber]) {
+            tempDrawedMemory.current[pageNumber] = {
+                drawArr: []
+            }
+        }
+
+
+
+
+        context.beginPath();
+        context.moveTo(offsetX, offsetY);
+        setDrawing(true);
+        tempDrawedMemory.current[pageNumber].drawArr.push({
+            type: 'startDrawing',
+            x: offsetX,
+            y: offsetY,
+        });
+    };
+
+    const draw = (e) => {
+        if (!drawing) return;
+        const { offsetX, offsetY } = e.nativeEvent;
+        const canvas = gazecanvasref.current;
+        const context = canvas.getContext('2d');
+
+
+        context.lineTo(offsetX, offsetY);
+        context.stroke();
+
+
+        tempDrawedMemory.current[pageNumber].drawArr.push({
+            type: 'draw',
+            x: offsetX,
+            y: offsetY,
+        });
+    };
+
+    const stopDrawing = () => {
+        if (!drawing) return;
+        const canvas = gazecanvasref.current;
+        const context = canvas.getContext('2d');
+        context.closePath();
+        setDrawing(false);
+
+        tempDrawedMemory.current[pageNumber].drawArr.push({
+            type: 'stopDrawing',
+        });
+    };
+
+    useEffect(() => {
+        if (renderDone&&pageNumber && tempDrawedMemory.current[pageNumber]) {
+            console.log("tempDrawedMemory.current[pageNumber]", tempDrawedMemory.current[pageNumber]);
+
+            let drawArr = tempDrawedMemory.current[pageNumber].drawArr;
+            const canvas = gazecanvasref.current;
+            // console.log("canvas", canvas)
+            const context = canvas.getContext('2d');
+            // console.log("pageNumber", pageNumber);
+            // console.log("drawArr", drawArr)
+            for (let i = 0; i < drawArr.length; i++) {
+                if (drawArr[i].type === 'startDrawing') {
+                    // console.log("드라우시작")
+                    context.beginPath();
+                    context.moveTo(drawArr[i].x, drawArr[i].y);
+                }
+                else if (drawArr[i].type === 'draw') {
+                    // console.log("드라우")
+                    context.lineTo(drawArr[i].x, drawArr[i].y);
+                    context.stroke();
+                }
+                else if (drawArr[i].type === 'stopDrawing') {
+                    // console.log("드라우끝")
+                    context.closePath();
+                }
+            }
+
+        }
+    }, [pageNumber,renderDone])
 
     return (<div className="PDFviewModal no-drag" ref={modalref}>
 
@@ -348,6 +447,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                 <div className="PageController-left">
                     <button className="page-btn" disabled={pageNumber > 1 ? false : true} onClick={() => {
                         // if (pageNumber > 1) {
+                        set_renderDone(false);
                         setPageNumber(p => p - 1);
                         // }
 
@@ -356,13 +456,14 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                 <div className="PageController-right">
                     <button className="page-btn" disabled={pageNumber < numPages ? false : true} onClick={() => {
                         // if (pageNumber < numPages) {
+                        set_renderDone(false);
                         setPageNumber(p => p + 1);
                         // }
                     }}>{`>`}</button>
                 </div>
 
-                <div className="confirmTab" style={{display:showConfirmBtn?'':'none'}}>
-                    <button className="confirmPDFbtn" onClick={()=>{
+                <div className="confirmTab" style={{ display: showConfirmBtn ? '' : 'none' }}>
+                    <button className="confirmPDFbtn" onClick={() => {
                         if (showViewMode) {
                             set_viewpercent(viewPercent);
                         }
@@ -380,7 +481,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         //     set_viewpercent(viewPercent);
                         // }
 
-                       
+
 
 
                         onClose();
@@ -410,10 +511,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             }}>
 
             <Scrollbars
-               ref={prettyscrollref}
-            //    onScrollStop={()=>{
-            //      console.log("onScrollStop@@");
-            //    }}
+                ref={prettyscrollref}
+                //    onScrollStop={()=>{
+                //      console.log("onScrollStop@@");
+                //    }}
                 onScroll={handleWrapperScroll}
                 renderThumbHorizontal={(props) => <div {...props}
                     className="thumb-horizontal"
@@ -457,17 +558,21 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             // alert('Rendered the page!')
                         }}
                     >
-                    <canvas ref={gazecanvasref}  
-                    className="pathwayGazeCanvas"
-                    width={canvasSize.width}
-                    height={canvasSize.height}
+                        <canvas ref={gazecanvasref}
+                            className="pathwayGazeCanvas"
+                            width={canvasSize.width}
+                            height={canvasSize.height}
 
-                     />
+                            onMouseDown={startDrawing}
+                            onMouseMove={draw}
+                            onMouseUp={stopDrawing}
+                            onMouseOut={stopDrawing}
+                        />
                     </Page>
 
 
                 </Document>
-             
+
             </Scrollbars>
         </div>
 

@@ -39,7 +39,7 @@ function App() {
   }
 
 
-  const pdfviewref=  React.useRef();
+  const pdfviewref = React.useRef();
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
@@ -74,22 +74,23 @@ function App() {
     set_previewURL(logoURL);
 
   }
-  const handleScrollCallback = (s)=>{
+  const handleScrollCallback = (s) => {
     // console.log("s콜백",s);    
   }
 
-  const handlePageCallback = (p)=>{
+  const handlePageCallback = (p) => {
     // console.log("p콜백",p)
   }
 
 
   //
-  const handlePDFCallback = (d)=>{
-    console.log("pdf사이즈콜백",d)
+  const handlePDFCallback = (d) => {
+    console.log("pdf사이즈콜백", d)
   }
 
 
   
+
 
   return (
     <div className="App">
@@ -113,26 +114,27 @@ function App() {
           미리보기
         </button>
       </div>
-      
-      <button onClick={()=>{
+
+      <button onClick={() => {
         console.log(pdfviewref);
         pdfviewref.current.set_pageNumber(2);
       }}>page 2</button>
-      
-      <button onClick={()=>{
+
+      <button onClick={() => {
         console.log(pdfviewref);
         pdfviewref.current.set_scrollTop(100);
-      }}>scroll100</button> 
+      }}>scroll100</button>
 
-      <button onClick={()=>{
-                
-                console.log("사이즈",pdfviewref.current.get_pdfSize());
+      <button onClick={() => {
+
+        console.log("사이즈", pdfviewref.current.get_pdfSize());
 
       }}>pdfsize콜백</button>
-      <button onClick={()=>{
+
+      <button onClick={() => {
         let sizeobj = pdfviewref.current.get_pdfSize();
 
-        let canvasref =pdfviewref.current.get_canvasRef();
+        let canvasref = pdfviewref.current.get_canvasRef();
         let canvas = canvasref.current;
         console.log(canvas);
 
@@ -147,7 +149,7 @@ function App() {
         rctx.lineWidth = 0.5;
         rctx.strokeStyle = 'rgb(255,0,0,0.3)';
         rctx.fillStyle = 'rgb(255,0,0,0.3)';
-        rctx.arc((0.1) * cw,(0.1) * ch,  r , 0, Math.PI * 2);
+        rctx.arc((0.1) * cw, (0.1) * ch, r, 0, Math.PI * 2);
         rctx.fill();
 
 
@@ -155,53 +157,55 @@ function App() {
         rctx.lineWidth = 0.5;
         rctx.strokeStyle = 'rgb(255,0,0,0.3)';
         rctx.fillStyle = 'rgb(255,0,0,0.3)';
-        rctx.arc((0.2) * cw,(0.1) * ch,  r , 0, Math.PI * 2);
+        rctx.arc((0.2) * cw, (0.1) * ch, r, 0, Math.PI * 2);
         rctx.fill();
 
-        
+
         rctx.stroke();
 
 
 
       }}>canvas위에그리기</button>
+
       {previewURL &&
-      <>
-        <div className="PDFpreView">
-          <PDFviewModal
-          ref={pdfviewref}
-          WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:300111111"}
-            PDFonloadCallback={(pages)=>{
-              console.log("콜백옴 page수",pages);
-            }}
-            // WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
-            path={previewURL}
-            showViewMode={true}
-            viewpercent={viewpercent}
-            set_viewpercent={set_viewpercent}
-            
-            showConfirmBtn={true}
-            onConfirm={()=>{
-              cancelFullScreen();
-              // console.log("메모리해제")
-              window.URL.revokeObjectURL(previewURL);
-              set_previewURL(null);
-            }}
+        <>
+          <div className="PDFpreView">
+            <PDFviewModal
+              ref={pdfviewref}
+              WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:300111111"}
+              PDFonloadCallback={(pages) => {
+                console.log("콜백옴 page수", pages);
+              }}
+              // WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
+              path={previewURL}
+              showViewMode={true}
+              viewpercent={viewpercent}
+              set_viewpercent={set_viewpercent}
 
-            onClose={() => {
-              cancelFullScreen();
-              // console.log("메모리해제")
-              window.URL.revokeObjectURL(previewURL);
-              set_previewURL(null);
+              showConfirmBtn={true}
+              onConfirm={() => {
+                cancelFullScreen();
+                // console.log("메모리해제")
+                window.URL.revokeObjectURL(previewURL);
+                set_previewURL(null);
+              }}
 
-            }}
+              onClose={() => {
+                cancelFullScreen();
+                // console.log("메모리해제")
+                window.URL.revokeObjectURL(previewURL);
+                set_previewURL(null);
 
-            scrollCallback={handleScrollCallback} //스크롤 바뀔때 콜백
-            pageCallback={handlePageCallback} //page 바뀔때 콜백
-            pdfSizeCallback={handlePDFCallback} //PDF 사이즈 바뀔때 콜백
-          />
-        </div>
-            
-              </>
+              }}
+              
+
+              scrollCallback={handleScrollCallback} //스크롤 바뀔때 콜백
+              pageCallback={handlePageCallback} //page 바뀔때 콜백
+              pdfSizeCallback={handlePDFCallback} //PDF 사이즈 바뀔때 콜백
+            />
+          </div>
+
+        </>
       }
     </div>
   );
