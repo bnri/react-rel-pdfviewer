@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './App.scss';
 
 import PDFviewModal from './lib/PDFviewModal';
@@ -79,17 +79,89 @@ function App() {
   }
 
   const handlePageCallback = (p) => {
-    // console.log("p콜백",p)
+    // console.log("p콜백page",p)
   }
 
 
-  //
+
   const handlePDFCallback = (d) => {
-    console.log("pdf사이즈콜백", d)
+    // console.log("pdf사이즈콜백", d)
+    const {pageNumber} = d;
+    if(tempDrawedMemory.current[pageNumber]){
+      const drawArr = tempDrawedMemory.current[pageNumber].drawArr;
+      const canvasref = pdfviewref.current.get_canvasRef();
+      const canvas = canvasref.current;
+      // console.log("canvas", canvas)
+      const context = canvas.getContext('2d');
+      // console.log("pageNumber", pageNumber);
+      // console.log("drawArr", drawArr)
+      for (let i = 0; i < drawArr.length; i++) {
+          if (drawArr[i].type === 'startDrawing') {
+              // console.log("드라우시작")
+              context.beginPath();
+              context.moveTo(drawArr[i].x, drawArr[i].y);
+          }
+          else if (drawArr[i].type === 'draw') {
+              // console.log("드라우")
+              context.lineTo(drawArr[i].x, drawArr[i].y);
+              context.stroke();
+          }
+          else if (drawArr[i].type === 'stopDrawing') {
+              // console.log("드라우끝")
+              context.closePath();
+          }
+      }
+    }
+
   }
 
-
+  const tempDrawedMemory = React.useRef();
+  useEffect(() => {
+    tempDrawedMemory.current = {};
+  }, [])
   
+  const handleDrawStart = (obj) => {
+    const { x, y, pageNumber } = obj;
+    const canvasref = pdfviewref.current.get_canvasRef();
+    const canvas = canvasref.current;
+    const context = canvas.getContext('2d');
+    if (!tempDrawedMemory.current[pageNumber]) {
+      tempDrawedMemory.current[pageNumber] = {
+        drawArr: []
+      }
+    }
+    context.beginPath();
+    context.moveTo(x, y);
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+      type: 'startDrawing',
+      x: x,
+      y: y,
+    });
+  }
+  const handleDrawIng = (obj) => {
+    const { x, y, pageNumber } = obj;
+    const canvasref = pdfviewref.current.get_canvasRef();
+    const canvas = canvasref.current;
+    const context = canvas.getContext('2d');
+    context.lineTo(x, y);
+    context.stroke();
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+      type: 'draw',
+      x: x,
+      y: y,
+    });
+  }
+  const handleDrawEnd = (obj) => {
+    const { pageNumber } = obj;
+    const canvasref = pdfviewref.current.get_canvasRef();
+    const canvas = canvasref.current;
+    const context = canvas.getContext('2d');
+    context.closePath();
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+      type: 'stopDrawing',
+    });
+  }
+
 
 
   return (
@@ -197,7 +269,10 @@ function App() {
                 set_previewURL(null);
 
               }}
-              
+
+              drawStart={handleDrawStart}//그리기시작
+              drawIng={handleDrawIng}//그리고있을때
+              drawEnd={handleDrawEnd}//그리기끝남
 
               scrollCallback={handleScrollCallback} //스크롤 바뀔때 콜백
               pageCallback={handlePageCallback} //page 바뀔때 콜백

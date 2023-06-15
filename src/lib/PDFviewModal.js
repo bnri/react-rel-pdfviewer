@@ -33,7 +33,9 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { WORKERSRC, path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
+    const { 
+        drawStart,drawEnd,drawIng,
+        WORKERSRC, path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // console.log("WORKERSRC",WORKERSRC)
     // console.log("path",path);
 
@@ -111,6 +113,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         width: modalref.current.clientWidth,
                         height: modalref.current.clientHeight
                     },
+                    pageNumber:pageNumber
                     // Scrollwrap:{
                     //     width:prettyscrollref.current.clientWidth,
                     //     height:prettyscrollref.current.clientHeight,
@@ -286,8 +289,15 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     }, [])
 
     const startDrawing = (e) => {
-        const { offsetX, offsetY } = e.nativeEvent;
 
+        const { offsetX, offsetY } = e.nativeEvent;
+        setDrawing(true);
+        if(drawStart){
+            drawStart({x:offsetX,y:offsetY,pageNumber:pageNumber});
+            return;
+        }
+
+        /*
         const canvas = gazecanvasref.current;
         const context = canvas.getContext('2d');
 
@@ -297,47 +307,53 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             }
         }
 
-
-
-
         context.beginPath();
         context.moveTo(offsetX, offsetY);
-        setDrawing(true);
         tempDrawedMemory.current[pageNumber].drawArr.push({
             type: 'startDrawing',
             x: offsetX,
             y: offsetY,
         });
+        */
     };
 
     const draw = (e) => {
         if (!drawing) return;
+    
         const { offsetX, offsetY } = e.nativeEvent;
+        if(drawIng){
+            drawIng({x:offsetX,y:offsetY,pageNumber:pageNumber});
+            return;
+        }
+
+        /*
         const canvas = gazecanvasref.current;
         const context = canvas.getContext('2d');
-
-
         context.lineTo(offsetX, offsetY);
         context.stroke();
-
-
         tempDrawedMemory.current[pageNumber].drawArr.push({
             type: 'draw',
             x: offsetX,
             y: offsetY,
         });
+        */
     };
 
     const stopDrawing = () => {
-        if (!drawing) return;
+        if (!drawing) return;   
+        setDrawing(false); 
+        if(drawEnd){
+            drawEnd({pageNumber:pageNumber});
+            return;
+        }
+        /*
         const canvas = gazecanvasref.current;
         const context = canvas.getContext('2d');
         context.closePath();
-        setDrawing(false);
-
         tempDrawedMemory.current[pageNumber].drawArr.push({
             type: 'stopDrawing',
         });
+        */
     };
 
     useEffect(() => {

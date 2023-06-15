@@ -1,11 +1,13 @@
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 require("./PDFviewModal.scss");
 
@@ -16,6 +18,10 @@ var _reactNumberFormat = _interopRequireDefault(require("react-number-format"));
 var _reactCustomScrollbars = require("react-custom-scrollbars");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
@@ -47,13 +53,16 @@ var Loading = function Loading(_ref) {
     className: "Loading"
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: "text"
-  }, "Loading"));
+  }, "ReadersEye"));
 };
 
 var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) {
   var props = _extends({}, _ref2);
 
-  var WORKERSRC = props.WORKERSRC,
+  var drawStart = props.drawStart,
+      drawEnd = props.drawEnd,
+      drawIng = props.drawIng,
+      WORKERSRC = props.WORKERSRC,
       path = props.path,
       onClose = props.onClose,
       showViewMode = props.showViewMode,
@@ -129,6 +138,11 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     }
   }
 
+  var _useState = (0, _react.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      renderDone = _useState2[0],
+      set_renderDone = _useState2[1];
+
   var _React$useState13 = _react.default.useState({
     height: 0,
     width: 0
@@ -144,6 +158,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     //     width: canvasRef.current.width,
     //     height: canvasRef.current.height
     // })
+    set_renderDone(true);
     set_canavasSize({
       width: canvasRef.current.width,
       height: canvasRef.current.height
@@ -168,7 +183,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
           SCRwrap: {
             width: modalref.current.clientWidth,
             height: modalref.current.clientHeight
-          } // Scrollwrap:{
+          },
+          pageNumber: pageNumber // Scrollwrap:{
           //     width:prettyscrollref.current.clientWidth,
           //     height:prettyscrollref.current.clientHeight,
           // }
@@ -198,12 +214,14 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
     if (e.key === "ArrowRight") {
       if (pageNumber < numPages) {
+        set_renderDone(false);
         setPageNumber(function (p) {
           return p + 1;
         });
       }
     } else if (e.key === "ArrowLeft") {
       if (pageNumber > 1) {
+        set_renderDone(false);
         setPageNumber(function (p) {
           return p - 1;
         });
@@ -242,6 +260,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   _react.default.useImperativeHandle(ref, function () {
     return {
       set_pageNumber: function set_pageNumber(val) {
+        set_renderDone(false);
         setPageNumber(val);
       },
       set_scrollTop: function set_scrollTop(val) {
@@ -298,6 +317,124 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     }
   }, [viewPercent]);
 
+  var _useState3 = (0, _react.useState)(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      drawing = _useState4[0],
+      setDrawing = _useState4[1];
+
+  var tempDrawedMemory = _react.default.useRef();
+
+  (0, _react.useEffect)(function () {
+    tempDrawedMemory.current = {};
+  }, []);
+
+  var startDrawing = function startDrawing(e) {
+    var _e$nativeEvent = e.nativeEvent,
+        offsetX = _e$nativeEvent.offsetX,
+        offsetY = _e$nativeEvent.offsetY;
+    setDrawing(true);
+
+    if (drawStart) {
+      drawStart({
+        x: offsetX,
+        y: offsetY,
+        pageNumber: pageNumber
+      });
+      return;
+    }
+    /*
+    const canvas = gazecanvasref.current;
+    const context = canvas.getContext('2d');
+      if (!tempDrawedMemory.current[pageNumber]) {
+        tempDrawedMemory.current[pageNumber] = {
+            drawArr: []
+        }
+    }
+      context.beginPath();
+    context.moveTo(offsetX, offsetY);
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+        type: 'startDrawing',
+        x: offsetX,
+        y: offsetY,
+    });
+    */
+
+  };
+
+  var draw = function draw(e) {
+    if (!drawing) return;
+    var _e$nativeEvent2 = e.nativeEvent,
+        offsetX = _e$nativeEvent2.offsetX,
+        offsetY = _e$nativeEvent2.offsetY;
+
+    if (drawIng) {
+      drawIng({
+        x: offsetX,
+        y: offsetY,
+        pageNumber: pageNumber
+      });
+      return;
+    }
+    /*
+    const canvas = gazecanvasref.current;
+    const context = canvas.getContext('2d');
+    context.lineTo(offsetX, offsetY);
+    context.stroke();
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+        type: 'draw',
+        x: offsetX,
+        y: offsetY,
+    });
+    */
+
+  };
+
+  var stopDrawing = function stopDrawing() {
+    if (!drawing) return;
+    setDrawing(false);
+
+    if (drawEnd) {
+      drawEnd({
+        pageNumber: pageNumber
+      });
+      return;
+    }
+    /*
+    const canvas = gazecanvasref.current;
+    const context = canvas.getContext('2d');
+    context.closePath();
+    tempDrawedMemory.current[pageNumber].drawArr.push({
+        type: 'stopDrawing',
+    });
+    */
+
+  };
+
+  (0, _react.useEffect)(function () {
+    if (renderDone && pageNumber && tempDrawedMemory.current[pageNumber]) {
+      console.log("tempDrawedMemory.current[pageNumber]", tempDrawedMemory.current[pageNumber]);
+      var drawArr = tempDrawedMemory.current[pageNumber].drawArr;
+      var canvas = gazecanvasref.current; // console.log("canvas", canvas)
+
+      var context = canvas.getContext('2d'); // console.log("pageNumber", pageNumber);
+      // console.log("drawArr", drawArr)
+
+      for (var i = 0; i < drawArr.length; i++) {
+        if (drawArr[i].type === 'startDrawing') {
+          // console.log("드라우시작")
+          context.beginPath();
+          context.moveTo(drawArr[i].x, drawArr[i].y);
+        } else if (drawArr[i].type === 'draw') {
+          // console.log("드라우")
+          context.lineTo(drawArr[i].x, drawArr[i].y);
+          context.stroke();
+        } else if (drawArr[i].type === 'stopDrawing') {
+          // console.log("드라우끝")
+          context.closePath();
+        }
+      }
+    }
+  }, [pageNumber, renderDone]);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "PDFviewModal no-drag",
     ref: modalref
@@ -373,6 +510,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     disabled: pageNumber > 1 ? false : true,
     onClick: function onClick() {
       // if (pageNumber > 1) {
+      set_renderDone(false);
       setPageNumber(function (p) {
         return p - 1;
       }); // }
@@ -384,6 +522,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     disabled: pageNumber < numPages ? false : true,
     onClick: function onClick() {
       // if (pageNumber < numPages) {
+      set_renderDone(false);
       setPageNumber(function (p) {
         return p + 1;
       }); // }
@@ -486,7 +625,11 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     ref: gazecanvasref,
     className: "pathwayGazeCanvas",
     width: canvasSize.width,
-    height: canvasSize.height
+    height: canvasSize.height,
+    onMouseDown: startDrawing,
+    onMouseMove: draw,
+    onMouseUp: stopDrawing,
+    onMouseOut: stopDrawing
   }))))));
 });
 
