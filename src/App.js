@@ -216,8 +216,6 @@ function App() {
         let r = sizeobj.PDF.width * 0.01 * 1;
         rctx.clearRect(0, 0, cw, ch);
 
-
-        rctx.beginPath();
         rctx.lineWidth = 0.5;
         rctx.strokeStyle = 'rgb(255,0,0,0.3)';
         rctx.fillStyle = 'rgb(255,0,0,0.3)';
