@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import './App.scss';
-
 import PDFviewModal from './lib/PDFviewModal';
 
 
@@ -242,11 +241,9 @@ function App() {
           <div className="PDFpreView">
             <PDFviewModal
               ref={pdfviewref}
-              WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:300111111"}
               PDFonloadCallback={(pages) => {
                 console.log("콜백옴 page수", pages);
               }}
-              // WORKERSRC={process.env.REACT_APP_WORKERSRC || "http://localhost:3000"}
               path={previewURL}
               showViewMode={true}
               viewpercent={viewpercent}
