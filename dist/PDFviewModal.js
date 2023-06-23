@@ -627,7 +627,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       console.log("랜더에러"); // alert('Rendered the page!')
     }
   }, /*#__PURE__*/_react.default.createElement("div", {
-    className: "pathwayGazeCanvas"
+    className: "heatmapWrapper"
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: heatmapref
   })), /*#__PURE__*/_react.default.createElement("canvas", {
