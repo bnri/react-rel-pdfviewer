@@ -48,7 +48,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const modalref = React.useRef();
     const prettyscrollref = React.useRef();
     const gazecanvasref = React.useRef();
-    const gazecanvasref2 = React.useRef();
+    const heatmapref = React.useRef();
 
     const [pdfWidth, set_pdfWidth] = React.useState(null);
     const [pdfHeight, set_pdfHeight] = React.useState(null);
@@ -223,8 +223,8 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         get_canvasRef: () => {
             return gazecanvasref;
         },
-        get_canvasRef2:()=>{
-            return gazecanvasref2;
+        get_heatmapRef:()=>{
+            return heatmapref;
         },
         get_pdfSize: () => {
             try {
@@ -578,11 +578,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             // alert('Rendered the page!')
                         }}
                     >
-                        <canvas ref={gazecanvasref2}
+                        <div ref={heatmapref}
                             className="pathwayGazeCanvas"
-                            width={canvasSize.width}
-                            height={canvasSize.height}
                         />
+
                         <canvas ref={gazecanvasref}
                             className="pathwayGazeCanvas"
                             width={canvasSize.width}

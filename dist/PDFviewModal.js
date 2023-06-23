@@ -91,7 +91,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
 
   var gazecanvasref = _react.default.useRef();
 
-  var gazecanvasref2 = _react.default.useRef();
+  var heatmapref = _react.default.useRef();
 
   var _React$useState = _react.default.useState(null),
       _React$useState2 = _slicedToArray(_React$useState, 2),
@@ -278,8 +278,8 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       get_canvasRef: function get_canvasRef() {
         return gazecanvasref;
       },
-      get_canvasRef2: function get_canvasRef2() {
-        return gazecanvasref2;
+      get_heatmapRef: function get_heatmapRef() {
+        return heatmapref;
       },
       get_pdfSize: function get_pdfSize() {
         try {
@@ -626,11 +626,9 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     onRenderError: function onRenderError() {
       console.log("랜더에러"); // alert('Rendered the page!')
     }
-  }, /*#__PURE__*/_react.default.createElement("canvas", {
-    ref: gazecanvasref2,
-    className: "pathwayGazeCanvas",
-    width: canvasSize.width,
-    height: canvasSize.height
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    ref: heatmapref,
+    className: "pathwayGazeCanvas"
   }), /*#__PURE__*/_react.default.createElement("canvas", {
     ref: gazecanvasref,
     className: "pathwayGazeCanvas",
