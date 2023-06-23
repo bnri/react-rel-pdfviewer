@@ -578,9 +578,9 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             // alert('Rendered the page!')
                         }}
                     >
-                        <div ref={heatmapref}
-                            className="pathwayGazeCanvas"
-                        />
+                        <div className="pathwayGazeCanvas">
+                            <div ref={heatmapref}/>
+                        </div>
 
                         <canvas ref={gazecanvasref}
                             className="pathwayGazeCanvas"
