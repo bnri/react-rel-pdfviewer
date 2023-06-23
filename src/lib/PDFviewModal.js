@@ -579,7 +579,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         }}
                     >
                         <div className="heatmapWrapper">
-                            <div ref={heatmapref}/>
+                            <div ref={heatmapref} style={{width:'100%',height:'100%'}}/>
                         </div>
 
                         <canvas ref={gazecanvasref}
