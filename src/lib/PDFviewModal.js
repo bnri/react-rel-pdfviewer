@@ -149,36 +149,36 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
 
 
-    const handleKeyDown = React.useCallback((e) => {
-        // console.log(e.key);
-        if (e.target.classList.contains('viewPercent')) {
-            return;
-        }
+    // const handleKeyDown = React.useCallback((e) => {
+    //     // console.log(e.key);
+    //     if (e.target.classList.contains('viewPercent')) {
+    //         return;
+    //     }
 
-        if (e.key === "ArrowRight") {
-            if (pageNumber < numPages) {
-                set_renderDone(false);
-                setPageNumber(p => p + 1);
-            }
-        } else if (e.key === "ArrowLeft") {
-            if (pageNumber > 1) {
-                set_renderDone(false);
-                setPageNumber(p => p - 1);
-            }
-        }
-    }, [pageNumber, numPages]);
+    //     if (e.key === "ArrowRight") {
+    //         if (pageNumber < numPages) {
+    //             set_renderDone(false);
+    //             setPageNumber(p => p + 1);
+    //         }
+    //     } else if (e.key === "ArrowLeft") {
+    //         if (pageNumber > 1) {
+    //             set_renderDone(false);
+    //             setPageNumber(p => p - 1);
+    //         }
+    //     }
+    // }, [pageNumber, numPages]);
 
-    //키다운이벤트등록
-    React.useEffect(() => {
+    // //키다운이벤트등록
+    // React.useEffect(() => {
 
-        // console.log("이벤트등록")
-        // window.removeEventListener("keydown", handleKeyDown, false);
-        window.addEventListener("keydown", handleKeyDown, false);
-        return () => {
-            // console.log("이벤트해지")
-            window.removeEventListener("keydown", handleKeyDown, false);
-        };
-    }, [handleKeyDown]);
+    //     // console.log("이벤트등록")
+    //     // window.removeEventListener("keydown", handleKeyDown, false);
+    //     window.addEventListener("keydown", handleKeyDown, false);
+    //     return () => {
+    //         // console.log("이벤트해지")
+    //         window.removeEventListener("keydown", handleKeyDown, false);
+    //     };
+    // }, [handleKeyDown]);
 
 
     //스크롤이벤트
