@@ -58,7 +58,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
 
     useEffect(()=>{
-        if(viewPercent!==viewPercent){
+        if(viewpercent!==viewPercent){
             set_viewPercent(viewpercent);
         }
     },[viewpercent,viewPercent])

@@ -94,7 +94,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     viewPercent = _React$useState10[0],
     set_viewPercent = _React$useState10[1];
   (0, _react.useEffect)(function () {
-    if (viewPercent !== viewPercent) {
+    if (viewpercent !== viewPercent) {
       set_viewPercent(viewpercent);
     }
   }, [viewpercent, viewPercent]);
