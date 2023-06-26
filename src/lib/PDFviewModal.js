@@ -56,12 +56,11 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
-
+    
     useEffect(()=>{
-        if(viewpercent!==viewPercent){
-            set_viewPercent(viewpercent);
-        }
-    },[viewpercent,viewPercent])
+        set_viewPercent(viewpercent);
+    },[viewpercent])
+
     const [pageWidth, set_pageWidth] = React.useState(0);
     const option = React.useMemo(() => {
         return {
