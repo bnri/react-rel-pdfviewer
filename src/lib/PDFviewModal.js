@@ -34,7 +34,7 @@ const Loading = ({ ...props }) => {
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const { 
-        drawStart,drawEnd,drawIng,
+        drawStart,drawEnd,drawIng,viewPercentChangeCallback,
         WORKERSRC, path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // console.log("WORKERSRC",WORKERSRC)
     // console.log("path",path);
@@ -389,7 +389,11 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
         }
     }, [pageNumber,renderDone])
-
+    useEffect(()=>{
+        if(viewPercentChangeCallback){
+            viewPercentChangeCallback(viewPercent);
+        }
+    },[viewPercent,viewPercentChangeCallback])
     return (<div className="PDFviewModal no-drag" ref={modalref}>
 
         {(!pdfWidth || !pdfHeight) ?

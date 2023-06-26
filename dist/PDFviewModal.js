@@ -47,6 +47,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   var drawStart = props.drawStart,
     drawEnd = props.drawEnd,
     drawIng = props.drawIng,
+    viewPercentChangeCallback = props.viewPercentChangeCallback,
     WORKERSRC = props.WORKERSRC,
     path = props.path,
     onClose = props.onClose,
@@ -404,6 +405,11 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       }
     }
   }, [pageNumber, renderDone]);
+  (0, _react.useEffect)(function () {
+    if (viewPercentChangeCallback) {
+      viewPercentChangeCallback(viewPercent);
+    }
+  }, [viewPercent, viewPercentChangeCallback]);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "PDFviewModal no-drag",
     ref: modalref
