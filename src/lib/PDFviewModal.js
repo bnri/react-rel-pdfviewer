@@ -57,9 +57,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const [pageNumber, setPageNumber] = React.useState(1);
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
     
-    useEffect(()=>{
-        set_viewPercent(viewpercent);
-    },[viewpercent])
+
 
     const [pageWidth, set_pageWidth] = React.useState(0);
     const option = React.useMemo(() => {
@@ -153,37 +151,6 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
 
 
-    // const handleKeyDown = React.useCallback((e) => {
-    //     // console.log(e.key);
-    //     if (e.target.classList.contains('viewPercent')) {
-    //         return;
-    //     }
-
-    //     if (e.key === "ArrowRight") {
-    //         if (pageNumber < numPages) {
-    //             set_renderDone(false);
-    //             setPageNumber(p => p + 1);
-    //         }
-    //     } else if (e.key === "ArrowLeft") {
-    //         if (pageNumber > 1) {
-    //             set_renderDone(false);
-    //             setPageNumber(p => p - 1);
-    //         }
-    //     }
-    // }, [pageNumber, numPages]);
-
-    // //키다운이벤트등록
-    // React.useEffect(() => {
-
-    //     // console.log("이벤트등록")
-    //     // window.removeEventListener("keydown", handleKeyDown, false);
-    //     window.addEventListener("keydown", handleKeyDown, false);
-    //     return () => {
-    //         // console.log("이벤트해지")
-    //         window.removeEventListener("keydown", handleKeyDown, false);
-    //     };
-    // }, [handleKeyDown]);
-
 
     //스크롤이벤트
     React.useEffect(() => {
@@ -265,16 +232,6 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
 
 
-
-    // const pageWidth = React.useMemo(() => {
-    //     if (!modalref || !modalref.current ) return;
-
-    //     let p = (viewPercent - 10) / 100;
-
-    //     console.log("modalref", modalref.current);
-
-    //     return window.screen.width * p - 18;
-    // }, [viewPercent])
 
 
     React.useEffect(() => {

@@ -119,10 +119,6 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       viewPercent = _React$useState10[0],
       set_viewPercent = _React$useState10[1];
 
-  (0, _react.useEffect)(function () {
-    set_viewPercent(viewpercent);
-  }, [viewpercent]);
-
   var _React$useState11 = _react.default.useState(0),
       _React$useState12 = _slicedToArray(_React$useState11, 2),
       pageWidth = _React$useState12[0],
@@ -211,34 +207,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     prettyscrollref.current.scrollTop(0); // console.log("껍데기 x*y", wrapperRef.current.clientWidth, "x", wrapperRef.current.clientHeight);
     // //PDF view Modal 의 껍데기도 필요함
     // console.log("가장 큰 모달크기 x*y", modalref.current.clientWidth, "y", modalref.current.clientHeight);
-  } // const handleKeyDown = React.useCallback((e) => {
-  //     // console.log(e.key);
-  //     if (e.target.classList.contains('viewPercent')) {
-  //         return;
-  //     }
-  //     if (e.key === "ArrowRight") {
-  //         if (pageNumber < numPages) {
-  //             set_renderDone(false);
-  //             setPageNumber(p => p + 1);
-  //         }
-  //     } else if (e.key === "ArrowLeft") {
-  //         if (pageNumber > 1) {
-  //             set_renderDone(false);
-  //             setPageNumber(p => p - 1);
-  //         }
-  //     }
-  // }, [pageNumber, numPages]);
-  // //키다운이벤트등록
-  // React.useEffect(() => {
-  //     // console.log("이벤트등록")
-  //     // window.removeEventListener("keydown", handleKeyDown, false);
-  //     window.addEventListener("keydown", handleKeyDown, false);
-  //     return () => {
-  //         // console.log("이벤트해지")
-  //         window.removeEventListener("keydown", handleKeyDown, false);
-  //     };
-  // }, [handleKeyDown]);
-  //스크롤이벤트
+  } //스크롤이벤트
 
 
   _react.default.useEffect(function () {
@@ -307,13 +276,7 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
         }
       }
     };
-  }, [pdfWidth, pdfHeight]); // const pageWidth = React.useMemo(() => {
-  //     if (!modalref || !modalref.current ) return;
-  //     let p = (viewPercent - 10) / 100;
-  //     console.log("modalref", modalref.current);
-  //     return window.screen.width * p - 18;
-  // }, [viewPercent])
-
+  }, [pdfWidth, pdfHeight]);
 
   _react.default.useEffect(function () {
     if (viewPercent) {
