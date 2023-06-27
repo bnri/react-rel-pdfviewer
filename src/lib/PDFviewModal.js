@@ -230,6 +230,9 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         get_heatmapRef:()=>{
             return heatmapref;
         },
+        reset_viewPerecent: (val) => {
+            set_viewPercent(val);
+        },
         get_pdfSize: () => {
             try {
                 let obj = {

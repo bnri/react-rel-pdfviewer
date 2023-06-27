@@ -75,16 +75,19 @@ function App() {
   }
   const handleScrollCallback = (s) => {
     // console.log("s콜백",s);    
+    console.log("@@@@@@@@@@@@@@@@@@@@scroll콜백",s)
   }
 
   const handlePageCallback = (p) => {
     // console.log("p콜백page",p)
+    console.log("@@@@@@@@@@@@@@@@@page콜백",p);
   }
 
 
 
   const handlePDFCallback = (d) => {
     // console.log("pdf사이즈콜백", d)
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@pdf사이즈ㅂ콜백",d)
     const {pageNumber} = d;
     if(tempDrawedMemory.current[pageNumber]){
       const drawArr = tempDrawedMemory.current[pageNumber].drawArr;
