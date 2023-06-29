@@ -33,8 +33,8 @@ const Loading = ({ ...props }) => {
 
 
 const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
-    const { 
-        drawStart,drawEnd,drawIng,viewPercentChangeCallback,
+    const {
+        drawStart, drawEnd, drawIng, viewPercentChangeCallback,
         WORKERSRC, path, onClose, showViewMode, viewpercent, set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // console.log("WORKERSRC",WORKERSRC)
     // console.log("path",path);
@@ -56,7 +56,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const [viewPercent, set_viewPercent] = React.useState(viewpercent ? viewpercent : 100);
-    
+
 
 
     const [pageWidth, set_pageWidth] = React.useState(0);
@@ -116,7 +116,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         width: modalref.current.clientWidth,
                         height: modalref.current.clientHeight
                     },
-                    pageNumber:pageNumber
+                    pageNumber: pageNumber
                     // Scrollwrap:{
                     //     width:prettyscrollref.current.clientWidth,
                     //     height:prettyscrollref.current.clientHeight,
@@ -194,7 +194,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         get_canvasRef: () => {
             return gazecanvasref;
         },
-        get_heatmapRef:()=>{
+        get_heatmapRef: () => {
             return heatmapref;
         },
         reset_viewPerecent: (val) => {
@@ -260,8 +260,8 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
         const { offsetX, offsetY } = e.nativeEvent;
         setDrawing(true);
-        if(drawStart){
-            drawStart({x:offsetX,y:offsetY,pageNumber:pageNumber});
+        if (drawStart) {
+            drawStart({ x: offsetX, y: offsetY, pageNumber: pageNumber });
             return;
         }
 
@@ -287,10 +287,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
     const draw = (e) => {
         if (!drawing) return;
-    
+
         const { offsetX, offsetY } = e.nativeEvent;
-        if(drawIng){
-            drawIng({x:offsetX,y:offsetY,pageNumber:pageNumber});
+        if (drawIng) {
+            drawIng({ x: offsetX, y: offsetY, pageNumber: pageNumber });
             return;
         }
 
@@ -308,10 +308,10 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     };
 
     const stopDrawing = () => {
-        if (!drawing) return;   
-        setDrawing(false); 
-        if(drawEnd){
-            drawEnd({pageNumber:pageNumber});
+        if (!drawing) return;
+        setDrawing(false);
+        if (drawEnd) {
+            drawEnd({ pageNumber: pageNumber });
             return;
         }
         /*
@@ -325,7 +325,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     };
 
     useEffect(() => {
-        if (renderDone&&pageNumber && tempDrawedMemory.current[pageNumber]) {
+        if (renderDone && pageNumber && tempDrawedMemory.current[pageNumber]) {
             console.log("tempDrawedMemory.current[pageNumber]", tempDrawedMemory.current[pageNumber]);
 
             let drawArr = tempDrawedMemory.current[pageNumber].drawArr;
@@ -352,12 +352,12 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
             }
 
         }
-    }, [pageNumber,renderDone])
-    useEffect(()=>{
-        if(viewPercentChangeCallback){
+    }, [pageNumber, renderDone])
+    useEffect(() => {
+        if (viewPercentChangeCallback) {
             viewPercentChangeCallback(viewPercent);
         }
-    },[viewPercent,viewPercentChangeCallback])
+    }, [viewPercent, viewPercentChangeCallback])
     return (<div className="PDFviewModal no-drag" ref={modalref}>
 
         {(!pdfWidth || !pdfHeight) ?
@@ -527,27 +527,30 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
                 >
 
+                    <div style={{ position: 'relative', margin: 'auto' }}>
+                        <Page
+                            // canvasBackground={"red"}
+                            // loading={"asfasfasfasf"}
+                            canvasRef={canvasRef}
+                            className="PDF-page"
+                            pageNumber={pageNumber}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                            // height={window.screen.height*0.9}
+                            width={pageWidth}
+                            // scale={1}
+                            // rotate={90}
+                            onRenderSuccess={onDocumentRenderSuccess}
+                            onRenderError={() => {
+                                console.log("랜더에러")
+                                // alert('Rendered the page!')
+                            }}
+                        >
 
-                    <Page
-                        // canvasBackground={"red"}
-                        // loading={"asfasfasfasf"}
-                        canvasRef={canvasRef}
-                        className="PDF-page"
-                        pageNumber={pageNumber}
-                        renderTextLayer={false}
-                        renderAnnotationLayer={false}
-                        // height={window.screen.height*0.9}
-                        width={pageWidth}
-                        // scale={1}
-                        // rotate={90}
-                        onRenderSuccess={onDocumentRenderSuccess}
-                        onRenderError={() => {
-                            console.log("랜더에러")
-                            // alert('Rendered the page!')
-                        }}
-                    >
+
+                        </Page>
                         <div className="heatmapWrapper">
-                            <div ref={heatmapref} style={{width:'100%',height:'100%'}}/>
+                            <div ref={heatmapref} style={{ width: '100%', height: '100%' }} />
                         </div>
 
                         <canvas ref={gazecanvasref}
@@ -560,8 +563,8 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             onMouseUp={stopDrawing}
                             onMouseOut={stopDrawing}
                         />
-                
-                    </Page>
+                    </div>
+
 
 
                 </Document>
