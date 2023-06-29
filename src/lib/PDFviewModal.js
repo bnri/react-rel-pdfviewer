@@ -67,15 +67,23 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         }
     }, []);
     // const [pdfScale, set_pdfScale] = React.useState(1);
-    function onDocumentLoadSuccess({ numPages }) {
-        setNumPages(numPages);
+    async function onDocumentLoadSuccess(obj) {
+        const { numPages:np}=obj;
+        
+        //PDF의 실제 width height을 구할때 사용
+        // const pageObj = await obj.getPage(1)
+        // const pageHeight = pageObj.view[3];
+        // const pageWidth = pageObj.view[2];
+        
+
+        setNumPages(np);
         if (PDFonloadCallback) {
-            PDFonloadCallback(numPages);
+            PDFonloadCallback(np);
         }
 
     }
     const [renderDone, set_renderDone] = useState(false);
-    const [canvasSize, set_canavasSize] = React.useState({
+    const [canvasSize, set_canvasSize] = React.useState({
         height: 0,
         width: 0
     });
@@ -88,10 +96,14 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         //     height: canvasRef.current.height
         // })
         set_renderDone(true);
-        set_canavasSize({
-            width: canvasRef.current.width,
-            height: canvasRef.current.height
+        const tempratio = (canvasRef.current.height/canvasRef.current.width).toFixed(2);
+      
+        set_canvasSize({
+            width: 1728,
+            height: 1728*tempratio
         })
+        
+        // console.log("tempratio",tempratio);
 
 
         if (pdfSizeCallback) {
@@ -116,7 +128,8 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         width: modalref.current.clientWidth,
                         height: modalref.current.clientHeight
                     },
-                    pageNumber: pageNumber
+                    pageNumber: pageNumber,
+                    height_devided_width_ratio:tempratio,
                     // Scrollwrap:{
                     //     width:prettyscrollref.current.clientWidth,
                     //     height:prettyscrollref.current.clientHeight,
@@ -546,9 +559,9 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                                 // alert('Rendered the page!')
                             }}
                         >
-
-
                         </Page>
+
+
                         <div className="heatmapWrapper">
                             <div ref={heatmapref} style={{ width: '100%', height: '100%' }} />
                         </div>

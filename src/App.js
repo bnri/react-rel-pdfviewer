@@ -74,12 +74,10 @@ function App() {
 
   }
   const handleScrollCallback = (s) => {
-    // console.log("s콜백",s);    
-    console.log("@@@@@@@@@@@@@@@@@@@@scroll콜백",s)
+    // console.log("@@@@@@@@@@@@@@@@@@@@scroll콜백",s)
   }
 
   const handlePageCallback = (p) => {
-    // console.log("p콜백page",p)
     console.log("@@@@@@@@@@@@@@@@@page콜백",p);
   }
 
