@@ -1,0 +1,42 @@
+$main-border-color: #145894;
+$main-border-color-70: #6b94b6;
+
+.PDFviewModalV2 {
+    width: 100%;
+    height: 100%;
+    background: green;
+
+    .PDFWrapper {
+        background:red;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
+        display:flex;
+        justify-content: center;
+        // align-items: center;
+        .mycanvas{
+            margin:auto;
+            // background:purple;
+        }
+        //스크롤바 디자인
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background: $main-border-color;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 3.5px;
+            background-color: $main-border-color;
+
+            &:hover {
+                background-color: blue;
+            }
+        }
+
+        &::-webkit-scrollbar-track {
+            background: $main-border-color-70;
+
+        }
+    }
+}

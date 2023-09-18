@@ -69,12 +69,14 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     // const [pdfScale, set_pdfScale] = React.useState(1);
     async function onDocumentLoadSuccess(obj) {
         const { numPages:np}=obj;
-        
-        //PDF의 실제 width height을 구할때 사용
-        // const pageObj = await obj.getPage(1)
-        // const pageHeight = pageObj.view[3];
-        // const pageWidth = pageObj.view[2];
-        
+        console.log("onDocumentLoadSuccess");
+
+        //PDF의 실제 width
+        const pageObj = await obj.getPage(1)
+        const pageHeight = pageObj.view[3];
+        const pageWidth = pageObj.view[2];
+        console.log("pageWidth x pageHeight",pageWidth+" X "+pageHeight)
+        //1910.74 X 5932.71
 
         setNumPages(np);
         if (PDFonloadCallback) {
@@ -88,7 +90,18 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         width: 0
     });
 
-    function onDocumentRenderSuccess() {
+    function onDocumentRenderSuccess(obj) {
+        console.log("onDocumentRenderSuccess");
+        console.log("obj",obj)
+        console.log(obj.height);
+        console.log(obj.width);
+        //5393.3984060688
+        //1737.0446339719788
+        //6009.838220881346
+        //1744.2739888944727
+
+        // console.log("??",obj.originHeight());
+
         // console.log("확인좀",some);
         // console.log("확인", canvasRef.current.width + 'x' + canvasRef.current.height);
         // set_pdfWidth({
@@ -524,20 +537,22 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
                 <Document
                     className="PDF-document"
-                    options={{
-                        cMapUrl: 'cmaps/',
-                        cMapPacked: true,
-                        standardFontDataUrl: 'standard_fonts/',
-                        workerSrc: `${WORKERSRC}/pdf.worker.js`
-                    }}
-
+                    // options={{
+                    //     cMapUrl: 'cmaps/',
+                    //     cMapPacked: true,
+                    //     standardFontDataUrl: 'standard_fonts/',
+                    //     workerSrc: `${WORKERSRC}/pdf.worker.js`
+                    // }}
+                    renderMode={"canvas"}
                     file={filepath}
                     // width={window.screen.width * 0.9}
                     // loading={<div>
                     //     갸갸갸갸갸
                     // </div>}
                     onLoadSuccess={onDocumentLoadSuccess}
-
+                    onLoadProgress={(p)=>{
+                        console.log("asf",p)
+                    }}
                 >
 
                     <div style={{ position: 'relative', margin: 'auto' }}>
@@ -551,6 +566,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                             renderAnnotationLayer={false}
                             // height={window.screen.height*0.9}
                             width={pageWidth}
+
                             // scale={1}
                             // rotate={90}
                             onRenderSuccess={onDocumentRenderSuccess}

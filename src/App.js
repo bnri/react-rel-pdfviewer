@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import './App.scss';
 import PDFviewModal from './lib/PDFviewModal';
+import PDFviewModalV2 from "./lib2/PDFviewModalV2";
 
 
 function App() {
@@ -69,7 +70,7 @@ function App() {
     // console.log("파일", file);
     let logoURL = window.URL.createObjectURL(file);
     // console.log(logoURL);
-    openFullscreen();
+    // openFullscreen();
     set_previewURL(logoURL);
 
   }
@@ -240,7 +241,7 @@ function App() {
       {previewURL &&
         <>
           <div className="PDFpreView">
-            <PDFviewModal
+            <PDFviewModalV2
               ref={pdfviewref}
               PDFonloadCallback={(pages) => {
                 console.log("콜백옴 page수", pages);
@@ -252,14 +253,14 @@ function App() {
 
               showConfirmBtn={true}
               onConfirm={() => {
-                cancelFullScreen();
+                // cancelFullScreen();
                 // console.log("메모리해제")
                 window.URL.revokeObjectURL(previewURL);
                 set_previewURL(null);
               }}
 
               onClose={() => {
-                cancelFullScreen();
+                // cancelFullScreen();
                 // console.log("메모리해제")
                 window.URL.revokeObjectURL(previewURL);
                 set_previewURL(null);
