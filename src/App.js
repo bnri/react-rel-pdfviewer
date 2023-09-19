@@ -24,6 +24,8 @@ function App() {
 
     }
   }
+
+
   const cancelFullScreen = () => {
     var el = document;
     var requestMethod = el.cancelFullScreen || el.webkitCancelFullScreen || el.mozCancelFullScreen || el.exitFullscreen || el.webkitExitFullscreen;
@@ -39,6 +41,7 @@ function App() {
   }
 
 
+  
   const pdfviewref = React.useRef();
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
