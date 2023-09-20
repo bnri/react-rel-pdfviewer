@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef ,useMemo} from "react";
 import './PDFviewModalV2.scss';
 
 // import { Document, Page, pdfjs } from 'react-pdf';
@@ -13,134 +13,230 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 // pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 
+
+
 const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
     const {
         drawStart, drawEnd, drawIng, viewPercentChangeCallback, path, onClose, showViewMode, viewpercent,
         set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
     // console.log("path",path);
-    const virtualCanvasRef = useRef(null);
+    const preparedPDFPageInform = useRef(null);
 
     const renderCanvasRef = useRef();
     const PDFWrapperRef = useRef();
 
 
-    const [pdfPages, set_pdfPages] = useState(null);
+    const [maxPdfPageNumber, set_maxPdfPageNumber] = useState(null);
     const [nowPage, set_nowPage] = useState(1);
     const [pages, set_pages] = useState(null);
 
+    const [isNowPageRenderPrepared, set_isNowPageRenderPrepared] = useState();
+    const [isNextPageRenderPrepared,set_isNextPageRenderPrepared] = useState();
+    const [isPrevPageRenderPrepared,set_isPrevPageRenderPrepared] = useState();
 
-    // const [pdf,set_pdf] = useState(null);
-    useEffect(async () => {
-        if (!path) return;
-        console.log("pdfjsLib", pdfjsLib)
-        console.log("path", path);
-        var loadingTask = await pdfjsLib.getDocument(path);
-        const pdf = await loadingTask.promise;
-        // set_pdf(pdf);
-
-        const pdfInfo = pdf._pdfInfo;
-        const pdfPageNumbers = pdfInfo.numPages;
-        const p = [];
-
-        for (let i = 1; i <= pdfPageNumbers; i++) {
-            const page = await pdf.getPage(i);
-            p.push(page)
+    const PDFrenderOption = useMemo(()=>{
+        return {
+            mode:1 //1모드는 랜더한페이지의 다음과 이전만 준비하는 방식.
         }
-        set_pages(p);
+    },[])
 
-
-        set_pdfPages(pdfPageNumbers);
+    
+    //PDF document 를 얻는부분
+    useEffect(() => {
+        if (!path) return;
+        // console.log("pdfjsLib", pdfjsLib)
+        // console.log("path", path);
+        async function getPDFdocumentByPath(){
+            var loadingTask = await pdfjsLib.getDocument(path);
+            const pdf = await loadingTask.promise;
+            // set_pdf(pdf);
+    
+            const pdfInfo = pdf._pdfInfo;
+            const pdfPageNumbers = pdfInfo.numPages;
+            const p = [];
+    
+            for (let i = 1; i <= pdfPageNumbers; i++) {
+                const page = await pdf.getPage(i);
+                p.push(page)
+            }
+            set_pages(p);
+            set_maxPdfPageNumber(pdfPageNumbers);
+        }
+        getPDFdocumentByPath();
     }, [path])
 
-    const [isPreparedRender, set_isPreparedRender] = useState(false);
+
+    //nowPage를 랜더준비를 하는곳
     useEffect(() => {
-        if (isPreparedRender && nowPage) {
-            let pa = virtualCanvasRef.current;
-            console.log("그릴거야 nowPage",nowPage);
-
-            console.log("renderCanvasRef.current",renderCanvasRef.current);
-            for (let i = 0; i < 2; i++) {
-                if (pa[i].pageNumber === nowPage) {
-
-                    const renderCanvas = renderCanvasRef.current;
-                    const rctx = renderCanvas.getContext("2d");
-                    rctx.clearRect(0, 0, renderCanvasRef.current.width, renderCanvasRef.current.height);
-                    renderCanvas.width = pa[i].viewWidth;
-                    renderCanvas.height = pa[i].viewHeight;
-                    rctx.drawImage(pa[i].canvas, 0, 0);
-                    break;
-                }
-
-            }
-
+        if (!preparedPDFPageInform.current) {
+            preparedPDFPageInform.current = [];
         }
-    }, [isPreparedRender, nowPage]);
+        if(!pages){
+            return;
+        }
+        set_isNowPageRenderPrepared(false);
+        set_isNextPageRenderPrepared(false);
+        set_isPrevPageRenderPrepared(false);
 
+        const wrapperWidth = PDFWrapperRef.current.offsetWidth;
+        const preparedPDFinform = preparedPDFPageInform.current; //배열형태임.
 
+        let targetPrepared=preparedPDFinform.find(d=>d.pageNumber===nowPage)
+        if(targetPrepared){
 
-
-    useEffect(() => {
-        //wrapper resize 시 다시 랜더해야함..
-        async function renderPageToVirtualCanvas() {
-            if (!pages) {
-                return;
+            if(targetPrepared.wrapperSize&&targetPrepared.wrapperSize.width===wrapperWidth){
+                console.log("이미있어서 targetPrepared를 다시 만들필요 없음");
+                set_isNowPageRenderPrepared(true);
             }
-            console.log("준비");
+            else{
+                //targetPrepared를삭제 preparedPDFinform에서
+                console.log("targetPrepared를삭제",targetPrepared);
+                let targetPreparedIndex = preparedPDFinform.findIndex(d => d.pageNumber === nowPage);
+                preparedPDFinform.splice(targetPreparedIndex, 1);
+                console.log("만들어야함")
 
-            set_isPreparedRender(false);
-            if (!virtualCanvasRef.current) {
-                virtualCanvasRef.current = [];
             }
+        }
+        else{
+            console.log("만들어야함")
+        }
+        //#@!#@! 이위에부분을 prepareRenderPage 안쪽에 넣자...
 
+       
 
-            for (let i = 1; i <= 2; i++) {
-                const canvas = document.createElement('canvas');
-                let obj = {
-                    canvas: canvas,
-                    pageNumber: i,
+        prepareRenderPage(nowPage).then(res_nowPageRender=>{
+            // console.log("res_nowPageRender",res_nowPageRender);
+            if(res_nowPageRender.valid){
+                preparedPDFinform.push(res_nowPageRender.data)
+                set_isNowPageRenderPrepared(true);
+                console.log("targetPrepared를 생성하는데 성공");
+
+            }
+            else{
+                console.log("targetPrepared를 생성하는데 실패");
+            }
+        });
+
+        if(PDFrenderOption.mode===1){
+            //
+            prepareRenderPage(nowPage-1).then(res_prevPageRender=>{
+                if(res_prevPageRender.valid){
+                    preparedPDFinform.push(res_prevPageRender.data)
+                    set_isPrevPageRenderPrepared(true);
+                    console.log("prevPage를 생성하는데 성공");
                 }
+                else{
+                    console.log("prevPage를 생성하는데 실패");
+                }
+            });
 
-  
-                const wrapperWidth = PDFWrapperRef.current.offsetWidth;
-                obj.wrapperWidth = wrapperWidth;
-                const page = pages[i - 1];
+            prepareRenderPage(nowPage+1).then(res_nextPageRender=>{
+                if(res_nextPageRender.valid){
+                    preparedPDFinform.push(res_nextPageRender.data)
+                    set_isNextPageRenderPrepared(true);
+                    console.log("nextPage를 생성하는데 성공");
+                }
+                else{
+                    console.log("nextPage를 생성하는데 실패");
+                }
+            });
+        }
 
-                const pageWidth = page.view[2] + page.view[0];
-                const pageHeight = page.view[3] + page.view[1];
-                console.log(page.view);
-                //PDF 의 렌더크기를 . 지금 wrapper의 Width에 맞춤
-                let myscale = wrapperWidth / pageWidth; //
-                obj.myscale = myscale;
-                console.log("myscale", myscale);
-                // 캔버스 컨텍스트 가져오기
-                const context = canvas.getContext('2d');
-                // 페이지 크기를 가져오기
-                const viewport = page.getViewport({ scale: myscale * 1 }); // 원하는 스케일로 조정
-                // 캔버스 크기 설정
-                obj.viewWidth = wrapperWidth;
-                obj.viewHeight = pageHeight * myscale;
-                // set_viewWidth(wrapperWidth);
-                // set_viewHeight(pageHeight * myscale);
 
+
+
+
+
+ //랜더할 width임. 어떤이미지든 여기 width 100% 기준임 지금은.
+        //wrapper resize 시 다시 랜더해야함..
+        function prepareRenderPage(pageNumber){
+            return new Promise(async function(resolve){
+                if(!pages){
+                    resolve({
+                        valid:false,
+                        msg:"페이지정보가 준비되지 않음"
+                    }) 
+                    return;
+                }
+                const shouldPreparePage = pages[pageNumber - 1];
+                if(!shouldPreparePage){
+                    resolve({
+                        valid:false,
+                        msg:"해당 페이지가 존재하지 않음"
+                    })           
+                    return;
+                }
+    
+
+                //해당페이지들의 실제 크기임.
+                const pageOriginWidth = shouldPreparePage.view[2] - shouldPreparePage.view[0];
+                const pageOriginHeight = shouldPreparePage.view[3] - shouldPreparePage.view[1];
+    
+                //랜더하고자 하는 wrapperWidth만큼 scale필요
+                let myscale = wrapperWidth / pageOriginWidth; 
+    
+                //랜더할 가상캔버스 생성
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d', { willReadFrequently: true });
+                const viewport = shouldPreparePage.getViewport({ scale: myscale }); // 원하는 스케일로 조정
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
-                // PDF 페이지를 캔버스에 렌더링
+                //가상캔버스에 viewport 이미지사이즈를 랜더할거임
+    
                 const renderContext = {
                     canvasContext: context,
                     viewport: viewport,
                 };
-                await page.render(renderContext);
-                virtualCanvasRef.current.push(obj);
-            }
-
-            set_isPreparedRender(true);
-            console.log("virtualCanvasRef.current", virtualCanvasRef.current)
-
+                await shouldPreparePage.render(renderContext).promise;
+                resolve({
+                    valid:true,
+                    data:{
+                        canvas:canvas,
+                        pageNumber:pageNumber,
+                        scale:myscale,
+                        PDForiginSize:{
+                            width:pageOriginWidth,
+                            height:pageOriginHeight
+                        },
+                        canvasSize:{
+                            width:viewport.width,
+                            height:viewport.height
+                        },
+                        wrapperSize:{
+                            width:wrapperWidth
+                        }
+                    }
+                });
+            });
         }
-        renderPageToVirtualCanvas();
 
-    }, [pages]);
+    }, [pages, nowPage,PDFrenderOption]);
+
+
+
+
+    const [renderedTarget,set_renderedTarget]= useState(null);
+    useEffect(() => {
+        if (!pages) return;
+        if (isNowPageRenderPrepared && nowPage) {
+            let pa = preparedPDFPageInform.current;
+            const targetPrepared=pa.find(d=>d.pageNumber===nowPage)
+            if(!targetPrepared) {
+                console.error("target이 준비되지 않았습니다");
+                return;
+            }
+            console.log("targetPrepared 친구를 render하겠음");
+            console.log("targetPrepared",targetPrepared);
+            const renderCanvas = renderCanvasRef.current;
+            const ctx = renderCanvas.getContext("2d");
+            ctx.clearRect(0, 0, renderCanvasRef.current.offsetWidth, renderCanvasRef.current.offsetHeight);
+            renderCanvas.width = targetPrepared.canvasSize.width;
+            renderCanvas.height = targetPrepared.canvasSize.height;
+            ctx.drawImage(targetPrepared.canvas, 0, 0);
+            set_renderedTarget(targetPrepared);
+        }
+    }, [isNowPageRenderPrepared, nowPage, pages]);
 
 
 
@@ -152,21 +248,31 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
 
     return (<div className="PDFviewModalV2 no-drag" >
         <div style={{ position: 'absolute', left: 0, top: 0, background: 'orange' }}>
-            총페이지:{pdfPages}<br />
+            총페이지:{maxPdfPageNumber}<br />
             지금페이지:{nowPage}<br />
 
 
-            <button onClick={() => {
+            <button disabled={isPrevPageRenderPrepared===true?false:true}onClick={() => {
                 set_nowPage(p => p > 1 ? p - 1 : p);
             }}>이전</button>
-            <button onClick={() => {
-                set_nowPage(p => p + 1 < pdfPages ? p + 1 : p);
+            <button disabled={isNextPageRenderPrepared===true?false:true} onClick={() => {
+                set_nowPage(p => p + 1 <= maxPdfPageNumber ? p + 1 : p);
             }}>다음</button>
         </div>
 
-        <div className="PDFWrapper" style={{ width: '100%', height: '100%', overflowY: 'auto' }} ref={PDFWrapperRef} >
-            {/* <PDFpage nowPage={nowPage} pages={pages} /> */}
-            <canvas ref={renderCanvasRef} style={{width:'100%',height:'auto'}} />
+        <div className="PDFWrapper" style={{ width: '1500px', height: '800px', overflowY: 'auto' }}
+            ref={PDFWrapperRef} >
+
+
+            <canvas ref={renderCanvasRef}
+                style={{
+                    width: renderedTarget !== null ?
+                    renderedTarget.wrapperSize.width : 0,
+                    height: renderedTarget !== null ?
+                    renderedTarget.canvas.height : 0
+                }} />
+
+
         </div>
 
 
