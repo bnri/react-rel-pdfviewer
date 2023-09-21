@@ -67,6 +67,7 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
     }, [path])
 
 
+
     //nowPage를 랜더준비를 하는곳
     useEffect(() => {
         if (!preparedPDFPageInform.current) {
@@ -81,27 +82,10 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
 
         const wrapperWidth = PDFWrapperRef.current.offsetWidth;
         const preparedPDFinform = preparedPDFPageInform.current; //배열형태임.
+        console.log("preparedPDFinform",preparedPDFinform)
+        //#@! 방식을 바꿔야해 만들기 시작했을땐 배열에 넣지 말아야함
+        
 
-        let targetPrepared=preparedPDFinform.find(d=>d.pageNumber===nowPage)
-        if(targetPrepared){
-
-            if(targetPrepared.wrapperSize&&targetPrepared.wrapperSize.width===wrapperWidth){
-                console.log("이미있어서 targetPrepared를 다시 만들필요 없음");
-                set_isNowPageRenderPrepared(true);
-            }
-            else{
-                //targetPrepared를삭제 preparedPDFinform에서
-                console.log("targetPrepared를삭제",targetPrepared);
-                let targetPreparedIndex = preparedPDFinform.findIndex(d => d.pageNumber === nowPage);
-                preparedPDFinform.splice(targetPreparedIndex, 1);
-                console.log("만들어야함")
-
-            }
-        }
-        else{
-            console.log("만들어야함")
-        }
-        //#@!#@! 이위에부분을 prepareRenderPage 안쪽에 넣자...
 
        
 
@@ -110,24 +94,25 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
             if(res_nowPageRender.valid){
                 preparedPDFinform.push(res_nowPageRender.data)
                 set_isNowPageRenderPrepared(true);
-                console.log("targetPrepared를 생성하는데 성공");
+                // console.log("targetPrepared를 생성하는데 성공");
 
             }
             else{
-                console.log("targetPrepared를 생성하는데 실패");
+                // console.error("targetPrepared를 생성하는데 실패");
             }
         });
 
         if(PDFrenderOption.mode===1){
-            //
+            //#@! 현제페이지를 다 만든후에 생성
+
             prepareRenderPage(nowPage-1).then(res_prevPageRender=>{
                 if(res_prevPageRender.valid){
                     preparedPDFinform.push(res_prevPageRender.data)
                     set_isPrevPageRenderPrepared(true);
-                    console.log("prevPage를 생성하는데 성공");
+                    // console.log("prevPage가 준비됨");
                 }
                 else{
-                    console.log("prevPage를 생성하는데 실패");
+                    // console.log("prevPage를 준비실패");
                 }
             });
 
@@ -135,10 +120,10 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
                 if(res_nextPageRender.valid){
                     preparedPDFinform.push(res_nextPageRender.data)
                     set_isNextPageRenderPrepared(true);
-                    console.log("nextPage를 생성하는데 성공");
+                    // console.log("nextPage를 생성하는데 성공");
                 }
                 else{
-                    console.log("nextPage를 생성하는데 실패");
+                    // console.log("nextPage를 생성하는데 실패");
                 }
             });
         }
@@ -168,6 +153,27 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
                     return;
                 }
     
+                let targetPrepared=preparedPDFinform.find(d=>d.pageNumber===pageNumber)
+                if(targetPrepared){
+        
+                    if(targetPrepared.wrapperSize&&targetPrepared.wrapperSize.width===wrapperWidth){
+                        console.log(`이미있어서 ${targetPrepared.pageNumber}page를 다시 만들필요 없음`);
+                        resolve({
+                            valid:true,
+                            data:targetPrepared
+                        });
+                        return;
+                    }
+                    else{
+                        //targetPrepared를삭제 preparedPDFinform에서
+                        // console.log("targetPrepared를삭제",targetPrepared);
+                        let targetPreparedIndex = preparedPDFinform.findIndex(d => d.pageNumber === pageNumber);
+                        preparedPDFinform.splice(targetPreparedIndex, 1);
+                        console.log("지우고 새로 만들어야함")
+                        console.log(`@삭제- ${nowPage}page`);
+                    }
+                }
+
 
                 //해당페이지들의 실제 크기임.
                 const pageOriginWidth = shouldPreparePage.view[2] - shouldPreparePage.view[0];
@@ -189,6 +195,8 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
                     viewport: viewport,
                 };
                 await shouldPreparePage.render(renderContext).promise;
+
+                console.log(`@생성- ${pageNumber}page`);
                 resolve({
                     valid:true,
                     data:{
@@ -215,8 +223,9 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
 
 
 
-
+    //랜더가 완료되면 값이 있음.
     const [renderedTarget,set_renderedTarget]= useState(null);
+    //실제 랜더가 되었나
     useEffect(() => {
         if (!pages) return;
         if (isNowPageRenderPrepared && nowPage) {
@@ -226,8 +235,8 @@ const PDFviewModalV2 = React.forwardRef(({ ...props }, ref) => {
                 console.error("target이 준비되지 않았습니다");
                 return;
             }
-            console.log("targetPrepared 친구를 render하겠음");
-            console.log("targetPrepared",targetPrepared);
+            // console.log("targetPrepared 친구를 render하겠음");
+            // console.log("targetPrepared",targetPrepared);
             const renderCanvas = renderCanvasRef.current;
             const ctx = renderCanvas.getContext("2d");
             ctx.clearRect(0, 0, renderCanvasRef.current.offsetWidth, renderCanvasRef.current.offsetHeight);
