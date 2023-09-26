@@ -1,4 +1,4 @@
-import  { useState, useEffect, useRef, useMemo,forwardRef } from "react";
+import { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from "react";
 import './PDFviewModalV2.scss';
 
 // import { Document, Page, pdfjs } from 'react-pdf';
@@ -33,7 +33,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
     const PDFWrapperRef = useRef();
     const gazecanvasref = useRef();
     const heatmapref = useRef();
- 
+
     // const [pages, set_pages] = useState(null);
     // const [maxPdfPageNumber, set_maxPdfPageNumber] = useState(null);
     const [nowPage, set_nowPage] = useState(1);
@@ -57,6 +57,66 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
     //랜더가 완료되면 값이 있음.
     const [renderedTarget, set_renderedTarget] = useState(null);
     const [drawing, setDrawing] = useState(false);
+
+
+    useImperativeHandle(ref, () => ({
+        // set_pageNumber(val) {
+        //     set_renderDone(false);
+        //     setPageNumber(val);
+        // },
+        // set_scrollTop: (val) => {
+        //     // wrapperRef.current.scrollTop = val;
+        //     prettyscrollref.current.scrollTop(val);
+        // },
+        // get_pdfSize2: () => {
+        //     return {
+        //         width: pdfWidth,
+        //         height: pdfHeight,
+        //     }
+        // },
+        get_canvasRef: () => {
+            return gazecanvasref;
+        },
+        // get_heatmapRef: () => {
+        //     return heatmapref;
+        // },
+        // reset_viewPerecent: (val) => {
+        //     set_viewPercent(val);
+        // },
+        // get_pdfSize: () => {
+        //     try {
+        //         let obj = {
+        //             PDF: {
+        //                 width: canvasRef.current.width,
+        //                 height: canvasRef.current.height,
+        //                 leftPixel: (modalref.current.clientWidth - canvasRef.current.width) / 2,
+        //                 topPixel: canvasRef.current.height >= modalref.current.clientHeight ? 0 : (modalref.current.clientHeight - canvasRef.current.height) / 2
+        //             },
+        //             PDFwrap: {
+        //                 width: canvasRef.current.width,
+        //                 height: modalref.current.clientHeight
+        //             },
+        //             SCRwrap: {
+        //                 width: modalref.current.clientWidth,
+        //                 height: modalref.current.clientHeight
+        //             },
+        //         }
+        //         return obj;
+        //     }
+        //     catch (e) {
+        //         console.log("get_pdfSize Error");
+        //         return null;
+        //     }
+
+        // }
+
+    }), []);
+
+    const renderWidth = useMemo(() => {
+
+        return 40;
+    }, [])
+
 
 
     //nowPage를 랜더준비를 하는곳
@@ -86,7 +146,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                 if (!res_nowPageRender.cache) {
                     preparedPDFinform.push(res_nowPageRender.data);
                 }
-                let resizeRatio = wrapperWidth / res_nowPageRender.data.canvasSize.width;
+                let resizeRatio = renderWidth / 100 * wrapperWidth / res_nowPageRender.data.canvasSize.width;
                 let newCanvasHeight = res_nowPageRender.data.canvasSize.height * resizeRatio
                 set_renderHeight(newCanvasHeight);
                 set_isNowPageRenderPrepared(true);
@@ -274,7 +334,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
             });
         }
 
-    }, [pages, nowPage, PDFrenderOption]);
+    }, [pages, nowPage, PDFrenderOption,renderWidth]);
 
 
 
@@ -288,14 +348,24 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                 return;
             }
             const renderCanvas = renderCanvasRef.current;
+            const drawCanvas = gazecanvasref.current;
             const ctx = renderCanvas.getContext("2d");
             ctx.clearRect(0, 0, renderCanvasRef.current.offsetWidth, renderCanvasRef.current.offsetHeight);
             renderCanvas.width = targetPrepared.canvasSize.width;
             renderCanvas.height = targetPrepared.canvasSize.height;
+            drawCanvas.width =  targetPrepared.canvasSize.width;
+            drawCanvas.height = targetPrepared.canvasSize.height;
+            //#@! 나머지 캔버스들도 크기지정필요
+
             ctx.drawImage(targetPrepared.canvas, 0, 0);
+            if (pdfSizeCallback) {
+                pdfSizeCallback({ pageNumber: nowPage })
+            }
+
             set_renderedTarget(targetPrepared);
         }
-    }, [isNowPageRenderPrepared, nowPage]);
+    }, [isNowPageRenderPrepared, nowPage, pdfSizeCallback]);
+
 
 
     //wrapper리사이즈시 canvas의 height 재설정 
@@ -311,7 +381,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                         return rt;
                     }
 
-                    let resizeRatio = entry.contentRect.width / rt.canvasSize.width;
+                    let resizeRatio = renderWidth / 100 * entry.contentRect.width / rt.canvasSize.width;
                     let newCanvasHeight = rt.canvasSize.height * resizeRatio
                     rt.wrapperSize = {
                         width: entry.contentRect.width,
@@ -328,7 +398,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
         return () => {
             resizeObserver.disconnect();
         }
-    }, []);
+    }, [renderWidth]);
 
 
 
@@ -364,7 +434,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
 
     return (<div className="PDFviewModalV2 no-drag" ref={PDFviewModalV2Ref}>
 
-        <div style={{ position: 'absolute', left: 0, top: 0, background: 'orange' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, background: 'orange', zIndex: 5 }}>
             총페이지:{maxPdfPageNumber}<br />
             지금페이지:{nowPage}<br />
             <button disabled={isPrevPageRenderPrepared === true ? false : true} onClick={() => {
@@ -386,25 +456,29 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
         <div className="PDFWrapper" style={{ width: '100%', height: '100%', overflowY: 'auto', position: 'relative' }}
             ref={PDFWrapperRef} >
 
-            <canvas className="PDFcanvas" ref={renderCanvasRef}
-                style={{
-                    width: '100%',
-                    height: renderHeight
-                }} />
+            <div style={{ margin: 'auto', position: 'relative', width: `${renderWidth}%`, height: renderHeight, }}>
+                <canvas className="PDFcanvas" ref={renderCanvasRef}
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }} />
 
-            <div className="heatmapWrapper">
-                <div ref={heatmapref} style={{ width: '100%', height: renderHeight }} />
+                <div className="heatmapWrapper">
+                    <div ref={heatmapref} style={{ width: '100%', height: renderHeight }} />
+                </div>
+                <canvas ref={gazecanvasref}
+                    className="pathwayGazeCanvas"
+                    style={{ width: '100%', height: renderHeight }}
+
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseOut={stopDrawing}
+                />
             </div>
 
-            <canvas ref={gazecanvasref}
-                className="pathwayGazeCanvas"
-                style={{ width: '100%', height: renderHeight }}
 
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={stopDrawing}
-                onMouseOut={stopDrawing}
-            />
+
 
         </div>
 

@@ -7,16 +7,26 @@ $main-border-color-70: #6b94b6;
     background: green;
     position: relative;
     .PDFWrapper {
-        background:red;
+        background:#b4b4b4;
         overflow-y: auto;
         overflow-x: hidden;
         box-sizing: border-box;
         display:flex;
         justify-content: center;
         // align-items: center;
-        .mycanvas{
+        position:relative;
+        margin:auto;
+        .PDFcanvas{
             margin:auto;
+            // z-index: 1000;
+            // position:absolute;
+            
             // background:purple;
+        }
+        .heatmapWrapper,.pathwayGazeCanvas{
+            position:absolute;
+            left:0;
+            top:0;
         }
         //스크롤바 디자인
         &::-webkit-scrollbar {

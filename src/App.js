@@ -126,6 +126,7 @@ function App() {
   
   const handleDrawStart = (obj) => {
     const { x, y, pageNumber } = obj;
+    console.log("그려")
     const canvasref = pdfviewref.current.get_canvasRef();
     const canvas = canvasref.current;
     const context = canvas.getContext('2d');
@@ -145,8 +146,10 @@ function App() {
   const handleDrawIng = (obj) => {
     const { x, y, pageNumber } = obj;
     const canvasref = pdfviewref.current.get_canvasRef();
+    console.log("canvasref",canvasref)
     const canvas = canvasref.current;
     const context = canvas.getContext('2d');
+    console.log("그려중")
     context.lineTo(x, y);
     context.stroke();
     tempDrawedMemory.current[pageNumber].drawArr.push({
@@ -156,6 +159,7 @@ function App() {
     });
   }
   const handleDrawEnd = (obj) => {
+    console.log("그려끝")
     const { pageNumber } = obj;
     const canvasref = pdfviewref.current.get_canvasRef();
     const canvas = canvasref.current;
