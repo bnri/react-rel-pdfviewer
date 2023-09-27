@@ -5,6 +5,7 @@ import './PDFviewModalV2.scss';
 // import pdfjsLib from "pdfjs-dist/build/pdf";
 // import * as pdfjsLib from 'pdfjs-dist';
 import usePDFLoader from "./hooks/usePDFLoader";
+import NumberOnlyInput from "./components/NumberOnlyInput";
 
 // import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry'
 
@@ -17,10 +18,17 @@ import usePDFLoader from "./hooks/usePDFLoader";
 //1. 이상한 파일이 들어왔을시 예외처리
 
 
+//react-virtualized 를 같이 사용해서..해야할듯
+
+
 const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
     const {
-        drawStart, drawEnd, drawIng, viewPercentChangeCallback, path, onClose, showViewMode, viewpercent,
-        set_viewpercent, scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
+        renderOption,
+        initViewPercent,
+        minViewPercent,
+        maxViewPercent,
+        drawStart, drawEnd, drawIng, viewPercentChangeCallback, path, onClose, showViewMode,
+        scrollCallback, pageCallback, pdfSizeCallback, onConfirm, showConfirmBtn, PDFonloadCallback } = props;
     // pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
     // console.log("path",path);
     const PDFviewModalV2Ref = useRef(null); //가장 바깥 ref
@@ -46,11 +54,18 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
     const PDFrenderOption = useMemo(() => {
         //1모드는 랜더한페이지의 다음과 이전만 준비하는 방식.
         //2모드는 전체 페이지를 다하고,,,
-        return {
-            mode: 1,
-            canvasWidth: 1920,
+        //3모드는 해당 랜더페이지만
+        if(!renderOption){
+            return {
+                mode: 3,
+                // canvasWidth: 1920,
+            }            
         }
-    }, []);
+        else{
+            return renderOption;
+        }
+      
+    }, [renderOption]);
 
 
     const [renderHeight, set_renderHeight] = useState(0);
@@ -112,16 +127,14 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
 
     }), []);
 
-    const renderWidth = useMemo(() => {
+    const [renderWidth,set_renderWidth] = useState(initViewPercent?initViewPercent:40);
 
-        return 40;
-    }, [])
 
 
 
     //nowPage를 랜더준비를 하는곳
     useEffect(() => {
-
+ 
         if (!preparedPDFPageInform.current) {
             preparedPDFPageInform.current = [];
         }
@@ -131,26 +144,39 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
         if (!pages || !pages.length) {
             return;
         }
-        set_isNowPageRenderPrepared(false);
-        set_isNextPageRenderPrepared(false);
-        set_isPrevPageRenderPrepared(false);
+
+
+        if(!PDFrenderOption.canvasWidth){
+            preparedPDFPageInform.current.splice(0, preparedPDFPageInform.current.length);
+        
+        }
+        console.log("랜더준비 호출");
+
 
         const wrapperWidth = PDFWrapperRef.current.offsetWidth;
         const preparedPDFinform = preparedPDFPageInform.current; //배열형태임.
-        console.log("@@@@@@@@@preparedPDFinform", preparedPDFinform);
+        // console.log("@@@@@@@@@preparedPDFinform", preparedPDFinform);
         const prepareIngArr = prepareIngPDFPageInform.current;
+        let pa = preparedPDFPageInform.current;
+        console.log("@@@@@@@@@@@@@@@@@@pa1",pa)
 
+        if(PDFrenderOption.mode===3){
+            set_first_preParing_loading(false);
+        }
         prepareRenderPage(nowPage).then(res_nowPageRender => {
             // console.log("res_nowPageRender",res_nowPageRender);
             if (res_nowPageRender.valid) {
-                if (!res_nowPageRender.cache) {
+                if (!res_nowPageRender.cache ) {
+                    console.log("넣어")
                     preparedPDFinform.push(res_nowPageRender.data);
+                    console.log("preparedPDFinform",preparedPDFinform)
                 }
                 let resizeRatio = renderWidth / 100 * wrapperWidth / res_nowPageRender.data.canvasSize.width;
                 let newCanvasHeight = res_nowPageRender.data.canvasSize.height * resizeRatio
                 set_renderHeight(newCanvasHeight);
                 set_isNowPageRenderPrepared(true);
-
+                let pa = preparedPDFPageInform.current;
+                console.log("@@@@@@@@@@@@@@@@@@pa2",pa)
 
                 // console.log("targetPrepared를 생성하는데 성공");
 
@@ -209,7 +235,7 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                 p[i] = prepareRenderPage(i).then(res_somepageRender => {
                     // console.log("res_nowPageRender",res_nowPageRender);
                     if (res_somepageRender.valid) {
-                        if (!res_somepageRender.cache) {
+                        if (!res_somepageRender.cache ) {
                             preparedPDFinform.push(res_somepageRender.data);
                         }
 
@@ -274,16 +300,19 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                     });
                     return;
                 }
+                const renderCanvas = renderCanvasRef.current;
 
                 prepareIngArr.push(pageNumber);
                 //해당페이지들의 실제 크기임.
-                const pageOriginWidth = shouldPreparePage.view[2] - shouldPreparePage.view[0];
-                const pageOriginHeight = shouldPreparePage.view[3] - shouldPreparePage.view[1];
-
+                // const pageOriginWidth = shouldPreparePage.view[2] - shouldPreparePage.view[0];
+                // const pageOriginHeight = shouldPreparePage.view[3] - shouldPreparePage.view[1];
+                const pageOriginWidth = shouldPreparePage.view[2];
+                const pageOriginHeight = shouldPreparePage.view[3];
                 //목표 이미지사이즈가 1920 임.
                 // 만약 pageOriginWidth로 랜더할꺼면 1920을 pageOriginWidth 로하면됨
 
-                let myscale = PDFrenderOption.canvasWidth / pageOriginWidth;
+                let myscale = PDFrenderOption.canvasWidth? PDFrenderOption.canvasWidth / pageOriginWidth:
+                1*renderCanvas.offsetWidth/pageOriginWidth;
 
                 // console.log("myscale",myscale);
                 //랜더할 가상캔버스 생성
@@ -300,8 +329,8 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                     viewport: viewport,
                 };
                 await shouldPreparePage.render(renderContext).promise;
-                console.log("prepareIngArr", prepareIngArr);
-                console.log(`@생성- ${pageNumber}page`);
+                // console.log("prepareIngArr", prepareIngArr);
+                // console.log(`@생성- ${pageNumber}page`);
 
 
                 resolve({
@@ -327,34 +356,46 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
 
                 let targetPreparedIndex = prepareIngArr.findIndex(d => d === pageNumber);
                 prepareIngArr.splice(targetPreparedIndex, 1);
-                console.log("prepareIngArr", prepareIngArr);
+                // console.log("prepareIngArr", prepareIngArr);
 
 
 
             });
         }
-
+        
     }, [pages, nowPage, PDFrenderOption,renderWidth]);
 
 
 
     //실제 랜더가 되었나
     useEffect(() => {
+        // console.log("isNowPageRenderPrepared",isNowPageRenderPrepared,nowPage)
         if (isNowPageRenderPrepared && nowPage) {
             let pa = preparedPDFPageInform.current;
+            console.log("@@@@@@@@@@@@@@@@@@pa3",pa)
             const targetPrepared = pa.find(d => d.pageNumber === nowPage)
+
             if (!targetPrepared) {
-                console.error("target이 준비되지 않았습니다");
+
+                console.error(`${nowPage}page가 준비되지 않았습니다`);
                 return;
             }
+
+            console.log(`임시 ${nowPage}page가 준비되서 랜더하고있음`);
             const renderCanvas = renderCanvasRef.current;
             const drawCanvas = gazecanvasref.current;
+            const drawCanvasElSize = drawCanvas.getClientRects()[0];
+            drawCanvas.width =  drawCanvasElSize.width;
+            drawCanvas.height = drawCanvasElSize.height;
+
             const ctx = renderCanvas.getContext("2d");
-            ctx.clearRect(0, 0, renderCanvasRef.current.offsetWidth, renderCanvasRef.current.offsetHeight);
+            //필요가없음 사이즈할당해서 clear 됨
+            // ctx.clearRect(0, 0, renderCanvasRef.current.offsetWidth, renderCanvasRef.current.offsetHeight);
             renderCanvas.width = targetPrepared.canvasSize.width;
             renderCanvas.height = targetPrepared.canvasSize.height;
-            drawCanvas.width =  targetPrepared.canvasSize.width;
-            drawCanvas.height = targetPrepared.canvasSize.height;
+            // drawCanvas.width =  targetPrepared.canvasSize.width;
+            // drawCanvas.height =targetPrepared.canvasSize.height;
+    
             //#@! 나머지 캔버스들도 크기지정필요
 
             ctx.drawImage(targetPrepared.canvas, 0, 0);
@@ -375,6 +416,11 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
             // 크기 변경시 실행할 작업을 여기에 작성합니다.
             entries.forEach(entry => {
                 console.log('PDF 껍데기의 크기가 변경되었습니다!', entry.contentRect.width, entry.contentRect.height);
+                if(!PDFrenderOption.canvasWidth){
+                    preparedPDFPageInform.current.splice(0, preparedPDFPageInform.current.length);
+                    set_isNowPageRenderPrepared(false);
+                    // return;
+                }
 
                 set_renderedTarget(rt => {
                     if (!rt) {
@@ -398,12 +444,13 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
         return () => {
             resizeObserver.disconnect();
         }
-    }, [renderWidth]);
+    }, [renderWidth,PDFrenderOption]);
 
 
 
     const startDrawing = (e) => {
         const { offsetX, offsetY } = e.nativeEvent;
+        // console.log("offsetX",offsetX)
         setDrawing(true);
         if (drawStart) {
             drawStart({ x: offsetX, y: offsetY, pageNumber: nowPage });
@@ -437,13 +484,32 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
         <div style={{ position: 'absolute', left: 0, top: 0, background: 'orange', zIndex: 5 }}>
             총페이지:{maxPdfPageNumber}<br />
             지금페이지:{nowPage}<br />
-            <button disabled={isPrevPageRenderPrepared === true ? false : true} onClick={() => {
+            <button disabled={PDFrenderOption.mode===3 || isPrevPageRenderPrepared === true ? false : true} onClick={() => {
                 set_nowPage(p => p > 1 ? p - 1 : p);
+                set_isNowPageRenderPrepared(false);
+                set_isNextPageRenderPrepared(false);
+                set_isPrevPageRenderPrepared(false);
             }}>이전</button>
-            <button disabled={isNextPageRenderPrepared === true ? false : true} onClick={() => {
+            <button disabled={PDFrenderOption.mode===3 || isNextPageRenderPrepared === true ? false : true} onClick={() => {
                 set_nowPage(p => p + 1 <= maxPdfPageNumber ? p + 1 : p);
+                set_isNowPageRenderPrepared(false);
+                set_isNextPageRenderPrepared(false);
+                set_isPrevPageRenderPrepared(false);
             }}>다음</button>
             <br />
+            <button disabled={renderWidth<=40?true:false}onClick={()=>set_renderWidth(e=>e-1)}>-</button>
+            <br/>
+            <NumberOnlyInput
+                value={renderWidth}
+                onChange={(newvalue)=>{
+                    set_renderWidth(newvalue)
+                }}
+                max={maxViewPercent?maxViewPercent:100}
+                min={minViewPercent?minViewPercent:40}
+            />
+            <br/>
+            <button disabled={renderWidth>=100?true:false} onClick={()=>set_renderWidth(e=>e+1)}>+</button>
+            <br/>
             <button onClick={() => {
                 if (onClose) {
                     onClose();
@@ -451,12 +517,12 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
             }}>닫기</button>
         </div>
 
+        
+        <div className="leftBar">
 
-
-        <div className="PDFWrapper" style={{ width: '100%', height: '100%', overflowY: 'auto', position: 'relative' }}
-            ref={PDFWrapperRef} >
-
-            <div style={{ margin: 'auto', position: 'relative', width: `${renderWidth}%`, height: renderHeight, }}>
+        </div>
+        <div className="PDFWrapper" ref={PDFWrapperRef} >
+            <div className="PDFcanvasWrap" style={{ width: `${renderWidth}%`, height: renderHeight, }}>
                 <canvas className="PDFcanvas" ref={renderCanvasRef}
                     style={{
                         width: '100%',
@@ -476,12 +542,10 @@ const PDFviewModalV2 = forwardRef(({ ...props }, ref) => {
                     onMouseOut={stopDrawing}
                 />
             </div>
-
-
-
+        </div>
+        <div className="rightBar">
 
         </div>
-
 
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect ,useMemo} from "react";
 import './App.scss';
 import PDFviewModal from './lib/PDFviewModal';
 import PDFviewModalV2 from "./lib2/PDFviewModalV2";
@@ -6,48 +6,24 @@ import PDFviewModalV2 from "./lib2/PDFviewModalV2";
 
 function App() {
 
-  const [viewpercent, set_viewpercent] = React.useState(100);
 
-  const openFullscreen = () => {
-    var elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari & Opera 
-      elem.webkitRequestFullscreen();
-
-    } else if (elem.mozRequestFullScreen) { // Firefox 
-
-      elem.mozRequestFullScreen();
-
-    } else if (elem.msRequestFullscreen) { // IE/Edge 
-      elem.msRequestFullscreen();
-
-    }
-  }
+  const option= useMemo(()=>{
+    //pdf 고유의 사이즈를 무시, 현제의 width기준으로 랜더
+    
+    return {
+        mode:3 , //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
+        canvasWidth:0, //값을 안넣어주면, 리랜더 하는방식으로..
+    };
+  },[])
 
 
-  const cancelFullScreen = () => {
-    var el = document;
-    var requestMethod = el.cancelFullScreen || el.webkitCancelFullScreen || el.mozCancelFullScreen || el.exitFullscreen || el.webkitExitFullscreen;
-    if (requestMethod) { // cancel full screen.
-      requestMethod.call(el);
-    }
-    // } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-    //   var wscript = new ActiveXObject("WScript.Shell");
-    //   if (wscript !== null) {
-    //     wscript.SendKeys("{F11}");
-    //   }
-    // }
-  }
 
 
-  
   const pdfviewref = React.useRef();
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
   const handleAddFile = (e) => {
-
     console.log(e.target.files[0]);
     //if (!e.target.files[0]) return;
     if (e.target.files[0].type !== 'application/pdf') {
@@ -66,9 +42,6 @@ function App() {
   }
 
   const handleOpenPreview = () => {
-
-
-
     if (!file) return;
     // console.log("파일", file);
     let logoURL = window.URL.createObjectURL(file);
@@ -77,6 +50,8 @@ function App() {
     set_previewURL(logoURL);
 
   }
+
+
   const handleScrollCallback = (s) => {
     // console.log("@@@@@@@@@@@@@@@@@@@@scroll콜백",s)
   }
@@ -84,7 +59,6 @@ function App() {
   const handlePageCallback = (p) => {
     console.log("@@@@@@@@@@@@@@@@@page콜백",p);
   }
-
 
 
   const handlePDFCallback = (d) => {
@@ -103,11 +77,13 @@ function App() {
           if (drawArr[i].type === 'startDrawing') {
               // console.log("드라우시작")
               context.beginPath();
-              context.moveTo(drawArr[i].x, drawArr[i].y);
+              context.moveTo(drawArr[i].x*canvasref.current.width,
+                 drawArr[i].y*canvasref.current.height);
           }
           else if (drawArr[i].type === 'draw') {
               // console.log("드라우")
-              context.lineTo(drawArr[i].x, drawArr[i].y);
+              context.lineTo(drawArr[i].x*canvasref.current.width,
+                 drawArr[i].y*canvasref.current.height);
               context.stroke();
           }
           else if (drawArr[i].type === 'stopDrawing') {
@@ -126,40 +102,45 @@ function App() {
   
   const handleDrawStart = (obj) => {
     const { x, y, pageNumber } = obj;
-    console.log("그려")
+    // console.log("그려")
     const canvasref = pdfviewref.current.get_canvasRef();
-    const canvas = canvasref.current;
-    const context = canvas.getContext('2d');
+    const drawCanvas = canvasref.current;
+    
+    
+    const context = drawCanvas.getContext('2d');
     if (!tempDrawedMemory.current[pageNumber]) {
       tempDrawedMemory.current[pageNumber] = {
         drawArr: []
       }
     }
     context.beginPath();
-    context.moveTo(x, y);
+    context.moveTo( x/canvasref.current.offsetWidth*canvasref.current.width,
+     y/canvasref.current.offsetHeight*canvasref.current.height);
     tempDrawedMemory.current[pageNumber].drawArr.push({
       type: 'startDrawing',
-      x: x,
-      y: y,
+      x: x/canvasref.current.offsetWidth,
+      y: y/canvasref.current.offsetHeight,
     });
   }
   const handleDrawIng = (obj) => {
     const { x, y, pageNumber } = obj;
     const canvasref = pdfviewref.current.get_canvasRef();
-    console.log("canvasref",canvasref)
+
+    // console.log("canvasref",canvasref)
     const canvas = canvasref.current;
     const context = canvas.getContext('2d');
-    console.log("그려중")
-    context.lineTo(x, y);
+    // console.log("그려중")
+    context.lineTo(x/canvasref.current.offsetWidth*canvasref.current.width,
+    y/canvasref.current.offsetHeight*canvasref.current.height);
     context.stroke();
     tempDrawedMemory.current[pageNumber].drawArr.push({
       type: 'draw',
-      x: x,
-      y: y,
+      x: x/canvasref.current.offsetWidth,
+      y: y/canvasref.current.offsetHeight,
     });
   }
   const handleDrawEnd = (obj) => {
-    console.log("그려끝")
+    // console.log("그려끝")
     const { pageNumber } = obj;
     const canvasref = pdfviewref.current.get_canvasRef();
     const canvas = canvasref.current;
@@ -254,9 +235,16 @@ function App() {
                 console.log("콜백옴 page수", pages);
               }}
               path={previewURL}
+              renderOption={option}
+
               showViewMode={true}
-              viewpercent={viewpercent}
-              set_viewpercent={set_viewpercent}
+
+
+              initViewPercent={25}
+
+              minViewPercent={20}
+              maxViewPercent={100}
+
 
               showConfirmBtn={true}
               onConfirm={() => {
