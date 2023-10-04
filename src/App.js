@@ -1,20 +1,23 @@
-import React, { useEffect ,useMemo} from "react";
+import React, { useEffect, useMemo, useState ,useCallback } from "react";
 import './App.scss';
 import PDFviewModal from './lib/PDFviewModal';
-import PDFviewModalV2 from "./lib2/PDFviewModalV2";
-
+import A, { PDFviewModalV2, PDFDocument, Page } from "./lib2";
+// console.log("A", A);
 
 function App() {
 
 
-  const option= useMemo(()=>{
+  const option = useMemo(() => {
     //pdf 고유의 사이즈를 무시, 현제의 width기준으로 랜더
-    
+
     return {
-        mode:3 , //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
-        canvasWidth:0, //값을 안넣어주면, 리랜더 하는방식으로..
+      mode: 2, //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
+      drawing: true,
+      canvasResolution:1,
+      // canvasWidth:1920, //값을 안넣어주면 계속 리랜더함 
+      //만약 전체 페이지 mode가 2번인상태로 값을 안넣어주면 전체페이지를 매번 리랜더.. viewpercent 바뀔때마다
     };
-  },[])
+  }, [])
 
 
 
@@ -23,6 +26,9 @@ function App() {
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
+  const [maxPageNumber,set_maxPageNumber] = useState();
+
+
   const handleAddFile = (e) => {
     console.log(e.target.files[0]);
     //if (!e.target.files[0]) return;
@@ -41,15 +47,6 @@ function App() {
     set_file(tmpfile);
   }
 
-  const handleOpenPreview = () => {
-    if (!file) return;
-    // console.log("파일", file);
-    let logoURL = window.URL.createObjectURL(file);
-    // console.log(logoURL);
-    // openFullscreen();
-    set_previewURL(logoURL);
-
-  }
 
 
   const handleScrollCallback = (s) => {
@@ -57,15 +54,14 @@ function App() {
   }
 
   const handlePageCallback = (p) => {
-    console.log("@@@@@@@@@@@@@@@@@page콜백",p);
+    console.log("@@@@@@@@@@@@@@@@@page콜백", p);
   }
-
 
   const handlePDFCallback = (d) => {
     // console.log("pdf사이즈콜백", d)
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@pdf사이즈ㅂ콜백",d)
-    const {pageNumber} = d;
-    if(tempDrawedMemory.current[pageNumber]){
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@pdf사이즈ㅂ콜백", d)
+    const { pageNumber } = d;
+    if (tempDrawedMemory.current[pageNumber]) {
       const drawArr = tempDrawedMemory.current[pageNumber].drawArr;
       const canvasref = pdfviewref.current.get_canvasRef();
       const canvas = canvasref.current;
@@ -74,39 +70,40 @@ function App() {
       // console.log("pageNumber", pageNumber);
       // console.log("drawArr", drawArr)
       for (let i = 0; i < drawArr.length; i++) {
-          if (drawArr[i].type === 'startDrawing') {
-              // console.log("드라우시작")
-              context.beginPath();
-              context.moveTo(drawArr[i].x*canvasref.current.width,
-                 drawArr[i].y*canvasref.current.height);
-          }
-          else if (drawArr[i].type === 'draw') {
-              // console.log("드라우")
-              context.lineTo(drawArr[i].x*canvasref.current.width,
-                 drawArr[i].y*canvasref.current.height);
-              context.stroke();
-          }
-          else if (drawArr[i].type === 'stopDrawing') {
-              // console.log("드라우끝")
-              context.closePath();
-          }
+        if (drawArr[i].type === 'startDrawing') {
+          // console.log("드라우시작")
+          context.beginPath();
+          context.moveTo(drawArr[i].x * canvasref.current.width,
+            drawArr[i].y * canvasref.current.height);
+        }
+        else if (drawArr[i].type === 'draw') {
+          // console.log("드라우")
+          context.lineTo(drawArr[i].x * canvasref.current.width,
+            drawArr[i].y * canvasref.current.height);
+          context.stroke();
+        }
+        else if (drawArr[i].type === 'stopDrawing') {
+          // console.log("드라우끝")
+          context.closePath();
+        }
       }
     }
 
   }
 
+
   const tempDrawedMemory = React.useRef();
   useEffect(() => {
     tempDrawedMemory.current = {};
   }, [])
-  
+
   const handleDrawStart = (obj) => {
     const { x, y, pageNumber } = obj;
     // console.log("그려")
     const canvasref = pdfviewref.current.get_canvasRef();
     const drawCanvas = canvasref.current;
-    
-    
+
+
     const context = drawCanvas.getContext('2d');
     if (!tempDrawedMemory.current[pageNumber]) {
       tempDrawedMemory.current[pageNumber] = {
@@ -114,12 +111,12 @@ function App() {
       }
     }
     context.beginPath();
-    context.moveTo( x/canvasref.current.offsetWidth*canvasref.current.width,
-     y/canvasref.current.offsetHeight*canvasref.current.height);
+    context.moveTo(x / canvasref.current.offsetWidth * canvasref.current.width,
+      y / canvasref.current.offsetHeight * canvasref.current.height);
     tempDrawedMemory.current[pageNumber].drawArr.push({
       type: 'startDrawing',
-      x: x/canvasref.current.offsetWidth,
-      y: y/canvasref.current.offsetHeight,
+      x: x / canvasref.current.offsetWidth,
+      y: y / canvasref.current.offsetHeight,
     });
   }
   const handleDrawIng = (obj) => {
@@ -130,13 +127,13 @@ function App() {
     const canvas = canvasref.current;
     const context = canvas.getContext('2d');
     // console.log("그려중")
-    context.lineTo(x/canvasref.current.offsetWidth*canvasref.current.width,
-    y/canvasref.current.offsetHeight*canvasref.current.height);
+    context.lineTo(x / canvasref.current.offsetWidth * canvasref.current.width,
+      y / canvasref.current.offsetHeight * canvasref.current.height);
     context.stroke();
     tempDrawedMemory.current[pageNumber].drawArr.push({
       type: 'draw',
-      x: x/canvasref.current.offsetWidth,
-      y: y/canvasref.current.offsetHeight,
+      x: x / canvasref.current.offsetWidth,
+      y: y / canvasref.current.offsetHeight,
     });
   }
   const handleDrawEnd = (obj) => {
@@ -150,12 +147,39 @@ function App() {
       type: 'stopDrawing',
     });
   }
+  const handleOpenPreview = () => {
+    if (!file) return;
+    // console.log("파일", file);
+    let logoURL = window.URL.createObjectURL(file);
+    // console.log(logoURL);
+    // openFullscreen();
+    // set_istotal(false);
+    set_previewURL(logoURL);
+
+  }
+
+  const [vp, set_vp] = useState(90);
+  const [nowPage,set_nowPage] = useState(1);
+
+  const handleDocumentLoadCallback = useCallback((pages) => {
+    console.log("콜백옴 page수", pages);
+    set_maxPageNumber(pages);
+  },[]);
 
 
-
+  // console.log("여기랜더111")
   return (
     <div className="App">
       <div className="tempFileZone">
+        {"PageNumber:"+nowPage}
+        <button onClick={() => set_nowPage(nowPage + 1 <= maxPageNumber? nowPage + 1 : nowPage)}>+</button>
+        <button onClick={() => set_nowPage(nowPage - 1 > 0 ? nowPage - 1 : nowPage)}>-</button>
+        <br/>
+        <br/>
+        {"가로 퍼센트" + vp + '%'}
+        <button onClick={() => set_vp(vp + 1 <= 100 ? vp + 1 : vp)}>+</button>
+        <button onClick={() => set_vp(vp - 1 > 0 ? vp - 1 : vp)}>-</button>
+        <br />
         {file && <> {`임시파일이름 : ${file.name}`} <button className="deletefilebtn" onClick={() => set_file(null)}>삭제</button></>}
         <input ref={fileRef} style={{ display: 'none' }}
 
@@ -163,7 +187,7 @@ function App() {
           accept="application/pdf"
 
           type="file" onChange={handleAddFile} />
-
+        <br />
         <button
           className="btn"
           onClick={() => {
@@ -174,6 +198,7 @@ function App() {
         <button onClick={handleOpenPreview}>
           미리보기
         </button>
+
       </div>
 
       <button onClick={() => {
@@ -226,7 +251,7 @@ function App() {
 
       }}>canvas위에그리기</button>
 
-      {previewURL &&
+      {/* {istotal===false&&previewURL &&
         <>
           <div className="PDFpreView">
             <PDFviewModalV2
@@ -235,7 +260,7 @@ function App() {
                 console.log("콜백옴 page수", pages);
               }}
               path={previewURL}
-              renderOption={option}
+              option={option}
 
               showViewMode={true}
 
@@ -273,7 +298,29 @@ function App() {
           </div>
 
         </>
+      } */}
+
+      {previewURL &&
+        <div className="PDFpreView">
+
+          <PDFDocument
+            PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
+            path={previewURL}
+            option={option}
+            viewPercent={vp}
+          >
+              
+              <Page
+                // ref={pdfviewref}
+                pageNumber={nowPage}
+              />
+          </PDFDocument>
+        </div>
       }
+
+
+
+
     </div>
   );
 }

@@ -1,0 +1,53 @@
+$main-border-color: #145894;
+$main-border-color-70: #6b94b6;
+
+.PDFDocument {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display:flex;
+    
+    .PDFScroll{
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+
+        .Page {
+            margin: auto;
+          
+            .PDFcanvas {
+                margin: auto;
+                // z-index: 1000;
+                // position:absolute;
+                box-sizing: border-box;
+                // background:red;
+            }
+        }
+    }
+    //스크롤바 디자인
+    // &::-webkit-scrollbar {
+    //     width: 8px;
+    //     height: 8px;
+    //     background: $main-border-color;
+    // }
+
+    // &::-webkit-scrollbar-thumb {
+    //     // border-radius: 3.5px;
+    //     background-color: $main-border-color;
+
+    //     &:hover {
+    //         background-color: blue;
+    //     }
+    // }
+
+    // &::-webkit-scrollbar-track {
+    //     background: $main-border-color-70;
+    // }
+
+
+   
+}

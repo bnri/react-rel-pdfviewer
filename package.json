@@ -15,7 +15,8 @@
     "pdfjs-dist": "^2.6.347",
     "react-custom-scrollbars": "^4.2.1",
     "react-number-format": "^4.9.3",
-    "react-pdf": "^5.7.2"
+    "react-pdf": "^5.7.2",
+    "react-virtualized": "^9.22.5"
   },
   "scripts": {
     "start": "react-scripts start",

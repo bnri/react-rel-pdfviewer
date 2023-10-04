@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js`;
 
-function usePDFLoader(path) {
+function usePDFLoader(path,PDFDocumentOnLoadCallback) {
     const [pages, setPages] = useState([]);
-    const [maxPdfPageNumber, setMaxPdfPageNumber] = useState(null);
-  
+
     useEffect(() => {
       if (!path) return;
   
@@ -22,9 +21,12 @@ function usePDFLoader(path) {
             const page = await pdf.getPage(i);
             loadedPages.push(page);
           }
-  
+          
           setPages(loadedPages);
-          setMaxPdfPageNumber(pdfPageNumbers);
+          // if(PDFDocumentOnLoadCallback){
+          //   PDFDocumentOnLoadCallback(pdfPageNumbers);
+          // }
+
         } catch (error) {
           // 오류 처리
           console.error("PDF 로드 중 오류 발생:", error);
@@ -33,8 +35,9 @@ function usePDFLoader(path) {
   
       getPDFdocumentByPath();
     }, [path]);
-  
-    return { pages, maxPdfPageNumber };
+    
+    console.log("usePDFLoader~~~")
+    return { pages };
   }
 
   export default usePDFLoader;
