@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState ,useCallback } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import './App.scss';
 import PDFviewModal from './lib/PDFviewModal';
-import A, { PDFviewModalV2, PDFDocument, Page } from "./lib2";
+import A, { PDFTopBar,PDFviewModalV2, PDFDocument, Page,PDFpreview } from "./lib2";
+
 // console.log("A", A);
 
 function App() {
@@ -13,10 +14,24 @@ function App() {
     return {
       mode: 2, //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
       drawing: true,
-      canvasResolution:1,
-      // canvasWidth:1920, //값을 안넣어주면 계속 리랜더함 
+      canvasResolution: 1,
+      // canvasWidth:200, //값을 안넣어주면 계속 리랜더함 
       //만약 전체 페이지 mode가 2번인상태로 값을 안넣어주면 전체페이지를 매번 리랜더.. viewpercent 바뀔때마다
     };
+  }, [])
+
+  const previewOption = useMemo(() => {
+
+    return {
+      show: true,
+      // specifySize:400,
+      pageMargin: 30,
+      wrapperStyle: {
+        position: "absolute",
+        left: 0,
+        width: 150,
+      }
+    }
   }, [])
 
 
@@ -26,7 +41,7 @@ function App() {
   const fileRef = React.useRef();
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
-  const [maxPageNumber,set_maxPageNumber] = useState();
+  const [maxPageNumber, set_maxPageNumber] = useState();
 
 
   const handleAddFile = (e) => {
@@ -159,23 +174,23 @@ function App() {
   }
 
   const [vp, set_vp] = useState(90);
-  const [nowPage,set_nowPage] = useState(1);
+  const [nowPage, set_nowPage] = useState(1);
 
   const handleDocumentLoadCallback = useCallback((pages) => {
     console.log("콜백옴 page수", pages);
     set_maxPageNumber(pages);
-  },[]);
+  }, []);
 
 
   // console.log("여기랜더111")
   return (
     <div className="App">
       <div className="tempFileZone">
-        {"PageNumber:"+nowPage}
-        <button onClick={() => set_nowPage(nowPage + 1 <= maxPageNumber? nowPage + 1 : nowPage)}>+</button>
+        {"PageNumber:" + nowPage}
+        <button onClick={() => set_nowPage(nowPage + 1 <= maxPageNumber ? nowPage + 1 : nowPage)}>+</button>
         <button onClick={() => set_nowPage(nowPage - 1 > 0 ? nowPage - 1 : nowPage)}>-</button>
-        <br/>
-        <br/>
+        <br />
+        <br />
         {"가로 퍼센트" + vp + '%'}
         <button onClick={() => set_vp(vp + 1 <= 100 ? vp + 1 : vp)}>+</button>
         <button onClick={() => set_vp(vp - 1 > 0 ? vp - 1 : vp)}>-</button>
@@ -301,20 +316,24 @@ function App() {
       } */}
 
       {previewURL &&
-        <div className="PDFpreView">
+        <div className="PDFDocWrap">
 
           <PDFDocument
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}
             option={option}
             viewPercent={vp}
+
+            previewOption={previewOption}
           >
-              
-              <Page
-                // ref={pdfviewref}
-                pageNumber={nowPage}
-              />
+            
+            {/* <Page
+              // ref={pdfviewref}
+              pageNumber={nowPage}
+            /> */}
           </PDFDocument>
+
+
         </div>
       }
 

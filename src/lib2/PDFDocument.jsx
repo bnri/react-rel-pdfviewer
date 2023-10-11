@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 import usePDFLoader from "./hooks/usePDFLoader";
 import _ from "lodash";
 
 import "./PDFDocument.scss";
 import * as pdfjsLib from 'pdfjs-dist';
+import { PDFTopBar, PDFpreview } from "./";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js`;
 
 
 const PDFDocument = (props) => {
-    const { children, option, path, PDFDocumentOnLoadCallback, viewPercent } = props;
+    const { previewOption, children, option, path, PDFDocumentOnLoadCallback, viewPercent } = props;
     // const { pages, maxPdfPageNumber } = usePDFLoader(path, PDFDocumentOnLoadCallback);
     // console.log("pages",pages)
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
     const [preparedPages, set_preparedPages] = useState();
-    
+    const [preparedPreviewPages, set_preparedPreviewPages] = useState();
+    const [previewPageNumber, set_previewPageNumber] = useState(1);
 
     useEffect(() => {
         if (!path) return;
@@ -34,8 +36,8 @@ const PDFDocument = (props) => {
                 }
 
                 setPages(loadedPages);
-                if(PDFDocumentOnLoadCallback){
-                  PDFDocumentOnLoadCallback(pdfPageNumbers);
+                if (PDFDocumentOnLoadCallback) {
+                    PDFDocumentOnLoadCallback(pdfPageNumbers);
                 }
 
             } catch (error) {
@@ -45,18 +47,26 @@ const PDFDocument = (props) => {
         }
 
         getPDFdocumentByPath();
-    }, [path,PDFDocumentOnLoadCallback]);
+    }, [path, PDFDocumentOnLoadCallback]);
 
 
     useEffect(() => {
         if (!documentRef.current) return;
         if (!pages || !pages.length) return;
-        
+
         const canvasWidth = option?.canvasWidth || 0; //고정사이즈
         console.log("@!@$!@$@!@$여기가호출", option, pages)
 
         const element = documentRef.current;
-        const handleRemakeVirtualCanvas = _.debounce((entries)=>{
+        let resizing = false; // Flag to track whether resizing is in progress
+
+        const handleRemakeVirtualCanvas = _.debounce((entries) => {
+            if (resizing) {
+                return; // If resizing is already in progress, return early
+            }
+
+            resizing = true; // Set the resizing flag to true
+
             entries.forEach(entry => {
                 console.log('@@@@@@@@@@@@@@@@PDFDocument 껍데기의 크기가 변경되었습니다!', entry.contentRect.width, entry.contentRect.height, viewPercent);
                 // set_renderWidth(entry.contentRect.width * viewPercent / 100);
@@ -65,25 +75,26 @@ const PDFDocument = (props) => {
                 // console.log('PDF 껍데기의 크기가 변경되었습니다!', contentWidth, contentHeight);
                 const renderWidth = contentWidth * viewPercent / 100;
                 // console.log("renderWidth", renderWidth)
-                
+
 
                 let p = [];
                 for (let i = 0; i < pages.length; i++) {
-                    p[i] = preparePage(i + 1);
+                    p[i] = preparePage(i + 1, canvasWidth);
                 }
 
                 Promise.all(p).then(res => {
                     console.log("모든페이지준비res", res);
                     set_preparedPages(res);
-
+                    resizing = false; // Reset the resizing flag
                 }).catch(err => {
                     console.log("에러:", err.msg);
+                    resizing = false; // Reset the resizing flag
                     // set_loadingmsg(err.msg);
                 })
                 //#@! 고정사이즈일경우 다시 가상캔버스를 그리지 않게 코딩할것
 
 
-                function preparePage(pageNumber) {
+                function preparePage(pageNumber, specificSize) {
                     return new Promise(async function (resolve, reject) {
                         if (!pageNumber) {
                             reject({
@@ -105,8 +116,14 @@ const PDFDocument = (props) => {
                         const pageOriginWidth = shouldPreparePage.view[2];
                         const pageOriginHeight = shouldPreparePage.view[3];
 
-                        let myscale = canvasWidth ? canvasWidth / pageOriginWidth :
-                            1.5 * renderWidth / pageOriginWidth * 1;
+                        let myscale;
+                        if (specificSize) {
+                            myscale = specificSize / pageOriginWidth;
+                        }
+                        else {
+                            myscale = 1 * renderWidth / pageOriginWidth;
+                        }
+
 
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d', { willReadFrequently: true });
@@ -135,10 +152,10 @@ const PDFDocument = (props) => {
                                 width: viewport.width,
                                 height: viewport.height
                             },
-                            wrapperSize:{
-                                resizeRatio:resizeRatio,
-                                width:renderWidth,
-                                height:viewport.height*resizeRatio
+                            wrapperSize: {
+                                resizeRatio: resizeRatio,
+                                width: renderWidth,
+                                height: viewport.height * resizeRatio
                             },
                         })
                     });
@@ -146,11 +163,11 @@ const PDFDocument = (props) => {
                 }
 
             });
-        },100);
+        }, 100);
 
         const resizeObserver = new ResizeObserver(entries => {
             // 크기 변경시 실행할 작업을 여기에 작성합니다.
-         
+
             handleRemakeVirtualCanvas(entries);
         });
 
@@ -161,20 +178,134 @@ const PDFDocument = (props) => {
     }, [viewPercent, pages, option]);
 
 
+    useEffect(() => {
+        if (!pages) return;
+        if (!previewOption) return;
+        if (preparedPreviewPages) return;
 
+
+        const renderWidth = previewOption.wrapperStyle ? previewOption.wrapperStyle.width - previewOption.pageMargin * 2 : 200;
+        // const renderWidth = previewOption.wrapperStyle.width-40;
+
+        prepareAllPage(pages);
+        async function prepareAllPage(pages) {
+
+            console.log("pages", pages);
+
+            let p = [];
+            for (let i = 0; i < pages.length; i++) {
+                p[i] = preparePage(i + 1, renderWidth);
+            }
+            Promise.all(p).then(res => {
+                console.log("Preview준비res", res);
+                // let preparedPages=res;
+                set_preparedPreviewPages(res);
+
+            }).catch(err => {
+                console.log("에러:", err.msg);
+                // set_loadingmsg(err.msg);
+            })
+
+            function preparePage(pageNumber, specificSize) {
+                return new Promise(async function (resolve, reject) {
+                    if (!pageNumber) {
+                        reject({
+                            valid: false,
+                            msg: "페이지넘버가 없음"
+                        })
+                        return;
+                    }
+
+
+                    const shouldPreparePage = pages[pageNumber - 1];
+                    if (!shouldPreparePage) {
+                        reject({
+                            valid: false,
+                            msg: "해당 페이지가 존재하지 않음"
+                        })
+                        return;
+                    }
+                    const pageOriginWidth = shouldPreparePage.view[2];
+                    const pageOriginHeight = shouldPreparePage.view[3];
+
+                    let myscale;
+                    if (specificSize) {
+                        myscale = specificSize / pageOriginWidth;
+                    }
+                    else {
+                        myscale = 1 * renderWidth / pageOriginWidth;
+                    }
+
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d', { willReadFrequently: true });
+                    const viewport = shouldPreparePage.getViewport({ scale: myscale }); // 원하는 스케일로 조정
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport,
+                    };
+                    // console.log("랜더컨택스 완료")
+                    const resizeRatio = renderWidth / viewport.width;
+
+                    await shouldPreparePage.render(renderContext).promise;
+
+
+                    resolve({
+                        canvas: canvas,
+                        pageNumber: pageNumber,
+                        originScale: myscale,
+                        PDForiginSize: {
+                            width: pageOriginWidth,
+                            height: pageOriginHeight
+                        },
+                        canvasSize: {
+                            width: viewport.width,
+                            height: viewport.height
+                        },
+                        wrapperSize: {
+                            resizeRatio: resizeRatio,
+                            width: renderWidth,
+                            height: viewport.height * resizeRatio
+                        },
+                    })
+                });
+
+            }
+        }
+    }, [previewOption, pages])
+
+    const handlePreviewChange = useCallback((pagenumber) => {
+        set_previewPageNumber(pagenumber)
+    }, []);
     return (<div className="PDFDocument" ref={documentRef}>
+        <PDFTopBar
+
+        />
+        {previewOption && preparedPreviewPages &&
+            <PDFpreview
+                previewPageNumber={previewPageNumber}
+                previewOption={previewOption}
+                preparedPreviewPages={preparedPreviewPages}
+                handlePreviewChange={(page) => {
+                    console.log("pageClick", page);
+                    set_previewPageNumber(page);
+                }}
+            />
+        }
+
         <div className="PDFScroll">
             {preparedPages ?
                 React.Children.map(children, (child) => {
                     return React.isValidElement(child)
-                        ? React.cloneElement(child, { preparedPages })
+                        ? React.cloneElement(child, { handlePreviewChange, previewPageNumber, preparedPages, preparedPreviewPages, previewOption })
                         : null
                 })
                 :
                 <div className="LoadingScreen">Loading...</div>
             }
         </div>
-
 
     </div>)
 }
