@@ -11,21 +11,53 @@ $topbar-height:50px;
     overflow:hidden;
     .PDFTopBar{
         // position:absolute;
-
         height:$topbar-height;
         width:100%;
         left:0;
         top:0;
-        background:#404040;
+        background:#383838;
         box-sizing: border-box;
         border-bottom: 1px solid #222;
         box-shadow: 3px 1px 1px #444;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        color:#fff;
+        gap:20px;
+        .grayBar{
+            
+            height:16px;
+            width:1px;
+            background:gray;
+        }
+        .oneTab{
+            // height:25px;
+            height:100%;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            font-size:12px;
+            input{
+                font-size:12px;
+                outline:none;
+                border:none;
+                width:40px;
+                text-align: center;
+                color:#fff;
+                background-color:#111;
+                outline:none;
+                height:18px;
+            }
+            input::selection {
+                background-color: gray;
+            }
+        }
     }
     .PDFpreview{
         height:calc(100% - #{$topbar-height});
         top:$topbar-height;
         overflow-y: auto;
-        background:#404040;
+        background:#383838;
         transition: left 300ms 300ms;
         .onePageWrap{
             box-sizing: border-box;
@@ -37,6 +69,7 @@ $topbar-height:50px;
                 margin:auto;
                 width:100%;
                 height:100%;
+                box-sizing: border-box;
             }
             .onePageBlur{
                 position:absolute;
@@ -59,9 +92,13 @@ $topbar-height:50px;
             }
 
             .pageNumberWrapper{
-                margin-top:7px;
+                height:25px;
                 color:#fff;
                 font-size:7px;
+                display:flex;
+                justify-content: center;
+                align-items: flex-end;
+
             }
         }
     }

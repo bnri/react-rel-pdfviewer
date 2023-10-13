@@ -9,15 +9,24 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 
 const PDFDocument = (props) => {
-    const { previewOption, children, option, path, PDFDocumentOnLoadCallback, viewPercent } = props;
+    const { previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
     // const { pages, maxPdfPageNumber } = usePDFLoader(path, PDFDocumentOnLoadCallback);
     // console.log("pages",pages)
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
     const [preparedPages, set_preparedPages] = useState();
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
-    const [previewPageNumber, set_previewPageNumber] = useState(1);
 
+    const [viewPercent,set_viewPercent] = useState(option.initViewPercent?option.initViewPercent:'100%');
+    const [nowPage,set_nowPage] = useState(1);
+    const maxPageNumber =useMemo(()=>{
+        if(pages){
+            return pages.length;
+        }
+        else{
+            return 0;
+        }
+    },[pages])
     useEffect(() => {
         if (!path) return;
 
@@ -277,29 +286,41 @@ const PDFDocument = (props) => {
     }, [previewOption, pages])
 
     const handlePreviewChange = useCallback((pagenumber) => {
-        set_previewPageNumber(pagenumber)
+        set_nowPage(pagenumber)
     }, []);
     return (<div className="PDFDocument" ref={documentRef}>
-        <PDFTopBar
 
-        />
+
         {previewOption && preparedPreviewPages &&
-            <PDFpreview
-                previewPageNumber={previewPageNumber}
-                previewOption={previewOption}
-                preparedPreviewPages={preparedPreviewPages}
-                handlePreviewChange={(page) => {
-                    console.log("pageClick", page);
-                    set_previewPageNumber(page);
-                }}
-            />
+            <>
+                <PDFTopBar 
+                    viewPercent={viewPercent}
+                    set_viewPercent={set_viewPercent}
+                    maxPageNumber={maxPageNumber}
+                    nowPage={nowPage}
+                    handleChangeNowPage={(p)=>{
+                        set_nowPage(p)
+                    }}
+                />
+                <PDFpreview
+                    nowPage={nowPage}
+                    previewOption={previewOption}
+                    preparedPreviewPages={preparedPreviewPages}
+                    handlePreviewChange={(page) => {
+                        // console.log("pageClick", page);
+                        set_nowPage(page);
+                    }}
+                />
+
+            </>
+
         }
 
         <div className="PDFScroll">
             {preparedPages ?
                 React.Children.map(children, (child) => {
                     return React.isValidElement(child)
-                        ? React.cloneElement(child, { handlePreviewChange, previewPageNumber, preparedPages, preparedPreviewPages, previewOption })
+                        ? React.cloneElement(child, { handlePreviewChange, nowPage, preparedPages, preparedPreviewPages, previewOption })
                         : null
                 })
                 :

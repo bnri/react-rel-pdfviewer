@@ -8,13 +8,55 @@ const PDFpreview = (props) => {
         preparedPreviewPages,
         handlePreviewChange,
         previewOption,
-        previewPageNumber
+        nowPage
     } = props;
 
+    const PDFpreviewRef = useRef();
+
+    useEffect(() => {
+        if (PDFpreviewRef.current) {
+            // 계산을 통해 onePageWrap이 보이게 하는 로직을 작성합니다.
+            const pageWrapHeight = PDFpreviewRef.current.offsetHeight;
+            // const scrollContainerHeight = PDFpreviewRef.current.scrollHeight;
+            const currentScroll=PDFpreviewRef.current.scrollTop;
+
+            let visibleMin = currentScroll;
+            let visibleMax = currentScroll+pageWrapHeight;
+
+            // console.log("pageWrapHeight",pageWrapHeight)
+            // console.log("scrollContainerHeight",scrollContainerHeight);
+            // console.log("visibleMin",visibleMin,visibleMax)
+            
+            // let data=[];
+            let hs = 0;
+
+            for(let i = 0 ; i<preparedPreviewPages.length; i++){
+                const onePage = preparedPreviewPages[i];
+                let onePageHeight=onePage.wrapperSize.height + previewOption.pageMargin+25;
+                // data.push({
+                //     pageNumber: i+1,
+                //     pageHeight:onePageHeight,
+                //     viewMinScrollHeight:hs,
+                //     viewMaxScrollHeight:hs+onePageHeight,
+                //     visible: hs>=visibleMin && (hs+onePageHeight)<=visibleMax ? true:false       
+                // });
+                
+                if(nowPage===i+1){
+                    let isneedtomovescroll=hs>=visibleMin && (hs+onePageHeight)<=visibleMax ?false:true;
+                    if(isneedtomovescroll){
+                        //위아래인지 구분
+                        PDFpreviewRef.current.scrollTop=hs;
+                    }
+                }
+                hs+=onePageHeight;
+            }
+        }
+    }, [nowPage, preparedPreviewPages,previewOption]);
 
 
-
-    return (<div className="PDFpreview" style={{
+    return (<div className="PDFpreview" 
+        ref={PDFpreviewRef}
+        style={{
         ...previewOption.wrapperStyle,
         left: previewOption.show ? 0: -(previewOption.wrapperStyle.width+previewOption.pageMargin*2) 
 
@@ -25,7 +67,6 @@ const PDFpreview = (props) => {
                     <div className="onePageWrap"
                         style={{
                             marginTop: previewOption.pageMargin,
-                            marginBottom: previewOption.pageMargin
                         }}
                         key={'preview_' + index}
                     >
@@ -55,9 +96,11 @@ const PDFpreview = (props) => {
                                 }}
 
                             />
-                            <div className={`onePageBlur ${previewPageNumber === (index * 1 + 1) ? 'selPage' : ''}`} onClick={() => {
+                            <div className={`onePageBlur ${nowPage === (index * 1 + 1) ? 'selPage' : ''}`} onClick={() => {
                                 if (handlePreviewChange) {
                                     handlePreviewChange(index + 1);
+                                    //#@! 스크롤이 있다면 이동
+
                                 }
                             }} />
                         </div>

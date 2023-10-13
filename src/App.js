@@ -15,6 +15,7 @@ function App() {
       mode: 2, //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
       drawing: true,
       canvasResolution: 1,
+      initViewPercent:'100%',
       // canvasWidth:200, //값을 안넣어주면 계속 리랜더함 
       //만약 전체 페이지 mode가 2번인상태로 값을 안넣어주면 전체페이지를 매번 리랜더.. viewpercent 바뀔때마다
     };
@@ -322,7 +323,7 @@ function App() {
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}
             option={option}
-            viewPercent={vp}
+           
 
             previewOption={previewOption}
           >
