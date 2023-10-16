@@ -26,6 +26,7 @@ $topbar-height:50px;
         gap:20px;
         position:relative;
         .btnWrap{
+            margin:2px;
             border-radius:50%;
             width:37px;
             height:37px;
@@ -38,8 +39,8 @@ $topbar-height:50px;
                 cursor:pointer;
             }
 
-            svg{
-                color:#fff;
+            img{
+                fill:#fff;
                 width: 25px;
                 height: 25px;
             }

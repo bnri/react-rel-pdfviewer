@@ -1,8 +1,10 @@
 import NumberOnlyInput from "./components/NumberOnlyInput";
 import PercentageInput from "./components/PercentageInput";
-import { ReactComponent as HamburgerSvg } from "./svg/Hamburger_icon.svg";
-import { ReactComponent as MinusSvg } from "./svg/Minus_symbol.svg";
-import { ReactComponent as PlusSvg } from "./svg/Plus_symbol.svg";
+import HamburgerSvg from "./svg/Hamburger_icon.svg";
+// import MinusSvg from "./svg/Minus_symbol.svg";
+import MinusSvg from "./svg/minus-sign-of-a-line-in-horizontal-position-svgrepo-com.svg";
+
+import PlusSvg from "./svg/plus-large-svgrepo-com.svg";
 const PDFTopBar = (props) => {
     const { set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage } = props;
     return (<div className="PDFTopBar">
@@ -12,7 +14,7 @@ const PDFTopBar = (props) => {
                     set_leftPreviewShow(v => !v);
                 }
             }}>
-                <HamburgerSvg  />
+                <img src={HamburgerSvg} alt=""  />
             </div>
 
         </div>
@@ -39,7 +41,7 @@ const PDFTopBar = (props) => {
         <div className="grayBar" />
         <div className="oneTab">
             <div className="btnWrap">
-              <MinusSvg />
+              <img alt="" src={MinusSvg}/>
             </div>
 
             <PercentageInput
@@ -48,7 +50,7 @@ const PDFTopBar = (props) => {
                 onChange={(v) => set_viewPercent(v)}
             />
             <div className="btnWrap">
-            <PlusSvg />
+                <img alt="" src={PlusSvg}/>
             </div>
 
         </div>
