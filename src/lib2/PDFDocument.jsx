@@ -4,7 +4,7 @@ import _ from "lodash";
 
 import "./PDFDocument.scss";
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFTopBar, PDFpreview } from "./";
+import { PDFTopBar, PDFdynamicAllPage, PDFpreview } from "./";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js`;
 
 
@@ -16,7 +16,7 @@ const PDFDocument = (props) => {
     const documentRef = useRef(null);
     const [preparedPages, set_preparedPages] = useState();
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
-
+    const [leftPreviewShow,set_leftPreviewShow] = useState(previewOption&&previewOption.initLeftPreviewshow?previewOption.initLeftPreviewshow:false);
     const [viewPercent,set_viewPercent] = useState(option.initViewPercent?option.initViewPercent:'100%');
     const [nowPage,set_nowPage] = useState(1);
     const maxPageNumber =useMemo(()=>{
@@ -293,6 +293,7 @@ const PDFDocument = (props) => {
 
         {previewOption && preparedPreviewPages &&
             <>
+
                 <PDFTopBar 
                     viewPercent={viewPercent}
                     set_viewPercent={set_viewPercent}
@@ -301,8 +302,10 @@ const PDFDocument = (props) => {
                     handleChangeNowPage={(p)=>{
                         set_nowPage(p)
                     }}
+                    set_leftPreviewShow={set_leftPreviewShow}
                 />
                 <PDFpreview
+                    leftPreviewShow={leftPreviewShow}
                     nowPage={nowPage}
                     previewOption={previewOption}
                     preparedPreviewPages={preparedPreviewPages}
@@ -311,10 +314,12 @@ const PDFDocument = (props) => {
                         set_nowPage(page);
                     }}
                 />
+                <PDFdynamicAllPage
 
+                />
             </>
-
         }
+
 
         <div className="PDFScroll">
             {preparedPages ?

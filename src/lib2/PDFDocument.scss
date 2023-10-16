@@ -24,6 +24,26 @@ $topbar-height:50px;
         align-items: center;
         color:#fff;
         gap:20px;
+        position:relative;
+        .btnWrap{
+            border-radius:50%;
+            width:37px;
+            height:37px;
+            // background:red;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            &:hover{
+                background:#555;
+                cursor:pointer;
+            }
+
+            svg{
+                color:#fff;
+                width: 25px;
+                height: 25px;
+            }
+        }
         .grayBar{
             
             height:16px;
@@ -31,6 +51,7 @@ $topbar-height:50px;
             background:gray;
         }
         .oneTab{
+         
             // height:25px;
             height:100%;
             display:flex;
@@ -52,13 +73,26 @@ $topbar-height:50px;
                 background-color: gray;
             }
         }
+        .oneTab.exceptLeft {
+            position: absolute; // 왼쪽에 배치
+            left:20px;
+            
+        }
+    }
+    .PDFdynamicAllPage{
+        height:calc(100% - #{$topbar-height});
+        width:100%;
+        overflow-y: auto;
+        background:red;
     }
     .PDFpreview{
         height:calc(100% - #{$topbar-height});
-        top:$topbar-height;
+        // top:$topbar-height;
         overflow-y: auto;
         background:#383838;
         transition: left 300ms 300ms;
+        padding-bottom:30px;
+        box-sizing: border-box;
         .onePageWrap{
             box-sizing: border-box;
             display:flex;
@@ -94,7 +128,7 @@ $topbar-height:50px;
             .pageNumberWrapper{
                 height:25px;
                 color:#fff;
-                font-size:7px;
+                font-size:.7rem;
                 display:flex;
                 justify-content: center;
                 align-items: flex-end;

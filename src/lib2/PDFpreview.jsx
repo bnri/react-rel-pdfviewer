@@ -8,6 +8,7 @@ const PDFpreview = (props) => {
         preparedPreviewPages,
         handlePreviewChange,
         previewOption,
+        leftPreviewShow,
         nowPage
     } = props;
 
@@ -58,7 +59,7 @@ const PDFpreview = (props) => {
         ref={PDFpreviewRef}
         style={{
         ...previewOption.wrapperStyle,
-        left: previewOption.show ? 0: -(previewOption.wrapperStyle.width+previewOption.pageMargin*2) 
+        left: leftPreviewShow ? 0: -(previewOption.wrapperStyle.width+previewOption.pageMargin*2) 
 
     }}>
         {previewOption && preparedPreviewPages &&

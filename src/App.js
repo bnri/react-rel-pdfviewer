@@ -24,7 +24,7 @@ function App() {
   const previewOption = useMemo(() => {
 
     return {
-      show: true,
+      initLeftPreviewshow: true,
       // specifySize:400,
       pageMargin: 30,
       wrapperStyle: {
@@ -323,8 +323,6 @@ function App() {
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}
             option={option}
-           
-
             previewOption={previewOption}
           >
             
