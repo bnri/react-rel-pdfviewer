@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
-import usePDFLoader from "./hooks/usePDFLoader";
+
 import _ from "lodash";
 
 import "./PDFDocument.scss";
@@ -10,11 +10,9 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 const PDFDocument = (props) => {
     const { previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
-    // const { pages, maxPdfPageNumber } = usePDFLoader(path, PDFDocumentOnLoadCallback);
-    // console.log("pages",pages)
+
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
-    const [preparedPages, set_preparedPages] = useState();
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [leftPreviewShow,set_leftPreviewShow] = useState(previewOption&&previewOption.initLeftPreviewshow?previewOption.initLeftPreviewshow:false);
     const [viewPercent,set_viewPercent] = useState(option.initViewPercent?option.initViewPercent:'100%');
@@ -59,6 +57,7 @@ const PDFDocument = (props) => {
     }, [path, PDFDocumentOnLoadCallback]);
 
 
+    /*
     useEffect(() => {
         if (!documentRef.current) return;
         if (!pages || !pages.length) return;
@@ -82,7 +81,7 @@ const PDFDocument = (props) => {
                 const contentWidth = element.offsetWidth;
                 const contentHeight = element.offsetHeight;
                 // console.log('PDF 껍데기의 크기가 변경되었습니다!', contentWidth, contentHeight);
-                const renderWidth = contentWidth * viewPercent / 100;
+                const renderWidth = contentWidth * parseInt(viewPercent) / 100;
                 // console.log("renderWidth", renderWidth)
 
 
@@ -185,8 +184,9 @@ const PDFDocument = (props) => {
             resizeObserver.disconnect();
         }
     }, [viewPercent, pages, option]);
+    */
 
-
+    
     useEffect(() => {
         if (!pages) return;
         if (!previewOption) return;
@@ -283,15 +283,26 @@ const PDFDocument = (props) => {
 
             }
         }
-    }, [previewOption, pages])
+    }, [previewOption, pages,preparedPreviewPages])
+    
 
-    const handlePreviewChange = useCallback((pagenumber) => {
-        set_nowPage(pagenumber)
-    }, []);
+    useEffect(()=>{
+        if(!preparedPreviewPages) return;
+        const intViewPercent = parseInt(viewPercent);
+        const renderWidth = (documentRef.current.offsetWidth - 150 ) *intViewPercent/100;
+        console.log("renderWidth",renderWidth)
+        for(let i = 0 ; i < preparedPreviewPages.length ; i++){
+
+        }
+
+        console.log("preparedPreviewPages",preparedPreviewPages)
+
+    },[preparedPreviewPages,viewPercent,leftPreviewShow])
+
+
+
     return (<div className="PDFDocument" ref={documentRef}>
-
-
-        {previewOption && preparedPreviewPages &&
+        {previewOption && preparedPreviewPages ?
             <>
 
                 <PDFTopBar 
@@ -315,13 +326,16 @@ const PDFDocument = (props) => {
                     }}
                 />
                 <PDFdynamicAllPage
-
+                    maxPageNumber={maxPageNumber}
                 />
             </>
+            :
+            <div className="LoadingScreen">Loading...</div>
         }
+     
 
-
-        <div className="PDFScroll">
+        
+        {/* <div className="PDFScroll">
             {preparedPages ?
                 React.Children.map(children, (child) => {
                     return React.isValidElement(child)
@@ -332,6 +346,7 @@ const PDFDocument = (props) => {
                 <div className="LoadingScreen">Loading...</div>
             }
         </div>
+         */}
 
     </div>)
 }

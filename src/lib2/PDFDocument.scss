@@ -83,6 +83,7 @@ $topbar-height:50px;
     .PDFdynamicAllPage{
         height:calc(100% - #{$topbar-height});
         width:100%;
+        flex:1;
         overflow-y: auto;
         background:red;
     }
@@ -137,6 +138,9 @@ $topbar-height:50px;
             }
         }
     }
+
+
+
 
     .PDFScroll{
 
