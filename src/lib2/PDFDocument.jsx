@@ -14,17 +14,19 @@ const PDFDocument = (props) => {
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
-    const [leftPreviewShow,set_leftPreviewShow] = useState(previewOption&&previewOption.initLeftPreviewshow?previewOption.initLeftPreviewshow:false);
-    const [viewPercent,set_viewPercent] = useState(option.initViewPercent?option.initViewPercent:'100%');
-    const [nowPage,set_nowPage] = useState(1);
-    const maxPageNumber =useMemo(()=>{
-        if(pages){
+    const [percentPagesData, set_percentPagesData] = useState();
+
+    const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
+    const [viewPercent, set_viewPercent] = useState(option.initViewPercent ? option.initViewPercent : '100%');
+    const [nowPage, set_nowPage] = useState(1);
+    const maxPageNumber = useMemo(() => {
+        if (pages) {
             return pages.length;
         }
-        else{
+        else {
             return 0;
         }
-    },[pages])
+    }, [pages])
     useEffect(() => {
         if (!path) return;
 
@@ -56,7 +58,71 @@ const PDFDocument = (props) => {
         getPDFdocumentByPath();
     }, [path, PDFDocumentOnLoadCallback]);
 
+    const preparePage = useCallback((page, pageNumber, specificSize, renderWidth) => {
 
+
+        return new Promise(async function (resolve, reject) {
+
+
+
+            const shouldPreparePage = page;
+            if (!shouldPreparePage) {
+                reject({
+                    valid: false,
+                    msg: "해당 페이지가 존재하지 않음"
+                })
+                return;
+            }
+            const pageOriginWidth = shouldPreparePage.view[2];
+            const pageOriginHeight = shouldPreparePage.view[3];
+
+            let myscale;
+            if (specificSize) {
+                myscale = specificSize / pageOriginWidth;
+            }
+            else {
+                myscale = 1 * renderWidth / pageOriginWidth;
+            }
+
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d', { willReadFrequently: true });
+            const viewport = shouldPreparePage.getViewport({ scale: myscale }); // 원하는 스케일로 조정
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport,
+            };
+            // console.log("랜더컨택스 완료")
+            const resizeRatio = renderWidth / viewport.width;
+
+            await shouldPreparePage.render(renderContext).promise;
+
+
+            resolve({
+                valid: true,
+                canvas: canvas,
+                // pageNumber: pageNumber,
+                // originScale: myscale,
+                // PDForiginSize: {
+                //     width: pageOriginWidth,
+                //     height: pageOriginHeight
+                // },
+                canvasSize: {
+                    width: viewport.width,
+                    height: viewport.height
+                },
+                // wrapperSize: {
+                //     resizeRatio: resizeRatio,
+                //     width: renderWidth,
+                //     height: viewport.height * resizeRatio
+                // },
+            })
+        });
+
+
+    }, [])
     /*
     useEffect(() => {
         if (!documentRef.current) return;
@@ -186,7 +252,7 @@ const PDFDocument = (props) => {
     }, [viewPercent, pages, option]);
     */
 
-    
+
     useEffect(() => {
         if (!pages) return;
         if (!previewOption) return;
@@ -283,34 +349,63 @@ const PDFDocument = (props) => {
 
             }
         }
-    }, [previewOption, pages,preparedPreviewPages])
-    
+    }, [previewOption, pages, preparedPreviewPages])
 
-    useEffect(()=>{
-        if(!preparedPreviewPages) return;
+
+    useEffect(() => {
+        if (!preparedPreviewPages) return;
+        let to;
+
+
+
         const intViewPercent = parseInt(viewPercent);
-        const renderWidth = (documentRef.current.offsetWidth - 150 ) *intViewPercent/100;
-        console.log("renderWidth",renderWidth)
-        for(let i = 0 ; i < preparedPreviewPages.length ; i++){
+        let viewPercentPagesData = [];
+        const sidebarSize = leftPreviewShow ? 150 : 0;
+        const renderWidth = (documentRef.current.offsetWidth - sidebarSize) * intViewPercent / 100;
+        // console.log("renderWidth",renderWidth)
+        let hs = 0;
+        for (let i = 0; i < preparedPreviewPages.length; i++) {
+            const onePage = preparedPreviewPages[i];
+            const { PDForiginSize } = onePage;
+            let onePageWidth = renderWidth;
+            let onePageHeight = renderWidth * PDForiginSize.height / PDForiginSize.width;
+            let onePageMarginTop = 25;
+            viewPercentPagesData.push({
+                pageNumber: i + 1,
+                bluredCanvas: onePage.canvas,
+                bluredCanvasSize: onePage.canvasSize,
+                width: onePageWidth,
+                height: onePageHeight,
+                marginHeight: onePageMarginTop,
+                viewMinScrollHeight: hs,
+                viewMaxScrollHeight: hs + onePageHeight + onePageMarginTop,
+                // visible: hs >= visibleMin && (hs + onePageHeight) <= visibleMax ? true : false
+            });
 
+            hs = hs + onePageHeight + onePageMarginTop;
         }
+        to = setTimeout(function () {
+            set_percentPagesData(viewPercentPagesData);
+        }, 300);
 
-        console.log("preparedPreviewPages",preparedPreviewPages)
-
-    },[preparedPreviewPages,viewPercent,leftPreviewShow])
+        // console.log("preparedPreviewPages",preparedPreviewPages)
+        return () => {
+            clearTimeout(to);
+        }
+    }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
 
 
     return (<div className="PDFDocument" ref={documentRef}>
-        {previewOption && preparedPreviewPages ?
+        {previewOption && preparedPreviewPages && percentPagesData ?
             <>
 
-                <PDFTopBar 
+                <PDFTopBar
                     viewPercent={viewPercent}
                     set_viewPercent={set_viewPercent}
                     maxPageNumber={maxPageNumber}
                     nowPage={nowPage}
-                    handleChangeNowPage={(p)=>{
+                    handleChangeNowPage={(p) => {
                         set_nowPage(p)
                     }}
                     set_leftPreviewShow={set_leftPreviewShow}
@@ -326,15 +421,19 @@ const PDFDocument = (props) => {
                     }}
                 />
                 <PDFdynamicAllPage
-                    maxPageNumber={maxPageNumber}
+                    leftPreviewShow={leftPreviewShow}
+                    percentPagesData={percentPagesData}
+                    set_nowPage={set_nowPage}
+                    pages={pages}
+                    preparePage={preparePage}
                 />
             </>
             :
             <div className="LoadingScreen">Loading...</div>
         }
-     
 
-        
+
+
         {/* <div className="PDFScroll">
             {preparedPages ?
                 React.Children.map(children, (child) => {

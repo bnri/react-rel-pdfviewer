@@ -40,7 +40,9 @@ const PDFTopBar = (props) => {
         </div>
         <div className="grayBar" />
         <div className="oneTab">
-            <div className="btnWrap">
+            <div className="btnWrap" onClick={()=>{
+                set_viewPercent(v=>parseInt(v)-1>25?(parseInt(v)-1)+'%':v);
+            }}>
               <img alt="" src={MinusSvg}/>
             </div>
 
@@ -49,7 +51,9 @@ const PDFTopBar = (props) => {
                 value={viewPercent}
                 onChange={(v) => set_viewPercent(v)}
             />
-            <div className="btnWrap">
+            <div className="btnWrap" onClick={()=>{
+           set_viewPercent(v=>parseInt(v)+1<=100?(parseInt(v)+1)+'%':v);
+            }}>
                 <img alt="" src={PlusSvg}/>
             </div>
 
