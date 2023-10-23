@@ -111,9 +111,19 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         }
         // console.log("partVisibleArr",partVisibleArr)
       
-        set_nowPage(findMaxIndex(partVisibleArr)+1);
+        set_nowPage(np=>{
+            let newnp=findMaxIndex(partVisibleArr)+1;
+            if(np===newnp){
+                return np;
+            }
+            else{
+                return newnp;
+            }
+        });
 
-         console.log("data",data);
+
+
+        //  console.log("data",data);
 
 
         if (beforehouldRenderHighQualityPageArray) {
@@ -124,6 +134,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                 if (ismakingHighQualityRef.current) {
                     return;
                 }
+
                 console.log("111111111이전값이 있지만 틀려서 생성중");
                 //#@!어째서 여기가 계속 호출되는것인가?
                 makeVirtualCanvasHighQualityPage().then(valid => {
@@ -185,15 +196,33 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
     }, [percentPagesData, pages, preparePage]);
 
 
-    const forceMoveScrollTop = useCallback((offset)=>{
-        scrollDivRef.current.Top(offset);
-    },[])
+    const forceMoveScrollTopToPage = useCallback((pageNumber)=>{
+        if(!percentPagesData) return;
+        // console.log("percentPagesData",percentPagesData);
+        let sctop=null;
+        for(let i = 0 ; i <percentPagesData.length; i++){
+            let p = percentPagesData[i];
+            if(p.pageNumber===pageNumber){
+                sctop=p.viewMinScrollHeight+(p.marginHeight);
+                break;
+            }
+
+        }
+        if(sctop!==null){
+            // console.log("sctop",sctop)
+            // console.dir(scrollDivRef.current)
+            scrollDivRef.current.scrollTop(sctop);
+        }
+
+        // console.dir(scrollDivRef);
+        // scrollDivRef.crTop(0);
+    },[percentPagesData])
 
     useImperativeHandle(ref,()=>({
-        set_scrollTop:(val)=>{
-            forceMoveScrollTop(val);
+        set_scrollMoveToPage:(pageNumber)=>{
+            forceMoveScrollTopToPage(pageNumber);
         }
-    }),[forceMoveScrollTop]);
+    }),[forceMoveScrollTopToPage]);
 
 
     useEffect(() => {
@@ -205,11 +234,11 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         changePercentPagesData();
     }, [changePercentPagesData]);
 
+    // console.log("percentPagesData",percentPagesData)
 
-
-    useEffect(() => {
-        console.log("@@@@@@@@shouldRenderHighQualityPageArray ", shouldRenderHighQualityPageArray)
-    }, [shouldRenderHighQualityPageArray])
+    // useEffect(() => {
+    //     console.log("@@@@@@@@shouldRenderHighQualityPageArray ", shouldRenderHighQualityPageArray)
+    // }, [shouldRenderHighQualityPageArray])
 
     return (<div className="PDFdynamicAllPage" style={{
         marginLeft: leftPreviewShow ? 150 : 0,

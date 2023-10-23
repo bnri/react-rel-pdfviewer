@@ -1,13 +1,17 @@
 import NumberOnlyInput from "./components/NumberOnlyInput";
 import PercentageInput from "./components/PercentageInput";
+import TextInput from "./components/TextInput";
 import HamburgerSvg from "./svg/Hamburger_icon.svg";
 // import MinusSvg from "./svg/Minus_symbol.svg";
 import MinusSvg from "./svg/minus-sign-of-a-line-in-horizontal-position-svgrepo-com.svg";
 
 import PlusSvg from "./svg/plus-large-svgrepo-com.svg";
+
+
 const PDFTopBar = (props) => {
-    const { set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage } = props;
-    return (<div className="PDFTopBar">
+    const { dynamicAllPageRef,set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage 
+    ,set_AOI_mode,AOI_mode,fileName,set_fileName} = props;
+    return (<div className="PDFTopBar no-drag">
         <div className="oneTab exceptLeft">
             <div className="btnWrap" onClick={() => {
                 if (set_leftPreviewShow) {
@@ -16,8 +20,19 @@ const PDFTopBar = (props) => {
             }}>
                 <img src={HamburgerSvg} alt=""  />
             </div>
-
+            <div  className="oneTab" style={{marginLeft:15}}>
+                <div>
+                <TextInput
+                    value={fileName}
+                    onChange={(newFileName)=>{
+                        set_fileName(newFileName)
+                    }}
+                />
+                </div>
+   
+            </div>
         </div>
+
         <div className="oneTab">
             <NumberOnlyInput
                 style={{ width: '25px' }}
@@ -25,14 +40,18 @@ const PDFTopBar = (props) => {
                 onChange={(val) => {
                     if (handleChangeNowPage) {
                         handleChangeNowPage(val);
+                        if(dynamicAllPageRef&&dynamicAllPageRef.current){
+                            // console.log(dynamicAllPageRef.current);
+                            dynamicAllPageRef.current.set_scrollMoveToPage(val);
+                        }
                     }
 
                 }}
                 min={1}
                 max={maxPageNumber}
-                onBlur={() => {
+                // onBlur={() => {
 
-                }}
+                // }}
             />
             <div style={{ marginBottom: 2 }}>
                 &nbsp;&nbsp;/&nbsp;{maxPageNumber}

@@ -43,7 +43,7 @@ function App() {
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
   const [maxPageNumber, set_maxPageNumber] = useState();
-
+  
 
   const handleAddFile = (e) => {
     console.log(e.target.files[0]);
@@ -324,6 +324,9 @@ function App() {
             path={previewURL}
             option={option}
             previewOption={previewOption}
+            pdfInform={{
+              fileName:"이것은PDF파일이름"
+            }}
           >
             
             {/* <Page

@@ -9,16 +9,19 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 
 const PDFDocument = (props) => {
-    const { previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
+    const { pdfInform,previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
 
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
+    const dynamicAllPageRef = useRef();
+
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [percentPagesData, set_percentPagesData] = useState();
 
     const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
     const [viewPercent, set_viewPercent] = useState(option.initViewPercent ? option.initViewPercent : '100%');
     const [nowPage, set_nowPage] = useState(1);
+    const [fileName,set_fileName] = useState(pdfInform.fileName?pdfInform.fileName:'임시파일이름');
     const maxPageNumber = useMemo(() => {
         if (pages) {
             return pages.length;
@@ -34,7 +37,7 @@ const PDFDocument = (props) => {
             try {
                 const loadingTask = await pdfjsLib.getDocument(path);
                 const pdf = await loadingTask.promise;
-
+    
                 const pdfInfo = pdf._pdfInfo;
                 const pdfPageNumbers = pdfInfo.numPages;
                 const loadedPages = [];
@@ -57,7 +60,7 @@ const PDFDocument = (props) => {
 
         getPDFdocumentByPath();
     }, [path, PDFDocumentOnLoadCallback]);
-
+    
     const preparePage = useCallback((page, pageNumber, specificSize, renderWidth) => {
 
 
@@ -351,12 +354,10 @@ const PDFDocument = (props) => {
         }
     }, [previewOption, pages, preparedPreviewPages])
 
-
+    //레프트바의 preview에 대한..설정인데
     useEffect(() => {
         if (!preparedPreviewPages) return;
         let to;
-
-
 
         const intViewPercent = parseInt(viewPercent);
         let viewPercentPagesData = [];
@@ -394,13 +395,18 @@ const PDFDocument = (props) => {
         }
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
+    const [AOI_moode,set_AOI_mode] = useState(0);
 
 
     return (<div className="PDFDocument" ref={documentRef}>
         {previewOption && preparedPreviewPages && percentPagesData ?
             <>
-
                 <PDFTopBar
+                    dynamicAllPageRef={dynamicAllPageRef}
+                    fileName={fileName}
+                    set_fileName={set_fileName}
+                    AOI_moode={AOI_moode}
+                    set_AOI_mode={set_AOI_mode}
                     viewPercent={viewPercent}
                     set_viewPercent={set_viewPercent}
                     maxPageNumber={maxPageNumber}
@@ -411,6 +417,7 @@ const PDFDocument = (props) => {
                     set_leftPreviewShow={set_leftPreviewShow}
                 />
                 <PDFpreview
+                    dynamicAllPageRef={dynamicAllPageRef}
                     leftPreviewShow={leftPreviewShow}
                     nowPage={nowPage}
                     previewOption={previewOption}
@@ -421,6 +428,7 @@ const PDFDocument = (props) => {
                     }}
                 />
                 <PDFdynamicAllPage
+                ref={dynamicAllPageRef}
                     leftPreviewShow={leftPreviewShow}
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}
