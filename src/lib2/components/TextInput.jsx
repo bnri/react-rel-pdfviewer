@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import "./TextInput.scss"
 const TextInput = (props) => {
     const { value, onChange, style, className } = props;
@@ -6,7 +6,7 @@ const TextInput = (props) => {
     const [editMode, set_editMode] = useState(false);
     const inputRef = useRef();
 
-    const handleOnSave = (e) => {
+    const handleOnSave = useCallback((e) => {
         if(e&&e.preventDefault){
             e.preventDefault();
         }
@@ -16,9 +16,10 @@ const TextInput = (props) => {
             onChange(anyValue);
         }
         set_editMode(false);
-    }
+    },[onChange,anyValue]);
 
-    const handleOnCancel = (e) => {
+
+    const handleOnCancel = useCallback((e) => {
         if(e&&e.preventDefault){
             e.preventDefault();
         }
@@ -26,9 +27,9 @@ const TextInput = (props) => {
         // console.log("Cancel호출")
         setAnyValue(value);
         set_editMode(false);
-    }
+    },[value]);
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = useCallback((event) => {
         // console.log("asf",event)
         if (event.key === 'Enter') {
             handleOnSave();
@@ -36,9 +37,9 @@ const TextInput = (props) => {
         else if (event.key === "Escape") {
             handleOnCancel();
         }
-    };
+    },[handleOnSave,handleOnCancel]);
 
-    const handleOnBlur = (e) => {
+    const handleOnBlur = useCallback((e) => {
         // e.stopPropagation();
         // console.log("불러호출")
         if (value === anyValue) {
@@ -49,7 +50,8 @@ const TextInput = (props) => {
             handleOnSave();
             set_editMode(false);
         }
-    }
+    },[value,anyValue,handleOnSave]);
+
 
 
     useEffect(() => {
@@ -67,14 +69,14 @@ const TextInput = (props) => {
                     value={anyValue}
                     onChange={e => setAnyValue(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    maxlength={12}
+                    maxLength={12}
                     className={`realInput ${className}`}
                     style={{ ...style }}
                 />
                 <div style={{ display: 'flex'}}>
                     <div className="textInputbtnWrap" onMouseDown={handleOnSave}>
                         <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="#00ee00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="#00ee00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
 
                     </div>

@@ -9,29 +9,31 @@ import PlusSvg from "./svg/plus-large-svgrepo-com.svg";
 
 
 const PDFTopBar = (props) => {
-    const { dynamicAllPageRef,set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage 
-    ,set_AOI_mode,AOI_mode,fileName,set_fileName} = props;
+    const { dynamicAllPageRef, set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage
+        , set_AOI_mode, AOI_mode, fileName, set_fileName } = props;
     return (<div className="PDFTopBar no-drag">
-        <div className="oneTab exceptLeft">
+        <div className="oneTab flexstart">
             <div className="btnWrap" onClick={() => {
                 if (set_leftPreviewShow) {
                     set_leftPreviewShow(v => !v);
                 }
             }}>
-                <img src={HamburgerSvg} alt=""  />
+                <img src={HamburgerSvg} alt="" />
             </div>
-            <div  className="oneTab" style={{marginLeft:15}}>
-                <div>
+            <div style={{ marginLeft: 15 }}>
                 <TextInput
                     value={fileName}
-                    onChange={(newFileName)=>{
+                    onChange={(newFileName) => {
                         set_fileName(newFileName)
                     }}
                 />
-                </div>
-   
             </div>
         </div>
+
+        <div className="oneTab">
+         
+        </div>
+
 
         <div className="oneTab">
             <NumberOnlyInput
@@ -40,7 +42,7 @@ const PDFTopBar = (props) => {
                 onChange={(val) => {
                     if (handleChangeNowPage) {
                         handleChangeNowPage(val);
-                        if(dynamicAllPageRef&&dynamicAllPageRef.current){
+                        if (dynamicAllPageRef && dynamicAllPageRef.current) {
                             // console.log(dynamicAllPageRef.current);
                             dynamicAllPageRef.current.set_scrollMoveToPage(val);
                         }
@@ -49,20 +51,18 @@ const PDFTopBar = (props) => {
                 }}
                 min={1}
                 max={maxPageNumber}
-                // onBlur={() => {
+            // onBlur={() => {
 
-                // }}
+            // }}
             />
             <div style={{ marginBottom: 2 }}>
-                &nbsp;&nbsp;/&nbsp;{maxPageNumber}
+                &nbsp;&nbsp;/&nbsp;{maxPageNumber}&nbsp;&nbsp;
             </div>
-        </div>
-        <div className="grayBar" />
-        <div className="oneTab">
-            <div className="btnWrap" onClick={()=>{
-                set_viewPercent(v=>parseInt(v)-1>25?(parseInt(v)-1)+'%':v);
+            <div className="grayBar" />
+            <div className="btnWrap" onClick={() => {
+                set_viewPercent(v => parseInt(v) - 1 > 25 ? (parseInt(v) - 1) + '%' : v);
             }}>
-              <img alt="" src={MinusSvg}/>
+                <img alt="" src={MinusSvg} />
             </div>
 
             <PercentageInput
@@ -70,14 +70,20 @@ const PDFTopBar = (props) => {
                 value={viewPercent}
                 onChange={(v) => set_viewPercent(v)}
             />
-            <div className="btnWrap" onClick={()=>{
-           set_viewPercent(v=>parseInt(v)+1<=100?(parseInt(v)+1)+'%':v);
+            <div className="btnWrap" onClick={() => {
+                set_viewPercent(v => parseInt(v) + 1 <= 100 ? (parseInt(v) + 1) + '%' : v);
             }}>
-                <img alt="" src={PlusSvg}/>
+                <img alt="" src={PlusSvg} />
             </div>
-
+            <div className="grayBar" />
         </div>
-        <div className="grayBar" />
+
+
+  
+
+        <div className="oneTab">
+            aaa
+        </div>
     </div>)
 }
 export default PDFTopBar;

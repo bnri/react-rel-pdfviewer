@@ -354,48 +354,83 @@ const PDFDocument = (props) => {
         }
     }, [previewOption, pages, preparedPreviewPages])
 
+    const prevRenderWidth = useRef();
     //레프트바의 preview에 대한..설정인데
     useEffect(() => {
         if (!preparedPreviewPages) return;
-        let to;
+        const wrapEl = documentRef.current;
+        let resizing = false; // Flag to track whether resizing is in progress
 
-        const intViewPercent = parseInt(viewPercent);
-        let viewPercentPagesData = [];
-        const sidebarSize = leftPreviewShow ? 150 : 0;
-        const renderWidth = (documentRef.current.offsetWidth - sidebarSize) * intViewPercent / 100;
-        // console.log("renderWidth",renderWidth)
-        let hs = 0;
-        for (let i = 0; i < preparedPreviewPages.length; i++) {
-            const onePage = preparedPreviewPages[i];
-            const { PDForiginSize } = onePage;
-            let onePageWidth = renderWidth;
-            let onePageHeight = renderWidth * PDForiginSize.height / PDForiginSize.width;
-            let onePageMarginTop = 25;
-            viewPercentPagesData.push({
-                pageNumber: i + 1,
-                bluredCanvas: onePage.canvas,
-                bluredCanvasSize: onePage.canvasSize,
-                width: onePageWidth,
-                height: onePageHeight,
-                marginHeight: onePageMarginTop,
-                viewMinScrollHeight: hs,
-                viewMaxScrollHeight: hs + onePageHeight + onePageMarginTop,
-                // visible: hs >= visibleMin && (hs + onePageHeight) <= visibleMax ? true : false
+        const resizeObserver = new ResizeObserver(entries => {
+            // 크기 변경시 실행할 작업을 여기에 작성합니다.
+            entries.forEach(entry => {
+                // console.log('@@@@@@@@@@@@@@@@PDFDocument 껍데기의 크기가 변경되었습니다!', entry.contentRect.width, entry.contentRect.height);
+                // set_renderWidth(entry.contentRect.width * viewPercent / 100);
+                // const contentWidth = wrapEl.offsetWidth;
+                // const contentHeight = wrapEl.offsetHeight;
+
+                const intViewPercent = parseInt(viewPercent);
+                const sidebarSize = leftPreviewShow ? 150 : 0;
+                const renderWidth = (wrapEl.offsetWidth - sidebarSize) * intViewPercent / 100;
+  
+                if(prevRenderWidth.current===renderWidth){
+                    return;
+                }
+                prevRenderWidth.current = renderWidth;
+
+                // console.log('PDF 껍데기의 크기가 변경되었습니다!', contentWidth, contentHeight);
+                //   const renderWidth = contentWidth * parseInt(viewPercent) / 100;
+                debouncedGeneratePercentPagesData(renderWidth);
             });
-
-            hs = hs + onePageHeight + onePageMarginTop;
-        }
-        to = setTimeout(function () {
+        });
+   
+        function generatePercentPagesData(renderWidth){
+            if (resizing) {
+                return; // If resizing is already in progress, return early
+            }
+            resizing = true; // Set the resizing flag to true
+            console.log("generatePercentPagesData 호출")
+            let viewPercentPagesData = [];
+            // const intViewPercent = parseInt(viewPercent);
+            // const sidebarSize = leftPreviewShow ? 150 : 0;
+            // const renderWidth = (wrapEl.offsetWidth - sidebarSize) * intViewPercent / 100;
+            // console.log("renderWidth",renderWidth)
+            let hs = 0;
+            for (let i = 0; i < preparedPreviewPages.length; i++) {
+                const onePage = preparedPreviewPages[i];
+                const { PDForiginSize } = onePage;
+                let onePageWidth = renderWidth;
+                let onePageHeight = renderWidth * PDForiginSize.height / PDForiginSize.width;
+                let onePageMarginTop = 25;
+                viewPercentPagesData.push({
+                    pageNumber: i + 1,
+                    bluredCanvas: onePage.canvas,
+                    bluredCanvasSize: onePage.canvasSize,
+                    width: onePageWidth,
+                    height: onePageHeight,
+                    marginHeight: onePageMarginTop,
+                    viewMinScrollHeight: hs,
+                    viewMaxScrollHeight: hs + onePageHeight + onePageMarginTop,
+                    // visible: hs >= visibleMin && (hs + onePageHeight) <= visibleMax ? true : false
+                });
+    
+                hs = hs + onePageHeight + onePageMarginTop;
+            }
             set_percentPagesData(viewPercentPagesData);
-        }, 300);
+            resizing=false;
+        }
+        const debouncedGeneratePercentPagesData =_.debounce((arg)=>{
+            generatePercentPagesData(arg)
+        },300);
 
-        // console.log("preparedPreviewPages",preparedPreviewPages)
+        resizeObserver.observe(wrapEl);
         return () => {
-            clearTimeout(to);
+            resizeObserver.disconnect();
         }
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
-    const [AOI_moode,set_AOI_mode] = useState(0);
+    const [AOI_moode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
+    
 
 
     return (<div className="PDFDocument" ref={documentRef}>
@@ -428,7 +463,7 @@ const PDFDocument = (props) => {
                     }}
                 />
                 <PDFdynamicAllPage
-                ref={dynamicAllPageRef}
+                    ref={dynamicAllPageRef}
                     leftPreviewShow={leftPreviewShow}
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}

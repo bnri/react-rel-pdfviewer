@@ -44,7 +44,8 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
     const beforeHighqualityRef = useRef();
     const ismakingHighQualityRef = useRef();
     const changePercentPagesData = useCallback(() => {
-        // console.log("@@@@@@@@@@@@@@@changePercentPagesData@@@@@@@@@@@")
+        console.log("@@@@@@@@@@@@@@@changePercentPagesData@@@@@@@@@@@");
+        //#@! debounce 써서 고칠것
         let beforehouldRenderHighQualityPageArray = beforeHighqualityRef.current;
 
         const { scrollTop, clientHeight } = scrollDivRef.current.getValues();
@@ -55,7 +56,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         let data = [];
         let shouldRenderPages = [];
 
-        //#@! set_nowPage 를여기서 해주자.
+      
         //메인페이지를 결정해줍시다.
 
         let partVisibleArr =[];
@@ -179,7 +180,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                     const pg = shouldRenderPages[i];
                     // console.log("pg",pg)
                     let res = await preparePage(pages[pg.pageNumber - 1], pg.pageNumber, pg.pageSize.width, pg.pageSize.width);
-
+                    
                     if (res.valid) {
                         shouldRenderPages[i].canvas = res.canvas;
                     }
@@ -193,7 +194,14 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
             });
 
         }
-    }, [percentPagesData, pages, preparePage]);
+
+        
+
+        //#@! debounce 추가...
+
+
+
+    }, [percentPagesData, pages, preparePage,set_nowPage]);
 
 
     const forceMoveScrollTopToPage = useCallback((pageNumber)=>{
@@ -233,6 +241,8 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
     const handleOnScroll = useCallback(() => {
         changePercentPagesData();
     }, [changePercentPagesData]);
+
+
 
     // console.log("percentPagesData",percentPagesData)
 
@@ -284,6 +294,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
                             />
                             {highQualityData &&
+                                <>
                                 <div className="highQualityCanvasWrap">
                                     <canvas
                                         className="onePageCanvas"
@@ -303,6 +314,17 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
                                     />
                                 </div>
+                                <div className="AreaCanvasWrap">
+                                     <canvas
+                                        className="onePageCanvas"
+                                        width={highQualityData.pageSize.width} // Set the canvas width
+                                        height={highQualityData.pageSize.height} // Set the canvas height
+
+                                  
+
+                                    />
+                                </div>
+                                </>
                             }
 
                         </div>
