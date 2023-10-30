@@ -43,12 +43,17 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
     const [shouldRenderHighQualityPageArray, set_shouldRenderHighQualityPageArray] = useState();
     const beforeHighqualityRef = useRef();
     const ismakingHighQualityRef = useRef();
+    const firstPartVisibleInformRef=useRef();
+    const prevFirstPartVisibleInformRef=useRef();
+    const shouldMoveScrollPercent = useRef();
+
     const changePercentPagesData = useCallback(() => {
         console.log("@@@@@@@@@@@@@@@changePercentPagesData@@@@@@@@@@@");
         //#@! debounce 써서 고칠것
         let beforehouldRenderHighQualityPageArray = beforeHighqualityRef.current;
 
-        const { scrollTop, clientHeight } = scrollDivRef.current.getValues();
+        const { scrollTop, clientHeight,scrollHeight } = scrollDivRef.current.getValues();
+        // console.log("obj",scrollDivRef.current.getValues())
         const currentScroll = scrollTop;
         let visibleMin = currentScroll;
         let visibleMax = currentScroll + clientHeight;
@@ -56,8 +61,9 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         let data = [];
         let shouldRenderPages = [];
 
-      
+        
         //메인페이지를 결정해줍시다.
+        let firstPartVisibleInformation=null;
 
         let partVisibleArr =[];
         for (let i = 0; i < percentPagesData.length; i++) {
@@ -79,6 +85,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                 partVisible = true;
             }
             
+
             // console.log("visibleMin",visibleMin);
             data.push({
                 pageNumber: i+1,
@@ -99,6 +106,45 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
          
 
             if (partVisible) {
+                if(firstPartVisibleInformation===null){
+                    firstPartVisibleInformation={
+                        partVisibleRatio:partVisibleRatio,
+                        pageNumber:i+1,
+                        pageHeight:onePageHeight,
+                        scrollHeight:scrollHeight,
+                        clientHeight:clientHeight,
+                        page_s:hs+onePage.marginHeight,
+                        page_e:hs+onePage.height + onePage.marginHeight,
+                        visibleMin:visibleMin,
+                        visibleMax:visibleMax,
+                        ps:ps,
+                        pe:pe,
+                    };
+                    // console.log("moveToLastScrollPosition",moveToLastScrollPosition)
+                    if(shouldMoveScrollPercent.current){
+
+                        shouldMoveScrollPercent.current=false;
+                        console.log("과거 스크롤정보",firstPartVisibleInformRef.current);
+                        let prev=firstPartVisibleInformRef.current;
+                        let now= firstPartVisibleInformation;
+                        // console.log("지금보이는 스크롤정보",firstPartVisibleInformation);
+                        let prevRatio=prev.visibleMin/prev.scrollHeight;
+
+                        let shouldmove = now.scrollHeight*prevRatio;
+                        // shouldmove;
+                        //
+
+                        scrollDivRef.current.scrollTop(shouldmove);
+                        prevFirstPartVisibleInformRef.current=firstPartVisibleInformRef.current;
+                        firstPartVisibleInformRef.current=firstPartVisibleInformation;
+                        return;
+                    }
+
+                    // console.log("하..여기가...")
+                    prevFirstPartVisibleInformRef.current=firstPartVisibleInformRef.current;
+                    firstPartVisibleInformRef.current=firstPartVisibleInformation;
+                    
+                }
                 shouldRenderPages.push({
                     pageNumber: i + 1,
                     pageSize: {
@@ -145,7 +191,6 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                         // console.log("shouldRenderHighQualityPageArray 리사이즈할당")
 
                         set_shouldRenderHighQualityPageArray(shouldRenderPages);
-
                         beforeHighqualityRef.current = shouldRenderPages;
                     }
                 });
@@ -165,7 +210,6 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                     // console.log("shouldRenderHighQualityPageArray 신규할당")
 
                     set_shouldRenderHighQualityPageArray(shouldRenderPages);
-
                     beforeHighqualityRef.current = shouldRenderPages;
                 }
             });
@@ -203,6 +247,17 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
     }, [percentPagesData, pages, preparePage,set_nowPage]);
 
+    // useEffect(()=>{
+    //     console.log("moveToLastScrollPosition",moveToLastScrollPosition)
+    //     if(moveToLastScrollPosition&&set_moveToLastScrollPosition){
+    //         set_moveToLastScrollPosition(false);
+    //         let prev=prevFirstPartVisibleInformRef.current;
+    //         let now=firstPartVisibleInformRef.current;
+    //         console.log("prev",prev);
+    //         console.log("now",now);
+    //     }
+    // },[moveToLastScrollPosition,set_moveToLastScrollPosition])
+
 
     const forceMoveScrollTopToPage = useCallback((pageNumber)=>{
         if(!percentPagesData) return;
@@ -226,9 +281,55 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         // scrollDivRef.crTop(0);
     },[percentPagesData])
 
+    const forceMoveScrollTopToPagePercent = useCallback((pageNumber,startPercent)=>{
+        if(!percentPagesData) return;
+        // console.log("percentPagesData",percentPagesData);
+        // console.log("startPercent",startPercent)
+        let sctop=null;
+        for(let i = 0 ; i <percentPagesData.length; i++){
+            let p = percentPagesData[i];
+            if(p.pageNumber===pageNumber){
+                sctop=p.viewMinScrollHeight+ p.height*startPercent;
+                // sctop=p.viewMinScrollHeight+(p.marginHeight);
+                break;
+            }
+
+        }
+        if(sctop!==null){
+            // console.log("sctop",sctop)
+            // console.dir(scrollDivRef.current)
+            scrollDivRef.current.scrollTop(sctop);
+        }
+
+        // console.dir(scrollDivRef);
+        // scrollDivRef.crTop(0);
+    },[percentPagesData])
+
+
     useImperativeHandle(ref,()=>({
         set_scrollMoveToPage:(pageNumber)=>{
             forceMoveScrollTopToPage(pageNumber);
+        },
+        // get_firstPartVisibleInform:()=>{
+        //     if(firstPartVisibleInformRef===null){
+        //         return null;
+        //     }
+        //     return firstPartVisibleInformRef.current;
+        // },
+        // set_scrollMoveToPagePercent:(pageNumber,startPercent)=>{
+        //     forceMoveScrollTopToPagePercent(pageNumber,startPercent);
+        // }
+        moveTothePrevScroll:()=>{
+            //#@!#@! 
+            //percentPagesData 가 바뀐후에 렌더가 끝나고 스크롤 이동을 해주자...
+            shouldMoveScrollPercent.current=true;
+
+            // console.log("@moveTothePrevScroll호출");
+            // let prev=prevFirstPartVisibleInformRef.current
+            // let now=firstPartVisibleInformRef.current
+            // console.log("하 이동");
+            // console.log("prev",prev);
+            // console.log("now",now)
         }
     }),[forceMoveScrollTopToPage]);
 

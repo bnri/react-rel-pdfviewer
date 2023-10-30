@@ -413,7 +413,7 @@ const PDFDocument = (props) => {
                     viewMaxScrollHeight: hs + onePageHeight + onePageMarginTop,
                     // visible: hs >= visibleMin && (hs + onePageHeight) <= visibleMax ? true : false
                 });
-    
+                
                 hs = hs + onePageHeight + onePageMarginTop;
             }
             set_percentPagesData(viewPercentPagesData);
@@ -430,7 +430,8 @@ const PDFDocument = (props) => {
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
     const [AOI_moode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
-    
+ 
+
 
 
     return (<div className="PDFDocument" ref={documentRef}>
@@ -446,6 +447,7 @@ const PDFDocument = (props) => {
                     set_viewPercent={set_viewPercent}
                     maxPageNumber={maxPageNumber}
                     nowPage={nowPage}
+            
                     handleChangeNowPage={(p) => {
                         set_nowPage(p)
                     }}
@@ -467,6 +469,8 @@ const PDFDocument = (props) => {
                     leftPreviewShow={leftPreviewShow}
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}
+            
+            
                     pages={pages}
                     preparePage={preparePage}
                 />

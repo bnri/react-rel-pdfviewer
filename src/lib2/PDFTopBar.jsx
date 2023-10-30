@@ -1,3 +1,5 @@
+import React, { useCallback } from "react";
+
 import NumberOnlyInput from "./components/NumberOnlyInput";
 import PercentageInput from "./components/PercentageInput";
 import TextInput from "./components/TextInput";
@@ -9,8 +11,35 @@ import PlusSvg from "./svg/plus-large-svgrepo-com.svg";
 
 
 const PDFTopBar = (props) => {
-    const { dynamicAllPageRef, set_leftPreviewShow, handleChangeNowPage, viewPercent, set_viewPercent, maxPageNumber, nowPage
+    const { dynamicAllPageRef, set_leftPreviewShow, handleChangeNowPage, viewPercent,
+         set_viewPercent, maxPageNumber, nowPage
         , set_AOI_mode, AOI_mode, fileName, set_fileName } = props;
+
+    const handleDecreasePercent = useCallback(() => {
+        set_viewPercent(v => parseInt(v) - 1 > 25 ? (parseInt(v) - 1) + '%' : v);
+        if (dynamicAllPageRef && dynamicAllPageRef.current) {
+            dynamicAllPageRef.current.moveTothePrevScroll();
+        }
+    },[dynamicAllPageRef,set_viewPercent]);
+
+    const handleSetPercent = useCallback((v) => {
+        console.log("handleSetPercent호출");
+
+        set_viewPercent(v);
+        if (dynamicAllPageRef && dynamicAllPageRef.current) {
+            console.log("호출~~")
+            dynamicAllPageRef.current.moveTothePrevScroll();
+        }
+    },[dynamicAllPageRef,set_viewPercent]);
+
+    const handleIncreasePercent = useCallback(() => {
+        set_viewPercent(v => parseInt(v) + 1 <= 100 ? (parseInt(v) + 1) + '%' : v);
+        if (dynamicAllPageRef && dynamicAllPageRef.current) {
+            dynamicAllPageRef.current.moveTothePrevScroll();
+        }
+    },[dynamicAllPageRef,set_viewPercent]);
+
+
     return (<div className="PDFTopBar no-drag">
         <div className="oneTab flexstart">
             <div className="btnWrap" onClick={() => {
@@ -59,20 +88,16 @@ const PDFTopBar = (props) => {
                 &nbsp;&nbsp;/&nbsp;{maxPageNumber}&nbsp;&nbsp;
             </div>
             <div className="grayBar" />
-            <div className="btnWrap" onClick={() => {
-                set_viewPercent(v => parseInt(v) - 1 > 25 ? (parseInt(v) - 1) + '%' : v);
-            }}>
+            <div className="btnWrap" onClick={handleDecreasePercent}>
                 <img alt="" src={MinusSvg} />
             </div>
 
             <PercentageInput
                 className="viewPercentInput"
                 value={viewPercent}
-                onChange={(v) => set_viewPercent(v)}
+                onChange={handleSetPercent}
             />
-            <div className="btnWrap" onClick={() => {
-                set_viewPercent(v => parseInt(v) + 1 <= 100 ? (parseInt(v) + 1) + '%' : v);
-            }}>
+            <div className="btnWrap" onClick={handleIncreasePercent}>
                 <img alt="" src={PlusSvg} />
             </div>
             <div className="grayBar" />

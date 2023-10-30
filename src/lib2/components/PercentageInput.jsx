@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 
 const PercentageInput = ({
     value,
@@ -40,15 +40,17 @@ const PercentageInput = ({
             onBlur();
         }
     }, [anyValue, onBlur, onChange, prevValidValue]);
-
+    const inputRef = useRef();
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-            validateAndSetPercentage();
+            // validateAndSetPercentage();
+            inputRef.current.blur(); // 포커스 아웃
         }
     };
 
     return (
         <input
+            ref={inputRef}
             type="text"
             value={anyValue}
             onChange={handleChange}
