@@ -9,7 +9,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 
 const PDFDocument = (props) => {
-    const { pdfInform,previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
+    const { AOI,pdfInform,previewOption, children, option, path, PDFDocumentOnLoadCallback } = props;
 
     const [pages, setPages] = useState();
     const documentRef = useRef(null);
@@ -17,6 +17,15 @@ const PDFDocument = (props) => {
 
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [percentPagesData, set_percentPagesData] = useState();
+    const [tempAOI,set_tempAOI] = useState(null);
+    useEffect(()=>{
+        if(AOI){
+            set_tempAOI(AOI)
+        }
+        else{
+            set_tempAOI([]);
+        }
+    },[AOI])
 
     const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
     const [viewPercent, set_viewPercent] = useState(option.initViewPercent ? option.initViewPercent : '100%');
@@ -469,7 +478,7 @@ const PDFDocument = (props) => {
                     leftPreviewShow={leftPreviewShow}
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}
-            
+                    tempAOI={tempAOI}
             
                     pages={pages}
                     preparePage={preparePage}

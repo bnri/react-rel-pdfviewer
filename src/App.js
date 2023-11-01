@@ -320,6 +320,14 @@ function App() {
         <div className="PDFDocWrap">
 
           <PDFDocument
+            AOI={[{
+              pageNumber:1,
+              type:"Quiz",
+              top:0.2,
+              left:0.2,
+              width:0.2,
+              height:0.2,
+            }]}
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}
             option={option}

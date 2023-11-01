@@ -60,7 +60,7 @@ const PDFTopBar = (props) => {
         </div>
 
         <div className="oneTab">
-         
+                아이콘
         </div>
 
 

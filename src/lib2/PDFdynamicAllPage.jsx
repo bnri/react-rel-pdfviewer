@@ -37,7 +37,7 @@ function findMaxIndex(arr) {
 }
 
 const PDFdynamicAllPage = forwardRef((props,ref) => {
-    const { set_nowPage,preparePage, pages, percentPagesData, leftPreviewShow } = props;
+    const { tempAOI,set_nowPage,preparePage, pages, percentPagesData, leftPreviewShow } = props;
     const scrollDivRef = useRef();
 
     const [shouldRenderHighQualityPageArray, set_shouldRenderHighQualityPageArray] = useState();
@@ -124,7 +124,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                     if(shouldMoveScrollPercent.current){
 
                         shouldMoveScrollPercent.current=false;
-                        console.log("과거 스크롤정보",firstPartVisibleInformRef.current);
+                        // console.log("과거 스크롤정보",firstPartVisibleInformRef.current);
                         let prev=firstPartVisibleInformRef.current;
                         let now= firstPartVisibleInformation;
                         // console.log("지금보이는 스크롤정보",firstPartVisibleInformation);
@@ -183,7 +183,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                 }
 
                 console.log("111111111이전값이 있지만 틀려서 생성중");
-                //#@!어째서 여기가 계속 호출되는것인가?
+                //어째서 여기가 계속 호출되는것인가?
                 makeVirtualCanvasHighQualityPage().then(valid => {
                     ismakingHighQualityRef.current = false;
                     if (valid) {
@@ -238,11 +238,6 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
             });
 
         }
-
-        
-
-        //#@! debounce 추가...
-
 
 
     }, [percentPagesData, pages, preparePage,set_nowPage]);
@@ -335,21 +330,24 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
 
     useEffect(() => {
+        console.log("여긴?")
         changePercentPagesData();
+        //#@! debounce 필요
     }, [changePercentPagesData])
 
 
     const handleOnScroll = useCallback(() => {
         changePercentPagesData();
+        //#@! debounce 필요
     }, [changePercentPagesData]);
 
 
 
     // console.log("percentPagesData",percentPagesData)
 
-    // useEffect(() => {
-    //     console.log("@@@@@@@@shouldRenderHighQualityPageArray ", shouldRenderHighQualityPageArray)
-    // }, [shouldRenderHighQualityPageArray])
+    useEffect(() => {
+        console.log("@@@@@@@@shouldRenderHighQualityPageArray ", shouldRenderHighQualityPageArray)
+    }, [shouldRenderHighQualityPageArray])
 
     return (<div className="PDFdynamicAllPage" style={{
         marginLeft: leftPreviewShow ? 150 : 0,
@@ -358,14 +356,15 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         <Scrollbars onScroll={handleOnScroll} ref={scrollDivRef} className="scrollDiv" renderThumbHorizontal={(props) => <div {...props} className="thumb-horizontal" style={{ display: "none" }} />}>
 
             {percentPagesData && percentPagesData.map((onePage, index) => {
-
+                // console.log("onePage",onePage);
+                const pageNumber = onePage.pageNumber;
                 // console.log("shouldRenderHighQualityPageArray",shouldRenderHighQualityPageArray)
                 let highQualityData = null;
                 if (shouldRenderHighQualityPageArray && shouldRenderHighQualityPageArray.find(d => d.pageNumber === index + 1)) {
                     highQualityData = shouldRenderHighQualityPageArray.find(d => d.pageNumber === index + 1);
                     // console.log("highQualityData",highQualityData);
                 }
-                // console.log("여기")
+                console.log("여기pageNumber",pageNumber,shouldRenderHighQualityPageArray)
                 return (
                     <div className="onePageWrap"
                         style={{
@@ -405,6 +404,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                                         ref={(canvas) => {
                                             // console.log("onePage",onePage);
                                             if (canvas && highQualityData.canvas) {
+                                                console.log("하이퀄리티랜더",pageNumber)
                                                 // Get the canvas's 2D rendering context
                                                 const context = canvas.getContext('2d');
                                                 // Draw the canvas content onto the canvas element
@@ -420,7 +420,33 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                                         className="onePageCanvas"
                                         width={highQualityData.pageSize.width} // Set the canvas width
                                         height={highQualityData.pageSize.height} // Set the canvas height
+                                        ref={(canvas)=>{
+                                            if(!canvas) return;
+                                            if(!tempAOI)return;
+                                            console.log("그려~~~~~~~~~~~",pageNumber)
+                                            let targetArr=[];
+                                            for(let i = 0 ; i <tempAOI.length; i++){
+                                                if(tempAOI[i].pageNumber===pageNumber){
+                                                    targetArr.push(tempAOI[i]);
+                                                }
+                                            }
+                              
+                                            const context = canvas.getContext('2d');
+                                            const w = highQualityData.pageSize.width;
+                                            const h = highQualityData.pageSize.height;
+                                            for(let i = 0 ; i <targetArr.length; i++){
+                                                // console.log("타겟어래이반복")
+                                                let t = targetArr[i];
 
+                                                context.beginPath();
+                                                context.lineWidth = 2;
+                                                context.strokeStyle = "purple";
+                                                context.fillStyle = "purple";
+                                                context.rect(t.left*w, t.top*h, t.width*w, t.height*h);
+                                                context.stroke();
+                                            }
+                                            
+                                        }}
                                   
 
                                     />
