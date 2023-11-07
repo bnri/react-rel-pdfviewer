@@ -47,6 +47,29 @@ $topbar-height:50px;
                 height: 25px;
             }
         }
+        .AOI_mode_btn{
+            margin:2px;
+            border-radius:50%;
+            width:37px;
+            height:37px;
+            // background:red;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            border:none;
+            &:hover{
+                // background:#555;
+                cursor:pointer;
+                opacity: 0.8;
+            }
+            &.selected{
+                background:red;
+                color:#fff !important;
+            }
+            // &:hover{
+            //     color:#eee;
+            // }
+        }
         .grayBar{
             
             height:16px;
@@ -55,7 +78,7 @@ $topbar-height:50px;
         }
         .oneTab{
             width:100%;
-            background:red;
+            // background:red;
             // height:25px;
             height:100%;
             display:flex;

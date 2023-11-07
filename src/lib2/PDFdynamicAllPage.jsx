@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 
 import { Scrollbars } from "react-custom-scrollbars";
+import _ from "lodash";
 
 
 function arraysAreEqual(arr1, arr2) {
@@ -242,17 +243,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
     }, [percentPagesData, pages, preparePage,set_nowPage]);
 
-    // useEffect(()=>{
-    //     console.log("moveToLastScrollPosition",moveToLastScrollPosition)
-    //     if(moveToLastScrollPosition&&set_moveToLastScrollPosition){
-    //         set_moveToLastScrollPosition(false);
-    //         let prev=prevFirstPartVisibleInformRef.current;
-    //         let now=firstPartVisibleInformRef.current;
-    //         console.log("prev",prev);
-    //         console.log("now",now);
-    //     }
-    // },[moveToLastScrollPosition,set_moveToLastScrollPosition])
-
+   
 
     const forceMoveScrollTopToPage = useCallback((pageNumber)=>{
         if(!percentPagesData) return;
@@ -276,29 +267,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
         // scrollDivRef.crTop(0);
     },[percentPagesData])
 
-    const forceMoveScrollTopToPagePercent = useCallback((pageNumber,startPercent)=>{
-        if(!percentPagesData) return;
-        // console.log("percentPagesData",percentPagesData);
-        // console.log("startPercent",startPercent)
-        let sctop=null;
-        for(let i = 0 ; i <percentPagesData.length; i++){
-            let p = percentPagesData[i];
-            if(p.pageNumber===pageNumber){
-                sctop=p.viewMinScrollHeight+ p.height*startPercent;
-                // sctop=p.viewMinScrollHeight+(p.marginHeight);
-                break;
-            }
 
-        }
-        if(sctop!==null){
-            // console.log("sctop",sctop)
-            // console.dir(scrollDivRef.current)
-            scrollDivRef.current.scrollTop(sctop);
-        }
-
-        // console.dir(scrollDivRef);
-        // scrollDivRef.crTop(0);
-    },[percentPagesData])
 
 
     useImperativeHandle(ref,()=>({
@@ -331,23 +300,19 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
 
     useEffect(() => {
         console.log("여긴?")
-        changePercentPagesData();
-        //#@! debounce 필요
+   
+        const debouncedChangePercentPagesData= _.debounce((arg)=>{
+            changePercentPagesData(arg);
+        },300);
+        debouncedChangePercentPagesData();
     }, [changePercentPagesData])
 
 
     const handleOnScroll = useCallback(() => {
         changePercentPagesData();
-        //#@! debounce 필요
     }, [changePercentPagesData]);
 
 
-
-    // console.log("percentPagesData",percentPagesData)
-
-    useEffect(() => {
-        console.log("@@@@@@@@shouldRenderHighQualityPageArray ", shouldRenderHighQualityPageArray)
-    }, [shouldRenderHighQualityPageArray])
 
     return (<div className="PDFdynamicAllPage" style={{
         marginLeft: leftPreviewShow ? 150 : 0,
@@ -364,7 +329,7 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                     highQualityData = shouldRenderHighQualityPageArray.find(d => d.pageNumber === index + 1);
                     // console.log("highQualityData",highQualityData);
                 }
-                console.log("여기pageNumber",pageNumber,shouldRenderHighQualityPageArray)
+                // console.log("여기pageNumber",pageNumber,shouldRenderHighQualityPageArray)
                 return (
                     <div className="onePageWrap"
                         style={{
@@ -432,8 +397,10 @@ const PDFdynamicAllPage = forwardRef((props,ref) => {
                                             }
                               
                                             const context = canvas.getContext('2d');
+
                                             const w = highQualityData.pageSize.width;
                                             const h = highQualityData.pageSize.height;
+                                            context.clearRect(0,0,w,h);
                                             for(let i = 0 ; i <targetArr.length; i++){
                                                 // console.log("타겟어래이반복")
                                                 let t = targetArr[i];

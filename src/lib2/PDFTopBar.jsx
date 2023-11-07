@@ -39,6 +39,16 @@ const PDFTopBar = (props) => {
         }
     },[dynamicAllPageRef,set_viewPercent]);
 
+    const handleToggleAOI = (num)=>{    
+            if(AOI_mode===num){
+                set_AOI_mode(0);
+            }
+            else{
+                
+                set_AOI_mode(num);
+            }
+
+    }
 
     return (<div className="PDFTopBar no-drag">
         <div className="oneTab flexstart">
@@ -60,7 +70,9 @@ const PDFTopBar = (props) => {
         </div>
 
         <div className="oneTab">
-                아이콘
+                <button className={`AOI_mode_btn ${AOI_mode===1?'selected':''}`}onClick={()=>handleToggleAOI(1)}>Quiz</button>
+                <button className={`AOI_mode_btn ${AOI_mode===2?'selected':''}`}  onClick={()=>handleToggleAOI(2)}>Picture</button>
+                <button className={`AOI_mode_btn ${AOI_mode===3?'selected':''}`} onClick={()=>handleToggleAOI(3)}>글</button>
         </div>
 
 

@@ -386,7 +386,7 @@ const PDFDocument = (props) => {
                     return;
                 }
                 prevRenderWidth.current = renderWidth;
-
+                console.log("PDF 크기",renderWidth)
                 // console.log('PDF 껍데기의 크기가 변경되었습니다!', contentWidth, contentHeight);
                 //   const renderWidth = contentWidth * parseInt(viewPercent) / 100;
                 debouncedGeneratePercentPagesData(renderWidth);
@@ -438,7 +438,7 @@ const PDFDocument = (props) => {
         }
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
-    const [AOI_moode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
+    const [AOI_mode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
  
 
 
@@ -450,7 +450,7 @@ const PDFDocument = (props) => {
                     dynamicAllPageRef={dynamicAllPageRef}
                     fileName={fileName}
                     set_fileName={set_fileName}
-                    AOI_moode={AOI_moode}
+                    AOI_mode={AOI_mode}
                     set_AOI_mode={set_AOI_mode}
                     viewPercent={viewPercent}
                     set_viewPercent={set_viewPercent}
@@ -479,7 +479,7 @@ const PDFDocument = (props) => {
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}
                     tempAOI={tempAOI}
-            
+                    AOI_mode={AOI_mode}
                     pages={pages}
                     preparePage={preparePage}
                 />
