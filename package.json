@@ -14,9 +14,11 @@
   "dependencies": {
     "pdfjs-dist": "^2.6.347",
     "react-custom-scrollbars": "^4.2.1",
+    "react-multi-crops": "0.0.10",
     "react-number-format": "^4.9.3",
     "react-pdf": "^5.7.2",
-    "react-virtualized": "^9.22.5"
+    "react-virtualized": "^9.22.5",
+    "shortid": "^2.2.16"
   },
   "scripts": {
     "start": "react-scripts start",
