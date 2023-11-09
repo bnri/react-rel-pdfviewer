@@ -17,15 +17,14 @@ const PDFDocument = (props) => {
 
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [percentPagesData, set_percentPagesData] = useState();
-    const [tempAOI,set_tempAOI] = useState(null);
-    useEffect(()=>{
-        if(AOI){
-            set_tempAOI(AOI)
-        }
-        else{
-            set_tempAOI([]);
-        }
-    },[AOI])
+    const [tempAOI,set_tempAOI] = useState(AOI?AOI:[[{
+        xr: 0.1, yr: 0.1, widthr: 0.1, heightr: 0.1, id: '1234',
+        type:"quiz"
+    }, {
+        xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',
+        type:"quiz"
+    },]]);
+
 
     const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
     const [viewPercent, set_viewPercent] = useState(option.initViewPercent ? option.initViewPercent : '100%');
@@ -479,6 +478,7 @@ const PDFDocument = (props) => {
                     percentPagesData={percentPagesData}
                     set_nowPage={set_nowPage}
                     tempAOI={tempAOI}
+                    set_tempAOI={set_tempAOI}
                     AOI_mode={AOI_mode}
                     pages={pages}
                     preparePage={preparePage}

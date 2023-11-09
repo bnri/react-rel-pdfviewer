@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 
 import { Scrollbars } from "react-custom-scrollbars";
 import _ from "lodash";
@@ -40,38 +40,65 @@ function findMaxIndex(arr) {
 }
 
 const PDFdynamicAllPage = forwardRef((props, ref) => {
-    const { tempAOI, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
+    const { set_tempAOI,tempAOI,AOI_mode, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
     const scrollDivRef = useRef();
 
-    const [coordinates, setCoordinates] = useState(() => {
 
-        const p1 = [{
-            x: 10, y: 10, width: 10, height: 10, id: '1234',
-        }, {
-            x: 40, y: 40, width: 10, height: 10, id: '5678',
-        },];
-
-        let pages_coordinates = [];
-
-        pages_coordinates.push(p1);
-
-        return pages_coordinates;
-    });
-    console.log("coordinates",coordinates)
+    // console.log("coordinates",coordinates)
 
 
+    // console.log("tempAOI",tempAOI)
     const changeCoordinate = (pageIndex,coordinate, index, coordinates) => {
+        console.log("@@@@@@@@@@@@")
         console.log("pageIndex",pageIndex)
-        console.log("coordinates",coordinate,index)
+        console.log("coordinates",coordinate);
+        console.log("index(현제페이지의 areaNumber)",index);
+        console.log("다음전체좌표)",coordinates);
+        console.log("@@@@@@@@@@@@")
+        // tempAOI[pageIndex]= coordinates;
+        // console.log("tempAOI",tempAOI)
+        console.log("set_tempAOI가 실행되었는가?")
+        set_tempAOI(aoi=>{
+            if(coordinates){
+                aoi[pageIndex] = coordinates;
+            }
+            console.log("aoi",aoi)
+            return JSON.parse(JSON.stringify(aoi));
+        });
         // setCoordinates({
         //     coordinates,
         // })
+        // setCoordinates(...coordinates)
     }
-    const deleteCoordinate = (pageIndex,coordinate, index, coordinates) => {
-        // setCoordinates({
-        //     coordinates,
-        // })
+
+    const deleteCoordinate = (pageIndex,targetCoordinate) => {
+        console.log("@@@@삭제@@@@@@@@")
+        console.log("pageIndex",pageIndex)
+        console.log("coordinates",targetCoordinate);
+        console.log("@@@@@@@@@@@@")
+        set_tempAOI(aoi=>{
+            const pageAOI=aoi[pageIndex];
+            for(let i = 0 ; i <pageAOI.length; i++){
+                if(pageAOI[i].id===targetCoordinate.id){
+                    pageAOI.splice(i,1);
+                    break;
+                }
+
+            }
+
+            return JSON.parse(JSON.stringify(aoi));
+        });
     }
+
+    const resizeCoordinate = useCallback((pageIndex,areaIndex,newAOI)=>{
+        // console.log("asfasf",pageIndex,areaIndex,newAOI);
+        console.log("resizeCoordinate 호출")
+        set_tempAOI(aoi=>{
+            const pageAOI=aoi[pageIndex];
+            pageAOI[areaIndex]=newAOI;
+            return JSON.parse(JSON.stringify(aoi));
+        });
+    },[]);
 
     const [shouldRenderHighQualityPageArray, set_shouldRenderHighQualityPageArray] = useState();
     const beforeHighqualityRef = useRef();
@@ -415,11 +442,14 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                                     </div>
                                     <div className="AreaCanvasWrap">
 
-                                        {coordinates[index] &&
+                                        {tempAOI&&tempAOI[index] &&
                                             <MultipleCropDiv
-                                                coordinates={coordinates[index]}
-                                                onChange={(p)=>changeCoordinate(index,p)}
-                                                onDelete={(p)=>deleteCoordinate(index,p)}
+                                                AOI_mode={AOI_mode}
+                                                pageIndex={index}
+                                                coordinates={tempAOI[index]}
+                                                onChange={(p,i,np)=>changeCoordinate(index,p,i,np)}
+                                                onDelete={(p,i,np)=>deleteCoordinate(index,p,i,np)}
+                                                onResize={resizeCoordinate}
                                             />
                                         }
 
