@@ -10,7 +10,8 @@ const PDFpreview = (props) => {
         previewOption,
         leftPreviewShow,
         nowPage,
-        dynamicAllPageRef
+        dynamicAllPageRef,
+        tempAOI
     } = props;
 
     const PDFpreviewRef = useRef();
@@ -56,9 +57,14 @@ const PDFpreview = (props) => {
         }
     }, [nowPage, preparedPreviewPages, previewOption]);
 
-    const [foldPreview,set_foldPreview] = useState(false);
-    const [foldAreaview,set_foldAreaview] = useState(true);
-
+    const [foldPreview, set_foldPreview] = useState(false);
+    const [foldAreaview, set_foldAreaview] = useState(true);
+    const handleScrollTothePage = (pageNumber)=>{
+        if (dynamicAllPageRef && dynamicAllPageRef.current) {
+           // console.log(dynamicAllPageRef.current);
+           dynamicAllPageRef.current.set_scrollMoveToPage(pageNumber);
+       }
+}
     return (<div className="PDFpreview no-drag"
 
         style={{
@@ -67,17 +73,17 @@ const PDFpreview = (props) => {
 
         }}>
         <div className="onePreView">
-            <div className="previewTitle" onClick={()=>set_foldPreview(d=>!d)}>
+            <div className="previewTitle" onClick={() => set_foldPreview(d => !d)}>
                 <svg fill="#fff"
                     style={{
-                        transform:foldPreview?"rotate(-90deg)":"",
+                        transform: foldPreview ? "rotate(-90deg)" : "",
                     }}
-                    width="16px" height="16px" viewBox="0 0 32 32" 
-            xmlns="http://www.w3.org/2000/svg">
-                <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z"/></svg>
+                    width="16px" height="16px" viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z" /></svg>
                 &nbsp;PDF Page List
             </div>
-            <div className="previewContents" style={{maxHeight:foldPreview?0:'100%'}}  ref={PDFpreviewRef}>
+            <div className="previewContents" style={{ maxHeight: foldPreview ? 0 : '100%' }} ref={PDFpreviewRef}>
                 {previewOption && preparedPreviewPages &&
                     preparedPreviewPages.map((onePage, index) => {
                         return (
@@ -119,10 +125,7 @@ const PDFpreview = (props) => {
                                             //#@! 스크롤이 있다면 이동
 
                                         }
-                                        if (dynamicAllPageRef && dynamicAllPageRef.current) {
-                                            // console.log(dynamicAllPageRef.current);
-                                            dynamicAllPageRef.current.set_scrollMoveToPage(index + 1);
-                                        }
+                                        handleScrollTothePage(index+1);
                                     }} />
                                 </div>
 
@@ -135,41 +138,40 @@ const PDFpreview = (props) => {
                 }
                 {/* <div style={{height:25}}/> */}
             </div>
-            <div className="previewTitle" onClick={()=>set_foldAreaview(d=>!d)}>
-            <svg fill="#fff"
+            <div className="previewTitle" onClick={() => set_foldAreaview(d => !d)}>
+                <svg fill="#fff"
                     style={{
-                        transform:foldAreaview?"rotate(-90deg)":"",
+                        transform: foldAreaview ? "rotate(-90deg)" : "",
                     }}
-                    width="16px" height="16px" viewBox="0 0 32 32" 
-            xmlns="http://www.w3.org/2000/svg">
-                <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z"/></svg>
+                    width="16px" height="16px" viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z" /></svg>
                 &nbsp;Area List
             </div>
             <div className="previewContents" style={{ maxHeight: foldAreaview ? '0' : '100%' }}>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
-                특정컨텐츠들<br/>
+                {tempAOI && tempAOI.map((pageAOI, index) => {
+                    return (<div key={`pageAOI_${index}`}>
+                        <div className="pageAOIGroup" onClick={()=>{
+                            handleScrollTothePage(index+1);
+                        }}>
+                            {(index + 1) + 'page AOI'}
+                        </div>
+                        {pageAOI.map((oneAOI,AOIindex)=>{
+                            // console.log("oneAOI",oneAOI)
+                            const AOI_type = oneAOI.type;
+
+                            return (<div className={`oneAOI ${AOI_type}`} onClick={()=>{
+                                handleScrollTothePage(index+1);
+                                if(dynamicAllPageRef&&dynamicAllPageRef.current){
+                                    dynamicAllPageRef.current.set_focusAOIArea(index+1,AOIindex+1);
+                                }
+                            }}>
+                                &nbsp;{(AOIindex+1)+'AOI - '+AOI_type}
+                                </div>)
+                        })}
+                    </div>)
+                }, [])}
+
             </div>
         </div>
 

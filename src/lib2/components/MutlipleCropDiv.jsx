@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect ,forwardRef,useImperativeHandle,createRef} from 'react';
 import shortid from 'shortid';
 import "./MultipleCropDiv.scss";
 // import Crop from './Crop';
@@ -12,7 +12,7 @@ const isValidPoint = (point) => {
   return strictNumber(point.x) && strictNumber(point.y);
 };
 
-const MultipleCropDiv = (props) => {
+const MultipleCropDiv = forwardRef((props,ref) => {
   const { AOI_mode, coordinates, pageIndex } = props;
   const drawingIndexRef = useRef(-1);
   const pointARef = useRef(null);
@@ -20,8 +20,23 @@ const MultipleCropDiv = (props) => {
 
   const idRef = useRef(shortid.generate());
   const containerRef = useRef(null);
+  const cropAreaRefArr = useRef(Array.from({ length: coordinates.length }, () => createRef()));
 
+  useImperativeHandle(ref, () => ({
+    set_focusArea(AreaNumber) {
+        // cropAreaRef.current.focus();
+        // console.log("cropAreaRefArr",cropAreaRefArr)
+        console.log("cropAreaRefArr.current",cropAreaRefArr.current)
+        // console.log("cropAreaRefArr[AreaNumber-1]",cropAreaRefArr.current[AreaNumber-1])
+        if(cropAreaRefArr.current&&cropAreaRefArr.current[AreaNumber-1]){
+          cropAreaRefArr.current[AreaNumber-1].current.set_focusArea();
+        }
 
+        // cropAreaRefArr[AreaNumber-1].current.set_focusArea();
+    },
+    
+
+  }), []);
 
 
   const getCursorPosition = (e) => {
@@ -59,7 +74,7 @@ const MultipleCropDiv = (props) => {
     if (!AOI_mode) return;
 
     if (pointA) {
-      console.log("pointA", pointA)
+      // console.log("pointA", pointA)
       const pointB = getCursorPosition(e);
 
       let type;
@@ -109,7 +124,8 @@ const MultipleCropDiv = (props) => {
       const containerHeight = wrapEl.offsetHeight;
       set_containerInform({
         width: containerWidth,
-        height: containerHeight
+        height: containerHeight,
+
       })
     }
     // const debouncedResetContainerInform = _.debounce((arg) => {
@@ -160,9 +176,10 @@ const MultipleCropDiv = (props) => {
   >
 
     {containerInform && coordinates && coordinates.map((coordinate, index) => {
-      console.log("coordinate",coordinate)
+      // console.log("coordinate",coordinate)
       return (
         <CropArea
+          ref={cropAreaRefArr.current[index]}
           key={coordinate.id || index}
           areaIndex={index}
           pageIndex={pageIndex}
@@ -175,7 +192,8 @@ const MultipleCropDiv = (props) => {
 
 
   </div>)
-}
+},[]);
+
 
 
 export default MultipleCropDiv;

@@ -17,13 +17,14 @@ const PDFDocument = (props) => {
 
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [percentPagesData, set_percentPagesData] = useState();
-    const [tempAOI,set_tempAOI] = useState(AOI?AOI:[[{
-        xr: 0.1, yr: 0.1, widthr: 0.1, heightr: 0.1, id: '1234',
-        type:"quiz"
-    }, {
-        xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',
-        type:"quiz"
-    },]]);
+    // const [tempAOI,set_tempAOI] = useState(AOI?AOI:[[{
+    //     xr: 0.1, yr: 0.1, widthr: 0.1, heightr: 0.1, id: '1234',
+    //     type:"quiz"
+    // }, {
+    //     xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',
+    //     type:"quiz"
+    // },]]);
+    const [tempAOI, set_tempAOI] = useState([]);
 
 
     const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
@@ -38,6 +39,27 @@ const PDFDocument = (props) => {
             return 0;
         }
     }, [pages])
+
+    useEffect(()=>{
+        const vacancy = Array.from({ length: maxPageNumber }, () => []);
+        if(AOI){
+            set_tempAOI(AOI);
+            for(let i = 0 ; i<vacancy.length; i++){
+                if(AOI[i]){
+                    vacancy[i]=AOI[i];
+                }
+                set_tempAOI(vacancy);
+            }
+        }
+        else{
+            if(maxPageNumber){
+                set_tempAOI(vacancy);
+            }
+        }
+
+    },[maxPageNumber,AOI])
+
+
     useEffect(() => {
         if (!path) return;
 
@@ -471,6 +493,7 @@ const PDFDocument = (props) => {
                         // console.log("pageClick", page);
                         set_nowPage(page);
                     }}
+                    tempAOI={tempAOI}
                 />
                 <PDFdynamicAllPage
                     ref={dynamicAllPageRef}

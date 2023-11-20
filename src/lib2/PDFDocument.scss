@@ -215,6 +215,31 @@ $topbar-height:50px;
                 transition: max-height 0.4s;
                 overflow-y: auto;
                 border-bottom:1px solid #414141;
+                .pageAOIGroup{
+                    text-align: left;
+                    padding-left:10px;
+                    height:30px;
+                    display:flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    &:hover{
+                        background:#666;
+                        cursor:pointer;
+                    }
+                }
+                .oneAOI{
+                    text-align: left;
+                    padding-left:20px;
+                    height:25px;
+                    font-size:14px;
+                    display:flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    &:hover{
+                        background:#666;
+                        cursor:pointer;
+                    }
+                }
             }
 
         }

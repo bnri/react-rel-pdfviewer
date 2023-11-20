@@ -331,6 +331,7 @@ function App() {
             },], //1번페이지
           
             ]}
+
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}
             option={option}

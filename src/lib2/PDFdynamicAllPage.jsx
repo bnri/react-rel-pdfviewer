@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
+import React, { createRef,useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 
 import { Scrollbars } from "react-custom-scrollbars";
 import _ from "lodash";
 import MultipleCropDiv from "./components/MutlipleCropDiv";
-// import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from "react-image-crop";
-// import 'react-image-crop/dist/ReactCrop.css'
 
 function arraysAreEqual(arr1, arr2) {
     if (!arr1 || !arr2) {
@@ -40,47 +38,37 @@ function findMaxIndex(arr) {
 }
 
 const PDFdynamicAllPage = forwardRef((props, ref) => {
-    const { set_tempAOI,tempAOI,AOI_mode, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
+    const { set_tempAOI, tempAOI, AOI_mode, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
     const scrollDivRef = useRef();
 
-
+    const pageMultileCropDivRef = useRef(Array.from({ length: percentPagesData.length }, () => createRef()));
     // console.log("coordinates",coordinates)
 
 
     // console.log("tempAOI",tempAOI)
-    const changeCoordinate = (pageIndex,coordinate, index, coordinates) => {
-        console.log("@@@@@@@@@@@@")
-        console.log("pageIndex",pageIndex)
-        console.log("coordinates",coordinate);
-        console.log("index(현제페이지의 areaNumber)",index);
-        console.log("다음전체좌표)",coordinates);
-        console.log("@@@@@@@@@@@@")
-        // tempAOI[pageIndex]= coordinates;
-        // console.log("tempAOI",tempAOI)
-        console.log("set_tempAOI가 실행되었는가?")
-        set_tempAOI(aoi=>{
-            if(coordinates){
+
+    //새로운 친구를 삽입할땠는것.
+    const changeCoordinate = (pageIndex, coordinate, index, coordinates) => {
+        set_tempAOI(aoi => {
+            if (coordinates) {
                 aoi[pageIndex] = coordinates;
             }
-            console.log("aoi",aoi)
+            // console.log("aoi",aoi)
             return JSON.parse(JSON.stringify(aoi));
         });
-        // setCoordinates({
-        //     coordinates,
-        // })
-        // setCoordinates(...coordinates)
+
     }
 
-    const deleteCoordinate = (pageIndex,targetCoordinate) => {
+    const deleteCoordinate = (pageIndex, targetCoordinate) => {
         console.log("@@@@삭제@@@@@@@@")
-        console.log("pageIndex",pageIndex)
-        console.log("coordinates",targetCoordinate);
+        console.log("pageIndex", pageIndex)
+        console.log("coordinates", targetCoordinate);
         console.log("@@@@@@@@@@@@")
-        set_tempAOI(aoi=>{
-            const pageAOI=aoi[pageIndex];
-            for(let i = 0 ; i <pageAOI.length; i++){
-                if(pageAOI[i].id===targetCoordinate.id){
-                    pageAOI.splice(i,1);
+        set_tempAOI(aoi => {
+            const pageAOI = aoi[pageIndex];
+            for (let i = 0; i < pageAOI.length; i++) {
+                if (pageAOI[i].id === targetCoordinate.id) {
+                    pageAOI.splice(i, 1);
                     break;
                 }
 
@@ -89,16 +77,90 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
             return JSON.parse(JSON.stringify(aoi));
         });
     }
+    const moveCoordinate = useCallback((pageIndex, areaIndex, e, containerInform) => {
+        set_tempAOI(aoi => {
+            const { width: containerWidth, height: containerHeight } = containerInform;
+            const pageAOI = aoi[pageIndex];
+            let last_cropCoordinate = pageAOI[areaIndex];
+            const { xr, yr, widthr, heightr } = last_cropCoordinate;
+            const x = xr * containerWidth;
+            const y = yr * containerHeight;
+            const w = containerWidth * widthr;
+            const h = containerHeight * heightr;
+            const { dx, dy } = e;
+            const movex = x + dx / 2 < 0 ? 0 : x + dx / 2;
+            const movey = y + dy / 2 < 0 ? 0 : y + dy / 2;
 
-    const resizeCoordinate = useCallback((pageIndex,areaIndex,newAOI)=>{
-        // console.log("asfasf",pageIndex,areaIndex,newAOI);
-        console.log("resizeCoordinate 호출")
-        set_tempAOI(aoi=>{
-            const pageAOI=aoi[pageIndex];
-            pageAOI[areaIndex]=newAOI;
+
+            //   console.log("containerInform",containerInform)
+            //     console.log("x2",x2);
+            // console.log("top", top)
+            // console.log("기존픽셀:", x, y, w, h);
+            // console.log("바뀐픽셀:", x + left, y + top, width, height);
+            const maxx = containerWidth - w;
+            const maxxr = 1 - widthr;
+            const maxy = containerHeight - h;
+            const maxyr = 1 - heightr;
+
+            let newCoordinate = {
+                ...last_cropCoordinate,
+                x: Math.min(movex, maxx),
+                y: Math.min(movey, maxy),
+                width: w,
+                height: h,
+                xr: Math.min((movex) / containerWidth, maxxr),
+                yr: Math.min((movey) / containerHeight, maxyr),
+                // widthr: width / containerWidth,
+                // heightr: height / containerHeight,
+
+            }
+            console.log("newCoordinate", newCoordinate)
+            pageAOI[areaIndex] = newCoordinate;
+            // if(xr+widthr>1){
+            //     newCoordinate.xr = 1-widthr;
+            //     newCoordinate.x = x;
+            // }
+
+            // return aoi;
             return JSON.parse(JSON.stringify(aoi));
         });
-    },[]);
+    }, [set_tempAOI])
+
+    const resizeCoordinate = useCallback((pageIndex, areaIndex, e, containerInform) => {
+        // console.log("asfasf",pageIndex,areaIndex,newAOI);
+        console.log("resizeCoordinate 호출")
+        set_tempAOI(aoi => {
+            const { width: containerWidth, height: containerHeight } = containerInform;
+            const pageAOI = aoi[pageIndex];
+            let last_cropCoordinate = pageAOI[areaIndex];
+            const { xr, yr, widthr, heightr } = last_cropCoordinate;
+            const x = xr * containerWidth;
+            const y = yr * containerHeight;
+            const w = containerWidth * widthr;
+            const h = containerHeight * heightr;
+            const { width, height } = e.rect; //바귄 높이이다.
+            const { left, top } = e.deltaRect;
+            // console.log("top", top)
+            // console.log("기존픽셀:", x, y, w, h);
+            // console.log("바뀐픽셀:", x + left, y + top, width, height);
+            let newCoordinate = {
+                ...last_cropCoordinate,
+                x: x + left / 2,
+                y: y + top / 2,
+                width: width,
+                height: height,
+                xr: (x + left / 2) / containerWidth,
+                yr: (y + top / 2) / containerHeight,
+                widthr: width / containerWidth,
+                heightr: height / containerHeight,
+
+            }
+            pageAOI[areaIndex] = newCoordinate;
+
+            // return aoi;
+            return JSON.parse(JSON.stringify(aoi));
+        });
+    }, [set_tempAOI]);
 
     const [shouldRenderHighQualityPageArray, set_shouldRenderHighQualityPageArray] = useState();
     const beforeHighqualityRef = useRef();
@@ -330,6 +392,18 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
 
     useImperativeHandle(ref, () => ({
+        set_focusAOIArea: (pageNumber, AreaNumber) => {
+            if(pageMultileCropDivRef.current){
+                console.log("pageNumber",pageNumber)
+                // console.log("pageMultileCropDivRef.current",pageMultileCropDivRef.current)
+                // console.log(pageMultileCropDivRef.current[pageNumber-1]);
+                
+                pageMultileCropDivRef.current[pageNumber-1].current.set_focusArea(AreaNumber);
+
+                // pageMultileCropDivRef.current[pageNumber - 1].set_focusArea(AreaNumber);
+            }
+
+        },
         set_scrollMoveToPage: (pageNumber) => {
             forceMoveScrollTopToPage(pageNumber);
         },
@@ -371,6 +445,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
         changePercentPagesData();
     }, [changePercentPagesData]);
 
+    console.log("~~!pageMultileCropDivRef",pageMultileCropDivRef)
 
 
 
@@ -419,82 +494,45 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
                             />
                             {highQualityData &&
-                                <>
-                                    <div className="highQualityCanvasWrap">
-                                        <canvas
-                                            className="onePageCanvas"
-                                            width={highQualityData.pageSize.width} // Set the canvas width
-                                            height={highQualityData.pageSize.height} // Set the canvas height
 
-                                            ref={(canvas) => {
-                                                // console.log("onePage",onePage);
-                                                if (canvas && highQualityData.canvas) {
-                                                    console.log("하이퀄리티랜더", pageNumber)
-                                                    // Get the canvas's 2D rendering context
-                                                    const context = canvas.getContext('2d');
-                                                    // Draw the canvas content onto the canvas element
-                                                    context.drawImage(highQualityData.canvas, 0, 0);
-                                                    // delete onePage.canvas;
-                                                }
-                                            }}
-
-                                        />
-                                    </div>
-                                    <div className="AreaCanvasWrap">
-
-                                        {tempAOI&&tempAOI[index] &&
-                                            <MultipleCropDiv
-                                                AOI_mode={AOI_mode}
-                                                pageIndex={index}
-                                                coordinates={tempAOI[index]}
-                                                onChange={(p,i,np)=>changeCoordinate(index,p,i,np)}
-                                                onDelete={(p,i,np)=>deleteCoordinate(index,p,i,np)}
-                                                onResize={resizeCoordinate}
-                                            />
-                                        }
-
-
-                                        {/* <canvas
+                                <div className="highQualityCanvasWrap">
+                                    <canvas
                                         className="onePageCanvas"
                                         width={highQualityData.pageSize.width} // Set the canvas width
                                         height={highQualityData.pageSize.height} // Set the canvas height
-                                        ref={(canvas)=>{
-                                            if(!canvas) return;
-                                            if(!tempAOI)return;
-                                            console.log("그려~~~~~~~~~~~",pageNumber)
-                                            let targetArr=[];
-                                            for(let i = 0 ; i <tempAOI.length; i++){
-                                                if(tempAOI[i].pageNumber===pageNumber){
-                                                    targetArr.push(tempAOI[i]);
-                                                }
-                                            }
-                              
-                                            const context = canvas.getContext('2d');
 
-                                            const w = highQualityData.pageSize.width;
-                                            const h = highQualityData.pageSize.height;
-                                            context.clearRect(0,0,w,h);
-                                            for(let i = 0 ; i <targetArr.length; i++){
-                                                // console.log("타겟어래이반복")
-                                                let t = targetArr[i];
-
-                                                context.beginPath();
-                                                context.lineWidth = 2;
-                                                context.strokeStyle = "purple";
-                                                context.fillStyle = "purple";
-                                                context.rect(t.left*w, t.top*h, t.width*w, t.height*h);
-                                                context.stroke();
+                                        ref={(canvas) => {
+                                            // console.log("onePage",onePage);
+                                            if (canvas && highQualityData.canvas) {
+                                                // console.log("하이퀄리티랜더", pageNumber)
+                                                // Get the canvas's 2D rendering context
+                                                const context = canvas.getContext('2d');
+                                                // Draw the canvas content onto the canvas element
+                                                context.drawImage(highQualityData.canvas, 0, 0);
+                                                // delete onePage.canvas;
                                             }
-                                            
                                         }}
-                                  
 
-                                    /> */}
-
-
-                                    </div>
-                                </>
+                                    />
+                                </div>
                             }
+                            <div className="AreaCanvasWrap">
+
+                                {tempAOI && tempAOI[index] &&
+                                    <MultipleCropDiv
+                                        ref={pageMultileCropDivRef.current[index]}
+                                        AOI_mode={AOI_mode}
+                                        pageIndex={index}
+                                        coordinates={tempAOI[index]}
+                                        onChange={(p, i, np) => changeCoordinate(index, p, i, np)}
+                                        onDelete={(p, i, np) => deleteCoordinate(index, p, i, np)}
+                                        onResize={resizeCoordinate}
+                                        onMove={moveCoordinate}
+                                    />
+                                }
+                            </div>
+
+
 
                         </div>
 
