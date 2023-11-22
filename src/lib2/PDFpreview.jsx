@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect, useRef
+    // , useMemo, forwardRef, useImperativeHandle 
+} from "react";
 import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js`;
 
@@ -11,7 +13,9 @@ const PDFpreview = (props) => {
         leftPreviewShow,
         nowPage,
         dynamicAllPageRef,
-        tempAOI
+        tempAOI,
+        selAOI,
+        set_selAOI
     } = props;
 
     const PDFpreviewRef = useRef();
@@ -59,12 +63,12 @@ const PDFpreview = (props) => {
 
     const [foldPreview, set_foldPreview] = useState(false);
     const [foldAreaview, set_foldAreaview] = useState(true);
-    const handleScrollTothePage = (pageNumber)=>{
+    const handleScrollTothePage = (pageNumber) => {
         if (dynamicAllPageRef && dynamicAllPageRef.current) {
-           // console.log(dynamicAllPageRef.current);
-           dynamicAllPageRef.current.set_scrollMoveToPage(pageNumber);
-       }
-}
+            // console.log(dynamicAllPageRef.current);
+            dynamicAllPageRef.current.set_scrollMoveToPage(pageNumber);
+        }
+    }
     return (<div className="PDFpreview no-drag"
 
         style={{
@@ -125,7 +129,7 @@ const PDFpreview = (props) => {
                                             //#@! 스크롤이 있다면 이동
 
                                         }
-                                        handleScrollTothePage(index+1);
+                                        handleScrollTothePage(index + 1);
                                     }} />
                                 </div>
 
@@ -151,23 +155,32 @@ const PDFpreview = (props) => {
             <div className="previewContents" style={{ maxHeight: foldAreaview ? '0' : '100%' }}>
                 {tempAOI && tempAOI.map((pageAOI, index) => {
                     return (<div key={`pageAOI_${index}`}>
-                        <div className="pageAOIGroup" onClick={()=>{
+                        <div className="pageAOIGroup" onClick={() => {
                             handleScrollTothePage(index+1);
                         }}>
                             {(index + 1) + 'page AOI'}
                         </div>
-                        {pageAOI.map((oneAOI,AOIindex)=>{
+                        {pageAOI.map((oneAOI, AOIindex) => {
                             // console.log("oneAOI",oneAOI)
                             const AOI_type = oneAOI.type;
-
-                            return (<div className={`oneAOI ${AOI_type}`} onClick={()=>{
-                                handleScrollTothePage(index+1);
-                                if(dynamicAllPageRef&&dynamicAllPageRef.current){
-                                    dynamicAllPageRef.current.set_focusAOIArea(index+1,AOIindex+1);
-                                }
-                            }}>
-                                &nbsp;{(AOIindex+1)+'AOI - '+AOI_type}
-                                </div>)
+                            let isSelected=false;
+                            if(selAOI&&selAOI.pageNumber===index+1 && selAOI.AOINumber===AOIindex+1){
+                                isSelected=true;
+                            }
+                            return (<div className={`oneAOI ${AOI_type} ${isSelected?'focused':''}`}
+                                key={`oneAOIofPAge_${AOIindex}`}
+                                onClick={() => {
+                                    // handleScrollTothePage(index+1);
+                                    if (dynamicAllPageRef && dynamicAllPageRef.current) {
+                                        dynamicAllPageRef.current.set_focusAOIArea(index + 1, AOIindex + 1);
+                                        set_selAOI({
+                                            pageNumber:index+1,
+                                            AOINumber:AOIindex+1
+                                        })
+                                    }
+                                }}>
+                                &nbsp;{(AOIindex + 1) + 'AOI - ' + AOI_type}
+                            </div>)
                         })}
                     </div>)
                 }, [])}

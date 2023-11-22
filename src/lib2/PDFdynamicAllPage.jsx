@@ -38,10 +38,24 @@ function findMaxIndex(arr) {
 }
 
 const PDFdynamicAllPage = forwardRef((props, ref) => {
-    const { set_tempAOI, tempAOI, AOI_mode, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
+    const { set_selAOI,set_tempAOI, tempAOI, AOI_mode, set_nowPage, preparePage, pages, percentPagesData, leftPreviewShow } = props;
     const scrollDivRef = useRef();
+    const pagesArrRef = useRef([]);
+    if(pagesArrRef.current.length !== percentPagesData.length){
+        pagesArrRef.current = Array(percentPagesData.length)
+        .fill()
+        .map((_, i) => pagesArrRef.current[i] || createRef());
+      }
 
-    const pageMultileCropDivRef = useRef(Array.from({ length: percentPagesData.length }, () => createRef()));
+    // const pageMultileCropDivRef = useRef(Array.from({ length: percentPagesData.length }, () => createRef()));
+    const pageMultileCropDivRef = useRef([]);
+    if(pageMultileCropDivRef.current.length !== percentPagesData.length){
+        pageMultileCropDivRef.current = Array(percentPagesData.length)
+        .fill()
+        .map((_, i) => pageMultileCropDivRef.current[i] || createRef());
+      }
+
+      
     // console.log("coordinates",coordinates)
 
 
@@ -114,7 +128,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                 // heightr: height / containerHeight,
 
             }
-            console.log("newCoordinate", newCoordinate)
+            // console.log("newCoordinate", newCoordinate)
             pageAOI[areaIndex] = newCoordinate;
             // if(xr+widthr>1){
             //     newCoordinate.xr = 1-widthr;
@@ -128,7 +142,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
     const resizeCoordinate = useCallback((pageIndex, areaIndex, e, containerInform) => {
         // console.log("asfasf",pageIndex,areaIndex,newAOI);
-        console.log("resizeCoordinate 호출")
+        // console.log("resizeCoordinate 호출")
         set_tempAOI(aoi => {
             const { width: containerWidth, height: containerHeight } = containerInform;
             const pageAOI = aoi[pageIndex];
@@ -136,8 +150,8 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
             const { xr, yr, widthr, heightr } = last_cropCoordinate;
             const x = xr * containerWidth;
             const y = yr * containerHeight;
-            const w = containerWidth * widthr;
-            const h = containerHeight * heightr;
+            // const w = containerWidth * widthr;
+            // const h = containerHeight * heightr;
             const { width, height } = e.rect; //바귄 높이이다.
             const { left, top } = e.deltaRect;
             // console.log("top", top)
@@ -170,8 +184,8 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
     const shouldMoveScrollPercent = useRef();
 
     const changePercentPagesData = useCallback(() => {
-        console.log("@@@@@@@@@@@@@@@changePercentPagesData@@@@@@@@@@@");
-        //#@! debounce 써서 고칠것
+        // console.log("@@@@@@@@@@@@@@@changePercentPagesData@@@@@@@@@@@");
+  
         let beforehouldRenderHighQualityPageArray = beforeHighqualityRef.current;
 
         const { scrollTop, clientHeight, scrollHeight } = scrollDivRef.current.getValues();
@@ -304,7 +318,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                     return;
                 }
 
-                console.log("111111111이전값이 있지만 틀려서 생성중");
+                // console.log("111111111이전값이 있지만 틀려서 생성중");
                 //어째서 여기가 계속 호출되는것인가?
                 makeVirtualCanvasHighQualityPage().then(valid => {
                     ismakingHighQualityRef.current = false;
@@ -368,7 +382,9 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
     const forceMoveScrollTopToPage = useCallback((pageNumber) => {
         if (!percentPagesData) return;
-        // console.log("percentPagesData",percentPagesData);
+
+
+        
         let sctop = null;
         for (let i = 0; i < percentPagesData.length; i++) {
             let p = percentPagesData[i];
@@ -379,10 +395,9 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
         }
         if (sctop !== null) {
-            // console.log("sctop",sctop)
-            // console.dir(scrollDivRef.current)
             scrollDivRef.current.scrollTop(sctop);
         }
+        
 
         // console.dir(scrollDivRef);
         // scrollDivRef.crTop(0);
@@ -394,7 +409,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         set_focusAOIArea: (pageNumber, AreaNumber) => {
             if(pageMultileCropDivRef.current){
-                console.log("pageNumber",pageNumber)
+                // console.log("pageNumber",pageNumber)
                 // console.log("pageMultileCropDivRef.current",pageMultileCropDivRef.current)
                 // console.log(pageMultileCropDivRef.current[pageNumber-1]);
                 
@@ -432,7 +447,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
 
     useEffect(() => {
-        console.log("여긴?")
+        // console.log("여긴?")
 
         const debouncedChangePercentPagesData = _.debounce((arg) => {
             changePercentPagesData(arg);
@@ -445,7 +460,6 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
         changePercentPagesData();
     }, [changePercentPagesData]);
 
-    console.log("~~!pageMultileCropDivRef",pageMultileCropDivRef)
 
 
 
@@ -457,7 +471,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
             {percentPagesData && percentPagesData.map((onePage, index) => {
                 // console.log("onePage",onePage);
-                const pageNumber = onePage.pageNumber;
+                // const pageNumber = onePage.pageNumber;
                 // console.log("shouldRenderHighQualityPageArray",shouldRenderHighQualityPageArray)
                 let highQualityData = null;
                 if (shouldRenderHighQualityPageArray && shouldRenderHighQualityPageArray.find(d => d.pageNumber === index + 1)) {
@@ -470,6 +484,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                         style={{
                             marginTop: onePage.marginHeight,
                         }}
+                        ref={pagesArrRef.current[index]}
                         key={'dynamic_page_' + index}
                     >
                         <div className="pageCanvasWrap" style={{
@@ -525,9 +540,11 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                                         pageIndex={index}
                                         coordinates={tempAOI[index]}
                                         onChange={(p, i, np) => changeCoordinate(index, p, i, np)}
-                                        onDelete={(p, i, np) => deleteCoordinate(index, p, i, np)}
+                                        onDelete={(targetcoordinate) => deleteCoordinate(index, targetcoordinate)}
                                         onResize={resizeCoordinate}
                                         onMove={moveCoordinate}
+                         
+                                        set_selAOI={set_selAOI}
                                     />
                                 }
                             </div>

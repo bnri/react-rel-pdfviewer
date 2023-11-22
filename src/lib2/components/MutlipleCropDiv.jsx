@@ -3,36 +3,36 @@ import shortid from 'shortid';
 import "./MultipleCropDiv.scss";
 // import Crop from './Crop';
 import CropArea from './CropArea';
-import _ from "lodash";
+// import _ from "lodash";
 //https://github.com/beizhedenglong/react-multi-crops/blob/master/src/components/Crop.js
 
 
-const isValidPoint = (point) => {
-  const strictNumber = (number) => !Number.isNaN(number);
-  return strictNumber(point.x) && strictNumber(point.y);
-};
+
 
 const MultipleCropDiv = forwardRef((props,ref) => {
-  const { AOI_mode, coordinates, pageIndex } = props;
+  const { AOI_mode, coordinates, pageIndex , onDelete } = props;
   const drawingIndexRef = useRef(-1);
   const pointARef = useRef(null);
 
 
   const idRef = useRef(shortid.generate());
   const containerRef = useRef(null);
-  const cropAreaRefArr = useRef(Array.from({ length: coordinates.length }, () => createRef()));
+  // const cropAreaRefArr = useRef([]);
+  // const cropAreaRefArr = useRef(Array.from({ length: coordinates.length }, () => createRef()));
+  const cropAreaRefArr = useRef([]);
+  if(cropAreaRefArr.current.length !== coordinates.length){
+    cropAreaRefArr.current = Array(coordinates.length)
+    .fill()
+    .map((_, i) => cropAreaRefArr.current[i] || createRef());
+  }
+
+
 
   useImperativeHandle(ref, () => ({
     set_focusArea(AreaNumber) {
-        // cropAreaRef.current.focus();
-        // console.log("cropAreaRefArr",cropAreaRefArr)
-        console.log("cropAreaRefArr.current",cropAreaRefArr.current)
-        // console.log("cropAreaRefArr[AreaNumber-1]",cropAreaRefArr.current[AreaNumber-1])
-        if(cropAreaRefArr.current&&cropAreaRefArr.current[AreaNumber-1]){
+        if(cropAreaRefArr.current&&cropAreaRefArr.current[AreaNumber-1]&&cropAreaRefArr.current[AreaNumber-1].current){
           cropAreaRefArr.current[AreaNumber-1].current.set_focusArea();
         }
-
-        // cropAreaRefArr[AreaNumber-1].current.set_focusArea();
     },
     
 
@@ -152,26 +152,33 @@ const MultipleCropDiv = forwardRef((props,ref) => {
 
 
 
-  const handleMouseUp = () => {
+  const handleMouseUpOrLeave = () => {
     pointARef.current = null;
-    // const {onAddCoordinate}= props;
-    // if (typeof onAddCoordinate === 'function') {
-    //   onAddCoordinate()
-    // }
+    if(!coordinates.length)return;
+
+    // const coordinate = coordinates[]
+    // console.log("coordinates",coordinates)
+    let lastcoordinate=coordinates[coordinates.length-1];
+    //#@!
+    if(onDelete&& (lastcoordinate.widthr<0.05 || lastcoordinate.heightr<0.05)){
+
+        onDelete(lastcoordinate)
+    }
+
+    //onDelete
+    //onDelete(coordinate)
+
 
   };
 
-  const handleMouseLeave = () => {
-    pointARef.current = null;
 
-  }
 
 
   return (<div className="Cropcontainer no-drag"
     onMouseDown={handleMouseDown}
     onMouseMove={handleMouseMove}
-    onMouseLeave={handleMouseLeave}
-    onMouseUp={handleMouseUp}
+    onMouseLeave={handleMouseUpOrLeave}
+    onMouseUp={handleMouseUpOrLeave}
     ref={containerRef}
   >
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import _ from "lodash";
 
@@ -460,7 +460,8 @@ const PDFDocument = (props) => {
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
     const [AOI_mode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
- 
+    const [selAOI,set_selAOI] = useState();
+
 
 
 
@@ -494,6 +495,8 @@ const PDFDocument = (props) => {
                         set_nowPage(page);
                     }}
                     tempAOI={tempAOI}
+                    selAOI={selAOI}
+                    set_selAOI={set_selAOI}
                 />
                 <PDFdynamicAllPage
                     ref={dynamicAllPageRef}
@@ -505,6 +508,8 @@ const PDFDocument = (props) => {
                     AOI_mode={AOI_mode}
                     pages={pages}
                     preparePage={preparePage}
+      
+                    set_selAOI={set_selAOI}
                 />
             </>
             :

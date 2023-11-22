@@ -1,16 +1,17 @@
 import React, { useState, useCallback, useEffect, useRef  ,forwardRef,useImperativeHandle} from 'react';
 import interact from 'interactjs';
 const CropArea = forwardRef((props, ref) => {
-    const { onMove,onResize, pageIndex, areaIndex, coordinate, containerInform, onDelete } = props;
+    const {set_selAOI, onMove,onResize, pageIndex, areaIndex, coordinate, containerInform, onDelete } = props;
     const [isFocused, setIsFocused] = useState(false);
     const cropAreaRef = useRef();
+    
     useImperativeHandle(ref, () => ({
         set_focusArea() {
             cropAreaRef.current.focus();
         },
-        
-
     }), []);
+
+
 
     const cropStyle = useCallback(() => {
         if (!containerInform) return;
@@ -44,12 +45,22 @@ const CropArea = forwardRef((props, ref) => {
         };
     }, [coordinate, containerInform]);
 
+    useEffect(()=>{
+        if(!isFocused){
+            set_selAOI(null);
+        }
+        else{
+            set_selAOI({
+                pageNumber:pageIndex+1,
+                AOINumber:areaIndex+1
+            })
+        }
+    },[isFocused,pageIndex,areaIndex,set_selAOI])
 
     useEffect(() => {
         if (!containerInform) return;
         // console.log("coordinate",coordinate);
-        // console.log("????????isFocused",isFocused)
-        console.log("@@@@@@@@@@이벤트등록")
+        // console.log("@@@@@@@@@@이벤트등록")
         const interactInstance = interact(cropAreaRef.current);
 
 
@@ -63,48 +74,18 @@ const CropArea = forwardRef((props, ref) => {
             if(onMove){
                 onMove(pageIndex, areaIndex, e, containerInform);
             }
-            // const { x, y } = coordinate;
-            // const { dx, dy } = e;
-
-            // const nextCoordinate = { ...coordinate, x: x + dx, y: y + dy };
-            // const nextCoordinates = update(index, nextCoordinate, coordinates);
-
-            // if (is(Function, onDrag)) {
-            //   onDrag(nextCoordinate, index, nextCoordinates);
-            // }
-
-            // if (is(Function, onChange)) {
-            //   onChange(nextCoordinate, index, nextCoordinates);
-            // }
         };
         // console.log("containerInform",containerInform)
 
         interactInstance.draggable({
-            // dragmove: handleDragMove,
-            // edges: {
-            //     left: true, right: true, bottom: true, top: true,
-            // },
-            // inertia: true, //미끄러짐
-            // restrict: {
-            //     elementRect: {
-            //       top: 0,
-            //       left: 0,
-            //       bottom: 1,
-            //       right: 1
-            //     }
-            //   },
             modifiers: [
                 // keep the edges inside the parent
                 interact.modifiers.restrictEdges({
                     outer: 'parent',
-                    // endOnly: false //좌 위
                     
                 }),
-      
             ],
-            autoScroll:{
-                isScrolling:false
-            },
+            autoScroll:true
         }).resizable({
             edges: {
                 left: true, right: true, bottom: true, top: true,
@@ -137,6 +118,7 @@ const CropArea = forwardRef((props, ref) => {
     }, [containerInform, pageIndex, areaIndex, onResize,onMove]);
 
 
+    
 
 
     return (<div className="CropArea" ref={cropAreaRef} style={cropStyle()}
@@ -144,6 +126,7 @@ const CropArea = forwardRef((props, ref) => {
         onBlur={() => {
             // console.log("~~~불러호출?")
             setIsFocused(false)
+            set_selAOI(null);
         }}
         tabIndex={0}
     >

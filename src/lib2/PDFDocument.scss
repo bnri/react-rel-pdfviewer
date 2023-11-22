@@ -223,11 +223,12 @@ $topbar-height:50px;
                     justify-content: flex-start;
                     align-items: center;
                     &:hover{
-                        background:#666;
+                        background:#444;
                         cursor:pointer;
                     }
                 }
                 .oneAOI{
+                 
                     text-align: left;
                     padding-left:20px;
                     height:25px;
@@ -236,8 +237,11 @@ $topbar-height:50px;
                     justify-content: flex-start;
                     align-items: center;
                     &:hover{
-                        background:#666;
+                        background:#444;
                         cursor:pointer;
+                    }
+                    &.focused{
+                        background:#666;
                     }
                 }
             }
