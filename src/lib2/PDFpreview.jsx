@@ -3,7 +3,15 @@ import { useState, useEffect, useRef
 } from "react";
 import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js`;
-
+const FoldSvg = ({isFold})=>{
+    return (<svg fill="#fff"
+    style={{
+        transform: isFold ? "rotate(-90deg)" : "",
+    }}
+    width="12px" height="12px" viewBox="0 0 32 32"
+    xmlns="http://www.w3.org/2000/svg">
+    <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z" /></svg>);
+}
 
 const PDFpreview = (props) => {
     const {
@@ -15,7 +23,11 @@ const PDFpreview = (props) => {
         dynamicAllPageRef,
         tempAOI,
         selAOI,
-        set_selAOI
+        set_selAOI,
+        hideAOIPageListArr,
+        set_hideAOIPageListArr,
+        foldAOIList,
+        set_foldAOIList
     } = props;
 
     const PDFpreviewRef = useRef();
@@ -62,7 +74,7 @@ const PDFpreview = (props) => {
     }, [nowPage, preparedPreviewPages, previewOption]);
 
     const [foldPreview, set_foldPreview] = useState(false);
-    const [foldAreaview, set_foldAreaview] = useState(true);
+
     const handleScrollTothePage = (pageNumber) => {
         if (dynamicAllPageRef && dynamicAllPageRef.current) {
             // console.log(dynamicAllPageRef.current);
@@ -78,13 +90,7 @@ const PDFpreview = (props) => {
         }}>
         <div className="onePreView">
             <div className="previewTitle" onClick={() => set_foldPreview(d => !d)}>
-                <svg fill="#fff"
-                    style={{
-                        transform: foldPreview ? "rotate(-90deg)" : "",
-                    }}
-                    width="16px" height="16px" viewBox="0 0 32 32"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z" /></svg>
+            <FoldSvg isFold={foldPreview} />
                 &nbsp;PDF Page List
             </div>
             <div className="previewContents" style={{ maxHeight: foldPreview ? 0 : '100%' }} ref={PDFpreviewRef}>
@@ -142,25 +148,24 @@ const PDFpreview = (props) => {
                 }
                 {/* <div style={{height:25}}/> */}
             </div>
-            <div className="previewTitle" onClick={() => set_foldAreaview(d => !d)}>
-                <svg fill="#fff"
-                    style={{
-                        transform: foldAreaview ? "rotate(-90deg)" : "",
-                    }}
-                    width="16px" height="16px" viewBox="0 0 32 32"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 4.21875 10.78125 L 2.78125 12.21875 L 15.28125 24.71875 L 16 25.40625 L 16.71875 24.71875 L 29.21875 12.21875 L 27.78125 10.78125 L 16 22.5625 Z" /></svg>
+            <div className="previewTitle" onClick={() => set_foldAOIList(d => !d)}>
+                    <FoldSvg isFold={foldAOIList} />
                 &nbsp;Area List
             </div>
-            <div className="previewContents" style={{ maxHeight: foldAreaview ? '0' : '100%' }}>
+            <div className="previewContents" style={{ maxHeight: foldAOIList ? '0' : '100%' }}>
                 {tempAOI && tempAOI.map((pageAOI, index) => {
                     return (<div key={`pageAOI_${index}`}>
                         <div className="pageAOIGroup" onClick={() => {
                             handleScrollTothePage(index+1);
+                            set_hideAOIPageListArr(prevState => {
+                                const newToggles = { ...prevState };
+                                newToggles[index] = !prevState[index];
+                                return newToggles;
+                            });
                         }}>
-                            {(index + 1) + 'page AOI'}
+                                <FoldSvg isFold={hideAOIPageListArr[index]} />   &nbsp;{(index + 1) + 'page AOI'}
                         </div>
-                        {pageAOI.map((oneAOI, AOIindex) => {
+                        {!hideAOIPageListArr[index]&&pageAOI.map((oneAOI, AOIindex) => {
                             // console.log("oneAOI",oneAOI)
                             const AOI_type = oneAOI.type;
                             let isSelected=false;
@@ -179,7 +184,7 @@ const PDFpreview = (props) => {
                                         })
                                     }
                                 }}>
-                                &nbsp;{(AOIindex + 1) + 'AOI - ' + AOI_type}
+                                   &nbsp;&nbsp;{(AOIindex + 1) + 'AOI - ' + AOI_type}
                             </div>)
                         })}
                     </div>)

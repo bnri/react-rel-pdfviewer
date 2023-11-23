@@ -74,10 +74,10 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
     }
 
     const deleteCoordinate = (pageIndex, targetCoordinate) => {
-        console.log("@@@@삭제@@@@@@@@")
-        console.log("pageIndex", pageIndex)
-        console.log("coordinates", targetCoordinate);
-        console.log("@@@@@@@@@@@@")
+        // console.log("@@@@삭제@@@@@@@@")
+        // console.log("pageIndex", pageIndex)
+        // console.log("coordinates", targetCoordinate);
+        // console.log("@@@@@@@@@@@@")
         set_tempAOI(aoi => {
             const pageAOI = aoi[pageIndex];
             for (let i = 0; i < pageAOI.length; i++) {

@@ -217,8 +217,9 @@ $topbar-height:50px;
                 border-bottom:1px solid #414141;
                 .pageAOIGroup{
                     text-align: left;
-                    padding-left:10px;
-                    height:30px;
+                    padding-left:15px;
+                    height:20px;
+                    font-size: 11px;
                     display:flex;
                     justify-content: flex-start;
                     align-items: center;
@@ -228,11 +229,11 @@ $topbar-height:50px;
                     }
                 }
                 .oneAOI{
-                 
+                    font-size: 11px;
                     text-align: left;
-                    padding-left:20px;
-                    height:25px;
-                    font-size:14px;
+                    padding-left:25px;
+                    height:20px;
+        
                     display:flex;
                     justify-content: flex-start;
                     align-items: center;

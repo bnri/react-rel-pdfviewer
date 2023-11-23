@@ -21,10 +21,14 @@ const PDFDocument = (props) => {
     //     xr: 0.1, yr: 0.1, widthr: 0.1, heightr: 0.1, id: '1234',
     //     type:"quiz"
     // }, {
-    //     xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',
+    //     xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',f
     //     type:"quiz"
     // },]]);
     const [tempAOI, set_tempAOI] = useState([]);
+    const [hideAOIPageListArr,set_hideAOIPageListArr] = useState([]);
+    const [AOI_mode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
+    const [selAOI,set_selAOI] = useState();
+    // console.log("hideAOIPageListArr",hideAOIPageListArr)
 
 
     const [leftPreviewShow, set_leftPreviewShow] = useState(previewOption && previewOption.initLeftPreviewshow ? previewOption.initLeftPreviewshow : false);
@@ -39,9 +43,43 @@ const PDFDocument = (props) => {
             return 0;
         }
     }, [pages])
-
+    useEffect(()=>{
+        if(selAOI){
+            set_foldAOIList(false);
+            set_hideAOIPageListArr(prev=>{
+                prev[selAOI.pageNumber - 1] = false;
+                return JSON.parse(JSON.stringify(prev));
+            })
+            // set_hideAOIPageListArr(prev => {
+            //     if (!prev || !Array.isArray(prev)) {
+            //         // If prev is falsy or not an array, initialize a new array
+            //         const newHideList = Array(maxPageNumber).fill(true);
+            //         newHideList[selAOI.pageNumber - 1] = false;
+            //         return newHideList;
+            //     }
+    
+            //     // prev is truthy and an array, perform the update
+            //     const newHideList = [...prev];
+            //     newHideList[selAOI.pageNumber - 1] = false;
+            //     return newHideList;
+            // });
+        }
+    },[selAOI])
+    const [foldAOIList, set_foldAOIList] = useState(true);
     useEffect(()=>{
         const vacancy = Array.from({ length: maxPageNumber }, () => []);
+
+        /*
+        let hideList =[];
+        for(let i = 0; i <maxPageNumber; i++){
+            hideList[i]=true;
+        }
+        set_hideAOIPageListArr(hideList);
+        */
+        const initialHideAOIPageListArr = Array.from({ length: maxPageNumber }, () => true);
+        set_hideAOIPageListArr(initialHideAOIPageListArr);
+   
+
         if(AOI){
             set_tempAOI(AOI);
             for(let i = 0 ; i<vacancy.length; i++){
@@ -407,7 +445,7 @@ const PDFDocument = (props) => {
                     return;
                 }
                 prevRenderWidth.current = renderWidth;
-                console.log("PDF 크기",renderWidth)
+                // console.log("PDF 크기",renderWidth)
                 // console.log('PDF 껍데기의 크기가 변경되었습니다!', contentWidth, contentHeight);
                 //   const renderWidth = contentWidth * parseInt(viewPercent) / 100;
                 debouncedGeneratePercentPagesData(renderWidth);
@@ -419,7 +457,7 @@ const PDFDocument = (props) => {
                 return; // If resizing is already in progress, return early
             }
             resizing = true; // Set the resizing flag to true
-            console.log("generatePercentPagesData 호출")
+            // console.log("generatePercentPagesData 호출")
             let viewPercentPagesData = [];
             // const intViewPercent = parseInt(viewPercent);
             // const sidebarSize = leftPreviewShow ? 150 : 0;
@@ -459,8 +497,6 @@ const PDFDocument = (props) => {
         }
     }, [preparedPreviewPages, viewPercent, leftPreviewShow])
 
-    const [AOI_mode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표
-    const [selAOI,set_selAOI] = useState();
 
 
 
@@ -494,9 +530,13 @@ const PDFDocument = (props) => {
                         // console.log("pageClick", page);
                         set_nowPage(page);
                     }}
+                    hideAOIPageListArr={hideAOIPageListArr}
+                    set_hideAOIPageListArr={set_hideAOIPageListArr}
                     tempAOI={tempAOI}
                     selAOI={selAOI}
                     set_selAOI={set_selAOI}
+                    foldAOIList={foldAOIList}
+                    set_foldAOIList ={set_foldAOIList}
                 />
                 <PDFdynamicAllPage
                     ref={dynamicAllPageRef}
