@@ -91,6 +91,22 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
             return JSON.parse(JSON.stringify(aoi));
         });
     }
+
+    const changeCropName = (pageIndex, targetCoordinate,newName) => {
+        set_tempAOI(aoi => {
+            const pageAOI = aoi[pageIndex];
+            for (let i = 0; i < pageAOI.length; i++) {
+                if (pageAOI[i].id === targetCoordinate.id) {
+                    pageAOI[i].name = newName;
+                    break;
+                }
+
+            }
+
+            return JSON.parse(JSON.stringify(aoi));
+        });
+    }
+
     const moveCoordinate = useCallback((pageIndex, areaIndex, e, containerInform) => {
         set_tempAOI(aoi => {
             const { width: containerWidth, height: containerHeight } = containerInform;
@@ -543,7 +559,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
                                         onDelete={(targetcoordinate) => deleteCoordinate(index, targetcoordinate)}
                                         onResize={resizeCoordinate}
                                         onMove={moveCoordinate}
-                         
+                                        onFixCropName={(targetcoordinate,newname)=>changeCropName(index,targetcoordinate,newname)}
                                         set_selAOI={set_selAOI}
                                     />
                                 }

@@ -13,10 +13,13 @@ const MultipleCropDiv = forwardRef((props,ref) => {
   const { AOI_mode, coordinates, pageIndex , onDelete } = props;
   const drawingIndexRef = useRef(-1);
   const pointARef = useRef(null);
+  const isMouseDown = useRef(null);
+  const isMouseMove = useRef(null);
 
 
   const idRef = useRef(shortid.generate());
   const containerRef = useRef(null);
+  const [containerInform, set_containerInform] = useState();
   // const cropAreaRefArr = useRef([]);
   // const cropAreaRefArr = useRef(Array.from({ length: coordinates.length }, () => createRef()));
   const cropAreaRefArr = useRef([]);
@@ -62,7 +65,7 @@ const MultipleCropDiv = forwardRef((props,ref) => {
       drawingIndexRef.current = coordinates.length;
       pointARef.current = pointA;
 
-
+      isMouseDown.current=true;
       idRef.current = shortid.generate();
     }
   };
@@ -76,7 +79,7 @@ const MultipleCropDiv = forwardRef((props,ref) => {
     if (pointA) {
       // console.log("pointA", pointA)
       const pointB = getCursorPosition(e);
-
+      isMouseMove.current=true;
       let type;
       if (AOI_mode === 1) {
         type = "quiz"
@@ -98,9 +101,10 @@ const MultipleCropDiv = forwardRef((props,ref) => {
         xr: Math.min(pointA.xr, pointB.xr),
         yr: Math.min(pointA.yr, pointB.yr),
         id: idRef.current,
-        type: type
+        type: type,
+      
       };
-
+      // console.log("coordinates",coordinates)
       const nextCoordinates = [...coordinates];
       nextCoordinates[drawingIndexRef.current] = tempCoordinate;
 
@@ -114,7 +118,77 @@ const MultipleCropDiv = forwardRef((props,ref) => {
     }
   }
 
-  const [containerInform, set_containerInform] = useState();
+  const handleMouseUp = () => {
+    pointARef.current = null;
+    if(!coordinates.length)return;
+    if (!AOI_mode) return;
+    if(!isMouseDown.current){
+      return;
+    }
+    if(!isMouseMove.current){
+      return;
+    }
+    console.log("@@@@@@@@@@@@@@@마우스업")
+    isMouseMove.current=false;
+    isMouseDown.current=false;
+    // const coordinate = coordinates[]
+    // console.log("coordinates",coordinates)
+    const lastcoordinate=coordinates[coordinates.length-1];
+    //#@!
+    if(onDelete&& (lastcoordinate.widthr<0.05 || lastcoordinate.heightr<0.05)){
+
+        onDelete(lastcoordinate)
+        isMouseMove.current=false;
+        isMouseDown.current=false;
+        return;
+    }
+
+    // console.log("cropAreaRefArr.current",cropAreaRefArr.current[cropAreaRefArr.current.length-1])
+    cropAreaRefArr.current[cropAreaRefArr.current.length-1].current.set_focusArea();
+
+    console.log("lastcoordinate",lastcoordinate)
+    // if(cropAreaRefArr.current&&cropAreaRefArr.current[AreaNumber-1]&&cropAreaRefArr.current[AreaNumber-1].current){
+    //   cropAreaRefArr.current[AreaNumber-1].current.set_focusArea();
+    // }
+
+    //lastcoordinate의 name fix 모드로..
+
+    //onDelete
+    //onDelete(coordinate)
+
+  };
+
+  const handleMouserLeave = () => {
+
+    pointARef.current = null;
+    if(!coordinates.length)return;
+    if (!AOI_mode) return;
+    if(!isMouseDown.current){
+      return;
+    }
+    if(!isMouseMove.current){
+      return;
+    }
+    console.log("@@@@@@@@@@@@@@@마우스리브")
+    isMouseMove.current=false;
+    isMouseDown.current=false;
+    // const coordinate = coordinates[]
+    // console.log("coordinates",coordinates)
+    const lastcoordinate=coordinates[coordinates.length-1];
+    //#@!
+    if(onDelete&& (lastcoordinate.widthr<0.05 || lastcoordinate.heightr<0.05)){
+        onDelete(lastcoordinate)
+    
+        return;
+    }
+    cropAreaRefArr.current[cropAreaRefArr.current.length-1].current.set_focusArea();
+    console.log("lastcoordinate",lastcoordinate)
+
+
+
+  };
+
+  //리사이즈시 컨테이너사이즈재정의
   useEffect(() => {
     if (!containerRef.current) return;
     const wrapEl = containerRef.current;
@@ -151,34 +225,11 @@ const MultipleCropDiv = forwardRef((props,ref) => {
   }, []);
 
 
-
-  const handleMouseUpOrLeave = () => {
-    pointARef.current = null;
-    if(!coordinates.length)return;
-
-    // const coordinate = coordinates[]
-    // console.log("coordinates",coordinates)
-    let lastcoordinate=coordinates[coordinates.length-1];
-    //#@!
-    if(onDelete&& (lastcoordinate.widthr<0.05 || lastcoordinate.heightr<0.05)){
-
-        onDelete(lastcoordinate)
-    }
-
-    //onDelete
-    //onDelete(coordinate)
-
-
-  };
-
-
-
-
   return (<div className="Cropcontainer no-drag"
     onMouseDown={handleMouseDown}
     onMouseMove={handleMouseMove}
-    onMouseLeave={handleMouseUpOrLeave}
-    onMouseUp={handleMouseUpOrLeave}
+    onMouseLeave={handleMouserLeave}
+    onMouseUp={handleMouseUp}
     ref={containerRef}
   >
 

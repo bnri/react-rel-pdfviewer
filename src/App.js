@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import './App.scss';
 import PDFviewModal from './lib/PDFviewModal';
-import A, { PDFTopBar,PDFviewModalV2, PDFDocument, Page,PDFpreview } from "./lib2";
+import A, { PDFTopBar, PDFviewModalV2, PDFDocument, Page, PDFpreview } from "./lib2";
 
 // console.log("A", A);
 
@@ -15,7 +15,7 @@ function App() {
       mode: 2, //지금페이지만 랜더 3, 전체preload 2 , 지금페이지 앞뒤 preload 1
       drawing: true,
       canvasResolution: 1,
-      initViewPercent:'100%',
+      initViewPercent: '100%',
       // canvasWidth:200, //값을 안넣어주면 계속 리랜더함 
       //만약 전체 페이지 mode가 2번인상태로 값을 안넣어주면 전체페이지를 매번 리랜더.. viewpercent 바뀔때마다
     };
@@ -43,7 +43,7 @@ function App() {
   const [previewURL, set_previewURL] = React.useState("");
   const [file, set_file] = React.useState(null);
   const [maxPageNumber, set_maxPageNumber] = useState();
-  
+
 
   const handleAddFile = (e) => {
     console.log(e.target.files[0]);
@@ -321,15 +321,25 @@ function App() {
 
           <PDFDocument
             AOI={[
-              
+
               [{
-              xr: 0.1, yr: 0.1, widthr: 0.1, heightr: 0.1, id: '1234',
-                type:"quiz"
-            }, {
-                xr: 0.4, yr: 0.4, widthr: 0.1, heightr: 0.1, id: '5678',
-                type:"quiz"
-            },], //1번페이지
-          
+                xr: 0.1, 
+                yr: 0.1, 
+                widthr: 0.1, 
+                heightr: 0.1, 
+                id: '1234',
+                type: "quiz",
+                name: "임시quiz1"
+              }, {
+                xr: 0.4, 
+                yr: 0.4, 
+                widthr: 0.1, 
+                heightr: 0.1, 
+                id: '5678',
+                type: "quiz",
+                name: "임시quiz2",
+              },], //1번페이지
+
             ]}
 
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
@@ -337,10 +347,10 @@ function App() {
             option={option}
             previewOption={previewOption}
             pdfInform={{
-              fileName:"이것은PDF파일이름"
+              fileName: "이것은PDF파일이름"
             }}
           >
-            
+
             {/* <Page
               // ref={pdfviewref}
               pageNumber={nowPage}
