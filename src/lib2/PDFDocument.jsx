@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import _ from "lodash";
-import { List } from 'immutable';
 import "./PDFDocument.scss";
 import * as pdfjsLib from 'pdfjs-dist';
 import { PDFTopBar, PDFdynamicAllPage, PDFpreview } from "./";
@@ -18,7 +17,7 @@ const PDFDocument = (props) => {
     const [preparedPreviewPages, set_preparedPreviewPages] = useState();
     const [percentPagesData, set_percentPagesData] = useState();
 
-    
+
     const [tempAOI, set_tempAOI] = useState([]);
     const [hideAOIPageListArr,set_hideAOIPageListArr] = useState([]);
     const [AOI_mode,set_AOI_mode] = useState(0); // 0 아님, 1Quiz,2글,3사진,표

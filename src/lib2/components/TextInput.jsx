@@ -1,16 +1,16 @@
-import React, { useState, useCallback, useEffect, useRef ,forwardRef,useImperativeHandle } from 'react';
+import React, { useState, useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import "./TextInput.scss"
-const TextInput = forwardRef((props,ref) => {
-    const { value, onChange, style, className  ,onEditModeChanged , onCancel } = props;
+const TextInput = forwardRef((props, ref) => {
+    const { value, onChange, style, className, onEditModeChanged, onCancel, onBlur } = props;
     const [anyValue, setAnyValue] = useState(value || '');
     const [editMode, set_editMode] = useState(false);
     const inputRef = useRef();
     const donotcallblurref = useRef();
-    useImperativeHandle(ref,()=>({
-        set_textEditMode(val){
+    useImperativeHandle(ref, () => ({
+        set_textEditMode(val) {
             set_editMode(val);
         }
-    }),[])
+    }), [])
     const handleOnSave = useCallback((e) => {
         if (e && e.preventDefault) {
             e.preventDefault();
@@ -18,18 +18,16 @@ const TextInput = forwardRef((props,ref) => {
         // if( e&& e.stopPropagation){
         //     e.stopPropagation();
         //   }
-  
-        donotcallblurref.current=true;
+
+        donotcallblurref.current = true;
         // console.log("--Save호출1111111111")
         if (onChange) {
             onChange(anyValue);
         }
 
         set_editMode(false)
-
-
-
     }, [onChange, anyValue]);
+
 
 
     const handleOnCancel = useCallback((e) => {
@@ -39,15 +37,16 @@ const TextInput = forwardRef((props,ref) => {
         // if( e&& e.stopPropagation){
         //   e.stopPropagation();
         // }
-    
-        donotcallblurref.current=true;
+
+        donotcallblurref.current = true;
         // console.log("--Cancel호출")
         setAnyValue(value);
         set_editMode(false);
-        if(onCancel){
+        if (onCancel) {
             onCancel(true)
         }
-    }, [value,onCancel]);
+    }, [value, onCancel]);
+
 
     const handleKeyDown = useCallback((event) => {
         // console.log("asf",event)
@@ -63,60 +62,60 @@ const TextInput = forwardRef((props,ref) => {
         if (e && e.preventDefault) {
             e.preventDefault();
         }
-        if(donotcallblurref.current){
-            donotcallblurref.current=false;
+
+        if (donotcallblurref.current) {
+            // console.log("불러호출마라")
+            donotcallblurref.current = false;
             return;
         }
-        const target = e.relatedTarget || document.activeElement;
-        // console.log("target",target)
-        if (target &&!target.isSameNode(inputRef.current)) {
-            // console.log("--불러호출");
-            set_editMode(false);
-            if (value === anyValue) {
-                // handleOnCancel();
-            } else {
-           
-                handleOnSave();
-                // set_editMode(false);
+
+
+        // console.log("--불러호출");
+        set_editMode(false);
+        if (value === anyValue) {
+        } else {
+            if (onBlur) {
+                onBlur(anyValue);
             }
         }
-    }, [value, anyValue, handleOnSave]);
+
+    }, [value, anyValue, onBlur]);
 
     const handleOnEditStart = useCallback((e) => {
         e.preventDefault(); // Prevents the default behavior (focus loss)
-        if( e&& e.stopPropagation){
+        if (e && e.stopPropagation) {
             e.stopPropagation();
-          }
-  
+        }
+
         set_editMode(true);
-        
+
     }, [])
 
     useEffect(() => {
         if (editMode) {
             // console.log("에딧모드돌입");            
-       
-       
+
+
             inputRef.current.focus();
-            if(onEditModeChanged){
+            if (onEditModeChanged) {
                 onEditModeChanged(true)
             }
         }
-        else{
-            if(onEditModeChanged){
+        else {
+            if (onEditModeChanged) {
                 onEditModeChanged(false)
             }
         }
-    }, [editMode,onEditModeChanged])
+    }, [editMode, onEditModeChanged])
 
 
 
     return (<div className="TextInput">
 
         <div style={{ display: editMode ? 'flex' : 'none', alignItems: 'center' }}
-         onBlur={handleOnBlur}   
-         tabIndex={0}
-            >
+            onBlur={handleOnBlur}
+        //  tabIndex={0}
+        >
             <input
                 ref={inputRef}
                 type="text"
@@ -125,7 +124,7 @@ const TextInput = forwardRef((props,ref) => {
                 onChange={e => setAnyValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 maxLength={12}
-                className={`realInput ${className?className:''}`}
+                className={`realInput ${className ? className : ''}`}
                 style={{ ...style }}
             />
             <div style={{ display: 'flex' }}>
@@ -141,9 +140,9 @@ const TextInput = forwardRef((props,ref) => {
                         <path d="M19.587 16.001l6.096 6.096c0.396 0.396 0.396 1.039 0 1.435l-2.151 2.151c-0.396 0.396-1.038 0.396-1.435 0l-6.097-6.096-6.097 6.096c-0.396 0.396-1.038 0.396-1.434 0l-2.152-2.151c-0.396-0.396-0.396-1.038 0-1.435l6.097-6.096-6.097-6.097c-0.396-0.396-0.396-1.039 0-1.435l2.153-2.151c0.396-0.396 1.038-0.396 1.434 0l6.096 6.097 6.097-6.097c0.396-0.396 1.038-0.396 1.435 0l2.151 2.152c0.396 0.396 0.396 1.038 0 1.435l-6.096 6.096z"></path>
                     </svg></div>
 
-                    
+
             </div>
-   
+
         </div>
 
         <div style={{ display: editMode ? 'none' : 'flex' }}>

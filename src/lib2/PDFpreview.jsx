@@ -184,7 +184,10 @@ const PDFpreview = (props) => {
                                         })
                                     }
                                 }}>
-                                   &nbsp;&nbsp;<div className={AOI_type}>{AOI_type}</div>{"-"+oneAOI.name}
+                                   &nbsp;&nbsp;<div className={AOI_type}>{AOI_type}</div>&nbsp;
+                                   <div className="aoi_name">
+                                    {oneAOI.name}
+                                    </div>
                             </div>)
                         })}
                     </div>)

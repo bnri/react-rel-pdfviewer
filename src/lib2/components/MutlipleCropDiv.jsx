@@ -37,8 +37,6 @@ const MultipleCropDiv = forwardRef((props,ref) => {
           cropAreaRefArr.current[AreaNumber-1].current.set_focusArea();
         }
     },
-    
-
   }), []);
 
 
@@ -102,7 +100,7 @@ const MultipleCropDiv = forwardRef((props,ref) => {
         yr: Math.min(pointA.yr, pointB.yr),
         id: idRef.current,
         type: type,
-        name:'임시영역이름'+coordinates.length
+        name:'임시영역이름('+(pageIndex+1)+'-'+coordinates.length+")"
       };
       // console.log("coordinates",coordinates)
       const nextCoordinates = [...coordinates];
@@ -145,7 +143,10 @@ const MultipleCropDiv = forwardRef((props,ref) => {
 
     // console.log("cropAreaRefArr.current",cropAreaRefArr.current[cropAreaRefArr.current.length-1])
     cropAreaRefArr.current[cropAreaRefArr.current.length-1].current.set_focusArea();
-    cropAreaRefArr.current[cropAreaRefArr.current.length-1].current.set_textEditMode(true);
+    // setTimeout(function(){
+      cropAreaRefArr.current[cropAreaRefArr.current.length-1].current.set_textEditMode(true);
+    // },100);
+
     // console.log("lastcoordinate",lastcoordinate)
     // if(cropAreaRefArr.current&&cropAreaRefArr.current[AreaNumber-1]&&cropAreaRefArr.current[AreaNumber-1].current){
     //   cropAreaRefArr.current[AreaNumber-1].current.set_focusArea();
@@ -169,7 +170,7 @@ const MultipleCropDiv = forwardRef((props,ref) => {
     if(!isMouseMove.current){
       return;
     }
-    console.log("@@@@@@@@@@@@@@@마우스리브")
+    // console.log("@@@@@@@@@@@@@@@마우스리브")
     isMouseMove.current=false;
     isMouseDown.current=false;
     // const coordinate = coordinates[]

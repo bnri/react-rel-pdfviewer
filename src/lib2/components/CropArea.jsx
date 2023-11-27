@@ -17,9 +17,8 @@ const CropArea = forwardRef((props, ref) => {
             cropAreaRef.current.focus();
         },
         set_textEditMode(val){
-            console.log("CropArea의 set_textEditMode 호출")
+            // console.log("CropArea의 set_textEditMode 호출")
             set_editMode(val);
-            // textInputRef.current.settextEditMode(true);
         }
     }), []);
     useEffect(()=>{
@@ -147,7 +146,7 @@ const CropArea = forwardRef((props, ref) => {
         }
     };
     const handleBlur = (e) => {
-
+        // console.log("크롭불러호출")
         if (e && e.preventDefault) {
             e.preventDefault();
         }
@@ -177,12 +176,21 @@ const CropArea = forwardRef((props, ref) => {
                                 // set_fileName(newFileName)
                                 if (onFixCropName) {
                                     onFixCropName(coordinate, newFileName);
+                                    // console.log("바뀜")
                                     // cropAreaRef.current.focus();
                                     // handleBlur();
                                     //onChange이후에 밖으로 마우스클릭시 handleBLur가
                                     //호출되지 않아서 그냥 강제로 호출하니까 해결하긴했는데
                                     //올바른 해결방법이 아님..포커싱이 풀림
-                                    cropAreaRef.current.focus();
+                                    // setTimeout(function(){
+                                        cropAreaRef.current.focus();
+                                    // },100);
+
+                                }
+                            }}
+                            onBlur={(newFileName)=>{
+                                if (onFixCropName) {
+                                    onFixCropName(coordinate, newFileName);
                                 }
                             }}
                             onCancel={()=>{

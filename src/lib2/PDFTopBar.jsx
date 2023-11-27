@@ -65,6 +65,9 @@ const PDFTopBar = (props) => {
                     onChange={(newFileName) => {
                         set_fileName(newFileName)
                     }}
+                    onBlur={(newFileName)=>{
+                        set_fileName(newFileName)
+                    }}
                 />
             </div>
         </div>
