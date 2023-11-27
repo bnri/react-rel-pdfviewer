@@ -1,18 +1,26 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef ,forwardRef,useImperativeHandle } from 'react';
 import "./TextInput.scss"
-const TextInput = (props) => {
-    const { value, onChange, style, className } = props;
+const TextInput = forwardRef((props,ref) => {
+    const { value, onChange, style, className  ,onEditModeChanged , onCancel } = props;
     const [anyValue, setAnyValue] = useState(value || '');
     const [editMode, set_editMode] = useState(false);
     const inputRef = useRef();
     const donotcallblurref = useRef();
+    useImperativeHandle(ref,()=>({
+        set_textEditMode(val){
+            set_editMode(val);
+        }
+    }),[])
     const handleOnSave = useCallback((e) => {
         if (e && e.preventDefault) {
             e.preventDefault();
         }
-        // e.stopPropagation();
+        // if( e&& e.stopPropagation){
+        //     e.stopPropagation();
+        //   }
+  
         donotcallblurref.current=true;
-        console.log("--Save호출1111111111")
+        // console.log("--Save호출1111111111")
         if (onChange) {
             onChange(anyValue);
         }
@@ -28,19 +36,23 @@ const TextInput = (props) => {
         if (e && e.preventDefault) {
             e.preventDefault();
         }
-        // e.stopPropagation();
+        // if( e&& e.stopPropagation){
+        //   e.stopPropagation();
+        // }
+    
         donotcallblurref.current=true;
-        console.log("--Cancel호출")
+        // console.log("--Cancel호출")
         setAnyValue(value);
         set_editMode(false);
-    }, [value]);
+        if(onCancel){
+            onCancel(true)
+        }
+    }, [value,onCancel]);
 
     const handleKeyDown = useCallback((event) => {
         // console.log("asf",event)
         if (event.key === 'Enter') {
-
             handleOnSave();
-
         }
         else if (event.key === "Escape") {
             handleOnCancel();
@@ -56,55 +68,55 @@ const TextInput = (props) => {
             return;
         }
         const target = e.relatedTarget || document.activeElement;
-        console.log("target",target)
+        // console.log("target",target)
         if (target &&!target.isSameNode(inputRef.current)) {
-            console.log("--불러호출");
+            // console.log("--불러호출");
+            set_editMode(false);
             if (value === anyValue) {
-                set_editMode(false);
+                // handleOnCancel();
             } else {
+           
                 handleOnSave();
-                set_editMode(false);
+                // set_editMode(false);
             }
         }
-        // if (!e.currentTarget.contains(e.relatedTarget)) {
-        //     console.log("--불러호출")
-        //     if (value === anyValue) {
-        //         // handleOnCancel();
-        //         set_editMode(false);
-        //     }
-        //     else {
-        //         handleOnSave();
-        //         set_editMode(false);
-        //     }
-        // }
-
-
     }, [value, anyValue, handleOnSave]);
 
     const handleOnEditStart = useCallback((e) => {
         e.preventDefault(); // Prevents the default behavior (focus loss)
+        if( e&& e.stopPropagation){
+            e.stopPropagation();
+          }
+  
         set_editMode(true);
         
     }, [])
 
     useEffect(() => {
         if (editMode) {
-            console.log("에딧모드돌입");            
+            // console.log("에딧모드돌입");            
        
        
             inputRef.current.focus();
-        
+            if(onEditModeChanged){
+                onEditModeChanged(true)
+            }
         }
         else{
-
+            if(onEditModeChanged){
+                onEditModeChanged(false)
+            }
         }
-    }, [editMode])
+    }, [editMode,onEditModeChanged])
 
 
 
     return (<div className="TextInput">
 
-        <div style={{ display: editMode ? 'flex' : 'none', alignItems: 'center' }} onBlur={handleOnBlur}      >
+        <div style={{ display: editMode ? 'flex' : 'none', alignItems: 'center' }}
+         onBlur={handleOnBlur}   
+         tabIndex={0}
+            >
             <input
                 ref={inputRef}
                 type="text"
@@ -128,8 +140,10 @@ const TextInput = (props) => {
 
                         <path d="M19.587 16.001l6.096 6.096c0.396 0.396 0.396 1.039 0 1.435l-2.151 2.151c-0.396 0.396-1.038 0.396-1.435 0l-6.097-6.096-6.097 6.096c-0.396 0.396-1.038 0.396-1.434 0l-2.152-2.151c-0.396-0.396-0.396-1.038 0-1.435l6.097-6.096-6.097-6.097c-0.396-0.396-0.396-1.039 0-1.435l2.153-2.151c0.396-0.396 1.038-0.396 1.434 0l6.096 6.097 6.097-6.097c0.396-0.396 1.038-0.396 1.435 0l2.151 2.152c0.396 0.396 0.396 1.038 0 1.435l-6.096 6.096z"></path>
                     </svg></div>
-            </div>
 
+                    
+            </div>
+   
         </div>
 
         <div style={{ display: editMode ? 'none' : 'flex' }}>
@@ -148,7 +162,8 @@ const TextInput = (props) => {
 
     </div>
     );
-}
+});
+
 
 
 export default TextInput;

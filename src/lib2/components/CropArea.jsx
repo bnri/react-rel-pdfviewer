@@ -8,13 +8,28 @@ const CropArea = forwardRef((props, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     const cropAreaRef = useRef();
 
+    const textInputRef = useRef();
+    const [editMode, set_editMode] = useState(false);
+
+
     useImperativeHandle(ref, () => ({
         set_focusArea() {
             cropAreaRef.current.focus();
         },
+        set_textEditMode(val){
+            console.log("CropArea의 set_textEditMode 호출")
+            set_editMode(val);
+            // textInputRef.current.settextEditMode(true);
+        }
     }), []);
-
-
+    useEffect(()=>{
+        if(editMode&&textInputRef.current){
+            // console.log("하 다시")
+            textInputRef.current.set_textEditMode(true);
+            // console.log("editMode",editMode)
+            // console.log("textInputRef.current",textInputRef.current)
+        }
+    },[editMode])
 
     const cropStyle = useCallback(() => {
         if (!containerInform) return;
@@ -24,13 +39,13 @@ const CropArea = forwardRef((props, ref) => {
         // console.log("containerWidth",containerWidth)
         let backgroundColor;
         if (type === 'quiz') {
-            backgroundColor = 'red';
+            backgroundColor = 'rgba(255,0,0,.3)';
         }
         else if (type === 'pic') {
-            backgroundColor = "green"
+            backgroundColor = "rgba(0,255,0,.3)"
         }
         else if (type === 'text') {
-            backgroundColor = "blue";
+            backgroundColor = "rgba(0,0,255,.3)";
         }
 
 
@@ -44,18 +59,21 @@ const CropArea = forwardRef((props, ref) => {
             //   boxShadow: '0 0 6px #000',
             //   background: '#8c8c8c',
             background: backgroundColor,
-            opacity: 0.3,
+            // opacity: 0.3,
         };
     }, [coordinate, containerInform]);
 
     useEffect(() => {
         if (!isFocused) {
-            console.log("포커스풀림", pageIndex, areaIndex)
+            // console.log("포커스풀림", pageIndex, areaIndex)
             set_selAOI(null);
 
         }
+        else {
+            // console.log("asfasf")
+        }
 
-    }, [isFocused, set_selAOI, pageIndex, areaIndex]);
+    }, [isFocused, set_selAOI]);
 
     useEffect(() => {
         if (!containerInform) return;
@@ -129,53 +147,18 @@ const CropArea = forwardRef((props, ref) => {
         }
     };
     const handleBlur = (e) => {
-        console.log("공통 Blur")
+
         if (e && e.preventDefault) {
             e.preventDefault();
         }
         e.stopPropagation();
-        const isChildElement = (parent, target) => {
-            if (!parent || !target) {
-                return false;
-            }
-        
-            if (parent === target) {
-                return true;
-            }
-        
-            for (let i = 0; i < parent.children.length; i++) {
-                const child = parent.children[i];
-                if (isChildElement(child, target)) {
-                    return true;
-                }
-            }
-        
-            return false;
-        };
+        // console.log("CropArea Blur")
 
-        // const isChildClick = e.currentTarget.contains(e.relatedTarget);
-        const isChildClick = isChildElement(e.currentTarget, e.relatedTarget);
-        // e.target // input.realInput 인데 이미
+        setIsFocused(false);
 
-        console.log("isChildClick",isChildClick);
-        // console.log("isTextInputChildClick",isTextInputChildClick)
-        if (!isChildClick ) {
-            console.log("1.CropArea의 handleBlur");
-            console.log("e.target",e)
-            //여기 e를 찍어봤는데..
-            //<TextInput 밖에를 클릭해서..여기 blur가 호출되는것은 정상이다.
-            //<TExtInput 내의 다른 버튼을 눌렀는데도 여기가 호출이 되는버그가 발생..
-            //이것을 고쳐야한다..
-            // setIsFocused(false);
-
-            // if (set_selAOI) {
-            //     set_selAOI(null);
-            // }
-        }
-        else {
-            console.log("2.차일드클릭")
-        }
     };
+
+
     //   console.log("coordinate",coordinate)
     return (<div className="CropArea" ref={cropAreaRef} style={cropStyle()}
         onFocus={handleFocus}
@@ -184,13 +167,14 @@ const CropArea = forwardRef((props, ref) => {
     >
         <div className={`CropAreaWrapper ${isFocused ? 'active-animatioon' : ''}`}>
             {isFocused &&
-                <div className="topBar">
+                <div className="topAOIBar" style={{opacity:1}}>
+
                     <div className="fixCropName">
                         <TextInput
+                            ref={textInputRef}
                             value={coordinate.name}
                             onChange={(newFileName) => {
                                 // set_fileName(newFileName)
-
                                 if (onFixCropName) {
                                     onFixCropName(coordinate, newFileName);
                                     // cropAreaRef.current.focus();
@@ -198,15 +182,31 @@ const CropArea = forwardRef((props, ref) => {
                                     //onChange이후에 밖으로 마우스클릭시 handleBLur가
                                     //호출되지 않아서 그냥 강제로 호출하니까 해결하긴했는데
                                     //올바른 해결방법이 아님..포커싱이 풀림
+                                    cropAreaRef.current.focus();
                                 }
                             }}
+                            onCancel={()=>{
+                                cropAreaRef.current.focus();
+                            }}
+
+                            onEditModeChanged={(editMode) => {
+                                // console.log("editMode바뀜", editMode)
+                                set_editMode(editMode);
+                            }}
+
                         />
                     </div>
-                    <div className="delCrop" onClick={() => {
-                        onDelete(coordinate)
-                    }}>
-                        X
-                    </div>
+                    {!editMode &&
+                        <div className="delCrop"
+                            onMouseDown={() => {
+                                // console.log("딜링트마우스다운")
+                                onDelete(coordinate)
+                            }}
+                        >
+                            X
+                        </div>
+                    }
+
                 </div>
 
             }

@@ -23,11 +23,11 @@ const PDFTopBar = (props) => {
     },[dynamicAllPageRef,set_viewPercent]);
 
     const handleSetPercent = useCallback((v) => {
-        console.log("handleSetPercent호출");
+        // console.log("handleSetPercent호출");
 
         set_viewPercent(v);
         if (dynamicAllPageRef && dynamicAllPageRef.current) {
-            console.log("호출~~")
+            // console.log("호출~~")
             dynamicAllPageRef.current.moveTothePrevScroll();
         }
     },[dynamicAllPageRef,set_viewPercent]);
@@ -70,9 +70,9 @@ const PDFTopBar = (props) => {
         </div>
 
         <div className="oneTab">
-                <button className={`AOI_mode_btn ${AOI_mode===1?'selected':''}`}onClick={()=>handleToggleAOI(1)}>Quiz</button>
-                <button className={`AOI_mode_btn ${AOI_mode===2?'selected':''}`}  onClick={()=>handleToggleAOI(2)}>Picture</button>
-                <button className={`AOI_mode_btn ${AOI_mode===3?'selected':''}`} onClick={()=>handleToggleAOI(3)}>글</button>
+                <button className={`AOI_mode_btn Quiz ${AOI_mode===1?'selected':''}`}onClick={()=>handleToggleAOI(1)}>Quiz</button>
+                <button className={`AOI_mode_btn Pic ${AOI_mode===2?'selected':''}`}  onClick={()=>handleToggleAOI(2)}>Pic</button>
+                <button className={`AOI_mode_btn Text ${AOI_mode===3?'selected':''}`} onClick={()=>handleToggleAOI(3)}>Text</button>
         </div>
 
 

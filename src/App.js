@@ -339,7 +339,9 @@ function App() {
                 type: "quiz",
                 name: "임시quiz2",
               },], //1번페이지
+              [
 
+              ],//2페이지
             ]}
 
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}

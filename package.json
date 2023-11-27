@@ -12,7 +12,10 @@
   "module": "dist/PDFviewModal.js",
   "main": "dist/PDFviewModal.js",
   "dependencies": {
+    "i": "^0.3.7",
+    "immutable": "^5.0.0-beta.4",
     "interactjs": "^1.10.20",
+    "npm": "^10.2.4",
     "pdfjs-dist": "^2.6.347",
     "react-custom-scrollbars": "^4.2.1",
     "react-multi-crops": "0.0.10",

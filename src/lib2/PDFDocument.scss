@@ -57,14 +57,39 @@ $topbar-height:50px;
             justify-content: center;
             align-items: center;
             border:none;
+            box-sizing: border-box;
+            border: 1px solid #fff;
             &:hover{
                 // background:#555;
                 cursor:pointer;
                 opacity: 0.8;
             }
-            &.selected{
-                background:red;
-                color:#fff !important;
+     
+            &.Quiz{
+                // background:rgba(255,0,0,.3);
+          
+                &.selected{
+                    background:rgb(255,179,179);
+                    color:red;
+               
+                }
+            }
+            &.Pic{
+                // background:rgba(255,0,0,.3);
+                &.selected{
+                    background:rgb(179,255,179);
+                    //#b3ffb3
+                    color:green;
+               
+                }
+            }
+            &.Text{
+    
+                &.selected{
+                    background:rgb(179,179,255);
+                    color:blue;
+               
+                }
             }
             // &:hover{
             //     color:#eee;
@@ -237,6 +262,30 @@ $topbar-height:50px;
                     display:flex;
                     justify-content: flex-start;
                     align-items: center;
+                    .text,.pic,.quiz{
+              
+                        width:18px;
+                        height:18px;
+                        border-radius: 50%;
+                        font-size:9px;
+                        display:flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-sizing: border-box;
+                        border: 1px solid #fff;
+
+                        background:rgb(179,179,255);
+                        color:blue;
+                    }
+                    .quiz{
+                        background:rgb(255,179,179);
+                        color:red;
+                    }
+                    .pic{
+                        background:rgb(179,255,179);
+                        color:green;
+                    }
+
                     &:hover{
                         background:#444;
                         cursor:pointer;
