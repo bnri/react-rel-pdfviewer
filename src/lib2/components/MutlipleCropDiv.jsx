@@ -69,7 +69,7 @@ const MultipleCropDiv = forwardRef((props,ref) => {
   };
 
   const handleMouseMove = (e) => {
-    const { onDraw, onChange, coordinates } = props;
+    const { onChange, coordinates } = props;
     const pointA = pointARef.current;
     if (!pointA) return;
     if (!AOI_mode) return;
@@ -100,15 +100,16 @@ const MultipleCropDiv = forwardRef((props,ref) => {
         yr: Math.min(pointA.yr, pointB.yr),
         id: idRef.current,
         type: type,
-        name:'임시영역이름('+(pageIndex+1)+'-'+coordinates.length+")"
+        name:'임시영역('+(pageIndex+1)+'-'+coordinates.length+")"
       };
       // console.log("coordinates",coordinates)
       const nextCoordinates = [...coordinates];
       nextCoordinates[drawingIndexRef.current] = tempCoordinate;
 
-      if (typeof onDraw === 'function') {
-        onDraw(tempCoordinate, drawingIndexRef.current, nextCoordinates);
-      }
+      // if (typeof onDraw === 'function') {
+      //   console.log("드로")
+      //   onDraw(tempCoordinate, drawingIndexRef.current, nextCoordinates);
+      // }
 
       if (typeof onChange === 'function') {
         onChange(tempCoordinate, drawingIndexRef.current, nextCoordinates);

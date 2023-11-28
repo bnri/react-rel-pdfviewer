@@ -61,6 +61,7 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
 
     // console.log("tempAOI",tempAOI)
 
+    
     //새로운 친구를 삽입할땠는것.
     const changeCoordinate = (pageIndex, coordinate, index, coordinates) => {
         set_tempAOI(aoi => {
@@ -70,7 +71,6 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
             // console.log("aoi",aoi)
             return JSON.parse(JSON.stringify(aoi));
         });
-
     }
 
     const deleteCoordinate = (pageIndex, targetCoordinate) => {
