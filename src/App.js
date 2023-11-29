@@ -329,7 +329,10 @@ function App() {
                 heightr: 0.1, 
                 id: '1234',
                 type: "quiz",
-                name: "임시quiz1"
+                name: "임시quiz1",
+                quizOptionCount:4, //(1~10 선택가능)
+                correctAnswer:1, //1번이 정답
+                shouldSolveQuestion:false //문제를 풀어야만 이전과 다음페이지로 이동가능..
               }, {
                 xr: 0.4, 
                 yr: 0.4, 
@@ -338,11 +341,25 @@ function App() {
                 id: '5678',
                 type: "quiz",
                 name: "임시quiz2",
-              },], //1번페이지
+                quizOptionCount:4, //(1~10 선택가능)
+                correctAnswer:1, //1번이 정답
+                shouldSolveQuestion:false //문제를 풀어야만 이전과 다음페이지로 이동가능..
+              }], //1번페이지
               [
 
               ],//2페이지
             ]}
+
+
+            pageInform={[
+              {
+                showPrevButton:false,
+                showNextButton:false,
+                showFinishButton:false,
+                minShouldViewSec:1,
+              }
+            ]}
+
 
             PDFDocumentOnLoadCallback={handleDocumentLoadCallback}
             path={previewURL}

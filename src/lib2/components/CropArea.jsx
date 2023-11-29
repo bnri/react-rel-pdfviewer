@@ -1,34 +1,36 @@
 import React, { useState, useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import interact from 'interactjs';
 import TextInput from './TextInput';
+import QuizDetail from './QuizDetail';
 
 //#@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@@!
 const CropArea = forwardRef((props, ref) => {
-    const { onFixCropName, set_selAOI, onMove, onResize, pageIndex, areaIndex, coordinate, containerInform, onDelete } = props;
+    const { onFixCropName, set_selAOI, onMove, onResize, pageIndex, areaIndex,
+        coordinate, containerInform, onDelete } = props;
     const [isFocused, setIsFocused] = useState(false);
     const cropAreaRef = useRef();
 
     const textInputRef = useRef();
     const [editMode, set_editMode] = useState(false);
-
+    const [showQuizDetail, set_showQuizDetail] = useState(false);
 
     useImperativeHandle(ref, () => ({
         set_focusArea() {
             cropAreaRef.current.focus();
         },
-        set_textEditMode(val){
+        set_textEditMode(val) {
             // console.log("CropArea의 set_textEditMode 호출")
             set_editMode(val);
         }
     }), []);
-    useEffect(()=>{
-        if(editMode&&textInputRef.current){
+    useEffect(() => {
+        if (editMode && textInputRef.current) {
             // console.log("하 다시")
             textInputRef.current.set_textEditMode(true);
             // console.log("editMode",editMode)
             // console.log("textInputRef.current",textInputRef.current)
         }
-    },[editMode])
+    }, [editMode])
 
     const cropStyle = useCallback(() => {
         if (!containerInform) return;
@@ -146,18 +148,21 @@ const CropArea = forwardRef((props, ref) => {
         }
     };
     const handleBlur = (e) => {
-        // console.log("크롭불러호출")
+ 
         if (e && e.preventDefault) {
             e.preventDefault();
         }
         e.stopPropagation();
         // console.log("CropArea Blur")
-
+        console.log("크롭불러호출")
         setIsFocused(false);
 
     };
 
-
+    const handleQuizDetailUpdate = (qd) => {
+        // set_showQuizDetail(qd);  
+        cropAreaRef.current.focus();
+    }
     //   console.log("coordinate",coordinate)
     return (<div className="CropArea" ref={cropAreaRef} style={cropStyle()}
         onFocus={handleFocus}
@@ -166,7 +171,7 @@ const CropArea = forwardRef((props, ref) => {
     >
         <div className={`CropAreaWrapper ${isFocused ? 'active-animatioon' : ''}`}>
             {isFocused &&
-                <div className="topAOIBar" style={{opacity:1}}>
+                <div className="topAOIBar" style={{ opacity: 1 }}>
 
                     <div className="fixCropName">
                         <TextInput
@@ -183,17 +188,17 @@ const CropArea = forwardRef((props, ref) => {
                                     //호출되지 않아서 그냥 강제로 호출하니까 해결하긴했는데
                                     //올바른 해결방법이 아님..포커싱이 풀림
                                     // setTimeout(function(){
-                                        cropAreaRef.current.focus();
+                                    cropAreaRef.current.focus();
                                     // },100);
 
                                 }
                             }}
-                            onBlur={(newFileName)=>{
+                            onBlur={(newFileName) => {
                                 if (onFixCropName) {
                                     onFixCropName(coordinate, newFileName);
                                 }
                             }}
-                            onCancel={()=>{
+                            onCancel={() => {
                                 cropAreaRef.current.focus();
                             }}
 
@@ -204,15 +209,24 @@ const CropArea = forwardRef((props, ref) => {
 
                         />
                     </div>
+
                     {!editMode &&
-                        <div className="delCrop"
-                            onMouseDown={() => {
-                                // console.log("딜링트마우스다운")
-                                onDelete(coordinate)
-                            }}
-                        >
-                            X
-                        </div>
+                        <>
+                            {coordinate.type === 'quiz'
+                                && <QuizDetail coordinate={coordinate}
+                                    onQuizDetailChanged={handleQuizDetailUpdate}
+                                />}
+
+                            <div className="delCrop"
+                                onMouseDown={() => {
+                                    // console.log("딜링트마우스다운")
+                                    onDelete(coordinate)
+                                }}
+                            >
+                                X
+                            </div>
+                        </>
+
                     }
 
                 </div>

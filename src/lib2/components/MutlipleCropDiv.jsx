@@ -102,6 +102,13 @@ const MultipleCropDiv = forwardRef((props,ref) => {
         type: type,
         name:'임시영역('+(pageIndex+1)+'-'+coordinates.length+")"
       };
+      if(type==='quiz'){
+        tempCoordinate.quizOptionCount=4;
+        tempCoordinate.correctAnswer=1;
+        tempCoordinate.shouldSolveQuestion=false;
+      }
+      
+
       // console.log("coordinates",coordinates)
       const nextCoordinates = [...coordinates];
       nextCoordinates[drawingIndexRef.current] = tempCoordinate;
