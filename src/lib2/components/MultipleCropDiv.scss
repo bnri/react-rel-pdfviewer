@@ -57,23 +57,53 @@
                   justify-content: center;
                   align-items: center;
                   float:right;
-                  width:40px;
+                  width:30px;
                   height:20px;
-                  background:red;
+                  background:#ededed;
                   color:white;
                   position:relative;
-                  .dropDown_qd{
-                    background:green;
+                  &:hover{
+                    cursor:pointer;
+                    background:#fff;
+             
+                  }
+                  .quiz_icon{
+                    height:100%;
+                    display:flex;
+                    justify-content: center;
+                    align-items: center;
+                    img{
+                      height:90%;
+      
+                    }
+                
+                  }
+                  .dropDown_triangle{
+                    background:#fff;
+                    border-left:1px solid green;
+                    border-bottom:1px solid green;
                     position:absolute;
-                    top:0px;
+                    top: 3px; // 중앙 정렬
+                    left: 32px; // 오른쪽 정렬
+                    transform: rotate(45deg); // 45도 회전 및 중앙 정렬
+                    width: 15px;
+                    height: 15px;
+                    // z-index: 1;
+                  }
+                  .dropDown_qd{
+                    border:1px solid green;
+                    background:#ededed;
+                    opacity: 1;
+                    color:#111;
+                    position:absolute;
+                    top:-10px;
                     left:40px;
                     width:auto;
+                    border-radius: 5px;
+                    padding:10px;
+                    box-sizing: border-box;
                   }
-                  &:hover{
-                      cursor:pointer;
-                      background:#555;
-               
-                  }
+                
                 }
                 .delCrop{
                     display:flex;

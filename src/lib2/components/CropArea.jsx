@@ -16,7 +16,9 @@ const CropArea = forwardRef((props, ref) => {
 
     useImperativeHandle(ref, () => ({
         set_focusArea() {
-            cropAreaRef.current.focus();
+            // console.log("포커스아래아")
+            setIsFocused(true);
+            cropAreaRef.current.scrollIntoView({ block: 'center' });
         },
         set_textEditMode(val) {
             // console.log("CropArea의 set_textEditMode 호출")
@@ -138,36 +140,63 @@ const CropArea = forwardRef((props, ref) => {
 
 
 
-    const handleFocus = () => {
-        setIsFocused(true);
-        if (set_selAOI) {
+    // const handleFocus = () => {
+    //     console.log("포커스")
+    //     setIsFocused(true);
+    //     if (set_selAOI) {
+    //         set_selAOI({
+    //             pageNumber: pageIndex + 1,
+    //             AOINumber: areaIndex + 1
+    //         });
+    //     }
+    // };
+
+
+    useEffect(()=>{
+        // console.log("isFocused",isFocused);
+        if(isFocused){
             set_selAOI({
                 pageNumber: pageIndex + 1,
                 AOINumber: areaIndex + 1
             });
         }
-    };
-    const handleBlur = (e) => {
- 
-        if (e && e.preventDefault) {
-            e.preventDefault();
-        }
-        e.stopPropagation();
-        // console.log("CropArea Blur")
-        console.log("크롭불러호출")
-        setIsFocused(false);
+    },[isFocused,pageIndex,areaIndex,set_selAOI])
 
-    };
+    useEffect(()=>{
+        const handleClickOutside = (e) => {
+            e.stopPropagation();
+            if (cropAreaRef.current && !cropAreaRef.current.contains(e.target)) {
+                // quizDetailRef 외부를 클릭했을 때
+                setIsFocused(false);
+            }
+            else{
+                setIsFocused(true);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    },[])
+    
+
 
     const handleQuizDetailUpdate = (qd) => {
-        // set_showQuizDetail(qd);  
-        cropAreaRef.current.focus();
+     
+        console.log("handleQuizDetailUpdate");
+        //업뎃하면댐
     }
-    //   console.log("coordinate",coordinate)
+    const handleQuizDetailCancel = (qd) => {
+   
+        console.log("handleQuizDetailCancel");
+        //취소하면댐
+    }
+
+
     return (<div className="CropArea" ref={cropAreaRef} style={cropStyle()}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        tabIndex={0}
+        // onFocus={handleFocus}
+   
     >
         <div className={`CropAreaWrapper ${isFocused ? 'active-animatioon' : ''}`}>
             {isFocused &&
@@ -181,16 +210,9 @@ const CropArea = forwardRef((props, ref) => {
                                 // set_fileName(newFileName)
                                 if (onFixCropName) {
                                     onFixCropName(coordinate, newFileName);
-                                    // console.log("바뀜")
-                                    // cropAreaRef.current.focus();
-                                    // handleBlur();
-                                    //onChange이후에 밖으로 마우스클릭시 handleBLur가
-                                    //호출되지 않아서 그냥 강제로 호출하니까 해결하긴했는데
-                                    //올바른 해결방법이 아님..포커싱이 풀림
-                                    // setTimeout(function(){
-                                    cropAreaRef.current.focus();
-                                    // },100);
+                               
 
+                                    cropAreaRef.current.focus();
                                 }
                             }}
                             onBlur={(newFileName) => {
@@ -215,6 +237,7 @@ const CropArea = forwardRef((props, ref) => {
                             {coordinate.type === 'quiz'
                                 && <QuizDetail coordinate={coordinate}
                                     onQuizDetailChanged={handleQuizDetailUpdate}
+                                    handleQuizDetailCancel={handleQuizDetailCancel}
                                 />}
 
                             <div className="delCrop"

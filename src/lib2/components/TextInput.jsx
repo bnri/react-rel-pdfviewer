@@ -58,6 +58,8 @@ const TextInput = forwardRef((props, ref) => {
         }
     }, [handleOnSave, handleOnCancel]);
 
+
+
     const handleOnBlur = useCallback((e) => {
         if (e && e.preventDefault) {
             e.preventDefault();
@@ -70,7 +72,7 @@ const TextInput = forwardRef((props, ref) => {
         }
 
 
-        // console.log("--불러호출");
+        console.log("--불러호출");
         set_editMode(false);
         if (value === anyValue) {
         } else {

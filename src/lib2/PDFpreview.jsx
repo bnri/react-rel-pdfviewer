@@ -136,6 +136,8 @@ const PDFpreview = (props) => {
         }
     }, [selAOI,tempAOI,hideAOIPageListArr]);
 
+
+    //#@! textinput Blur가 호출안댐
     
     
     return (<div className="PDFpreview no-drag"

@@ -425,7 +425,8 @@ const PDFdynamicAllPage = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         set_focusAOIArea: (pageNumber, AreaNumber) => {
             if(pageMultileCropDivRef.current){
-                // console.log("pageNumber",pageNumber)
+                // console.log("pageNumber",pageNumber);
+                // console.log("AreaNumber",AreaNumber);
                 // console.log("pageMultileCropDivRef.current",pageMultileCropDivRef.current)
                 // console.log(pageMultileCropDivRef.current[pageNumber-1]);
                 
