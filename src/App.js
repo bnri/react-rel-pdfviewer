@@ -122,6 +122,15 @@ function App() {
   
   const handleDrawStart = (obj) => {
     const { x, y, pageNumber } = obj;
+    console.log("x",x);
+    console.log("y",y);
+    //canvas 는 1728 2436 인데
+    
+    //568 805가 오는데 사이즈를 조절한뒤에..
+    
+
+    //1301 1836 좌표가 오는데?
+
     const canvasref = pdfviewref.current.get_canvasRef();
     const canvas = canvasref.current;
     const context = canvas.getContext('2d');

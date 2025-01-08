@@ -1,5 +1,8 @@
 you must copy these file in "/node_modules/react-pdf/dist/pdf.worker.js  "
 in CRA public folder  
+18.17.0 build 작품
+14.17.3 과 20.11.1 에서 정상동작
+
 
 -  file list  
 pdf.worker.js  

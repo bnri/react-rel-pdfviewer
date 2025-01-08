@@ -291,63 +291,73 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
   }, []);
   var startDrawing = function startDrawing(e) {
     var _e$nativeEvent = e.nativeEvent,
-      offsetX = _e$nativeEvent.offsetX,
-      offsetY = _e$nativeEvent.offsetY;
+      clientX = _e$nativeEvent.clientX,
+      clientY = _e$nativeEvent.clientY;
+    var canvas = gazecanvasref.current;
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width; // X축 비율
+    // Corrected coordinates
+    var correctedX = (clientX - rect.left) * scaleX;
+    var correctedY = (clientY - rect.top) * scaleX;
+
+    // const { offsetX, offsetY } = e.nativeEvent;
+
+    // // Canvas의 실제 크기와 CSS 크기 비교
+    // const canvas = gazecanvasref.current;
+    // const rect = canvas.getBoundingClientRect();
+    // const scaleX = canvas.width / rect.width; // X축 비율
+    // // console.log("offsetX",offsetX);
+    // // console.log("offsetY",offsetY)
+    // // console.log("scaleX",scaleX);
+    // // 보정된 좌표 계산
+    // // console.log("devicePixelRatio", window.devicePixelRatio);
+
+    // const correctedX = offsetX * scaleX * window.devicePixelRatio;
+    // const correctedY = offsetY * scaleX * window.devicePixelRatio;
+    // console.log("offsetX", offsetX);
+    // console.log("offsetY", offsetY);
+    // console.log("scaleX", scaleX);
+    // console.log("rect.width", rect.width);
     setDrawing(true);
     if (drawStart) {
       drawStart({
-        x: offsetX,
-        y: offsetY,
+        x: correctedX,
+        y: correctedY,
         pageNumber: pageNumber
       });
       return;
     }
-
-    /*
-    const canvas = gazecanvasref.current;
-    const context = canvas.getContext('2d');
-      if (!tempDrawedMemory.current[pageNumber]) {
-        tempDrawedMemory.current[pageNumber] = {
-            drawArr: []
-        }
-    }
-      context.beginPath();
-    context.moveTo(offsetX, offsetY);
-    tempDrawedMemory.current[pageNumber].drawArr.push({
-        type: 'startDrawing',
-        x: offsetX,
-        y: offsetY,
-    });
-    */
   };
-
   var draw = function draw(e) {
     if (!drawing) return;
-    var _e$nativeEvent2 = e.nativeEvent,
-      offsetX = _e$nativeEvent2.offsetX,
-      offsetY = _e$nativeEvent2.offsetY;
+
+    // const { offsetX, offsetY } = e.nativeEvent;
     if (drawIng) {
+      // const canvas = gazecanvasref.current;
+      // const rect = canvas.getBoundingClientRect();
+      // const scaleX = canvas.width / rect.width; // X축 비율
+
+      // // 보정된 좌표 계산
+
+      // const correctedX = offsetX * scaleX * window.devicePixelRatio;
+      // const correctedY = offsetY * scaleX * window.devicePixelRatio;
+      var _e$nativeEvent2 = e.nativeEvent,
+        clientX = _e$nativeEvent2.clientX,
+        clientY = _e$nativeEvent2.clientY;
+      var canvas = gazecanvasref.current;
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width; // X축 비율
+      // Corrected coordinates
+      var correctedX = (clientX - rect.left) * scaleX;
+      var correctedY = (clientY - rect.top) * scaleX;
       drawIng({
-        x: offsetX,
-        y: offsetY,
+        x: correctedX,
+        y: correctedY,
         pageNumber: pageNumber
       });
       return;
     }
-
-    /*
-    const canvas = gazecanvasref.current;
-    const context = canvas.getContext('2d');
-    context.lineTo(offsetX, offsetY);
-    context.stroke();
-    tempDrawedMemory.current[pageNumber].drawArr.push({
-        type: 'draw',
-        x: offsetX,
-        y: offsetY,
-    });
-    */
   };
-
   var stopDrawing = function stopDrawing() {
     if (!drawing) return;
     setDrawing(false);

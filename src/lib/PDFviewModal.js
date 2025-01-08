@@ -68,13 +68,13 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
     }, []);
     // const [pdfScale, set_pdfScale] = React.useState(1);
     async function onDocumentLoadSuccess(obj) {
-        const { numPages:np}=obj;
-        
+        const { numPages: np } = obj;
+
         //PDF의 실제 width height을 구할때 사용
         // const pageObj = await obj.getPage(1)
         // const pageHeight = pageObj.view[3];
         // const pageWidth = pageObj.view[2];
-        
+
 
         setNumPages(np);
         if (PDFonloadCallback) {
@@ -96,13 +96,13 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
         //     height: canvasRef.current.height
         // })
         set_renderDone(true);
-        const tempratio = (canvasRef.current.height/canvasRef.current.width).toFixed(2);
-      
+        const tempratio = (canvasRef.current.height / canvasRef.current.width).toFixed(2);
+
         set_canvasSize({
             width: 1728,
-            height: 1728*tempratio
+            height: 1728 * tempratio
         })
-        
+
         // console.log("tempratio",tempratio);
 
 
@@ -129,7 +129,7 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
                         height: modalref.current.clientHeight
                     },
                     pageNumber: pageNumber,
-                    height_devided_width_ratio:tempratio,
+                    height_devided_width_ratio: tempratio,
                     // Scrollwrap:{
                     //     width:prettyscrollref.current.clientWidth,
                     //     height:prettyscrollref.current.clientHeight,
@@ -269,55 +269,70 @@ const PDFviewModal = React.forwardRef(({ ...props }, ref) => {
 
     }, [])
 
+
     const startDrawing = (e) => {
 
-        const { offsetX, offsetY } = e.nativeEvent;
+        const { clientX, clientY } = e.nativeEvent;
+        const canvas = gazecanvasref.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width; // X축 비율
+        // Corrected coordinates
+        const correctedX = (clientX - rect.left) * scaleX;
+        const correctedY = (clientY - rect.top) * scaleX;
+
+
+        // const { offsetX, offsetY } = e.nativeEvent;
+
+        // // Canvas의 실제 크기와 CSS 크기 비교
+        // const canvas = gazecanvasref.current;
+        // const rect = canvas.getBoundingClientRect();
+        // const scaleX = canvas.width / rect.width; // X축 비율
+        // // console.log("offsetX",offsetX);
+        // // console.log("offsetY",offsetY)
+        // // console.log("scaleX",scaleX);
+        // // 보정된 좌표 계산
+        // // console.log("devicePixelRatio", window.devicePixelRatio);
+
+        // const correctedX = offsetX * scaleX * window.devicePixelRatio;
+        // const correctedY = offsetY * scaleX * window.devicePixelRatio;
+        // console.log("offsetX", offsetX);
+        // console.log("offsetY", offsetY);
+        // console.log("scaleX", scaleX);
+        // console.log("rect.width", rect.width);
         setDrawing(true);
         if (drawStart) {
-            drawStart({ x: offsetX, y: offsetY, pageNumber: pageNumber });
+            drawStart({ x: correctedX, y: correctedY, pageNumber: pageNumber });
             return;
         }
-
-        /*
-        const canvas = gazecanvasref.current;
-        const context = canvas.getContext('2d');
-
-        if (!tempDrawedMemory.current[pageNumber]) {
-            tempDrawedMemory.current[pageNumber] = {
-                drawArr: []
-            }
-        }
-
-        context.beginPath();
-        context.moveTo(offsetX, offsetY);
-        tempDrawedMemory.current[pageNumber].drawArr.push({
-            type: 'startDrawing',
-            x: offsetX,
-            y: offsetY,
-        });
-        */
     };
 
     const draw = (e) => {
         if (!drawing) return;
 
-        const { offsetX, offsetY } = e.nativeEvent;
+        // const { offsetX, offsetY } = e.nativeEvent;
         if (drawIng) {
-            drawIng({ x: offsetX, y: offsetY, pageNumber: pageNumber });
+            // const canvas = gazecanvasref.current;
+            // const rect = canvas.getBoundingClientRect();
+            // const scaleX = canvas.width / rect.width; // X축 비율
+
+            // // 보정된 좌표 계산
+
+            // const correctedX = offsetX * scaleX * window.devicePixelRatio;
+            // const correctedY = offsetY * scaleX * window.devicePixelRatio;
+            const { clientX, clientY } = e.nativeEvent;
+            const canvas = gazecanvasref.current;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width; // X축 비율
+            // Corrected coordinates
+            const correctedX = (clientX - rect.left) * scaleX;
+            const correctedY = (clientY - rect.top) * scaleX;
+
+
+            drawIng({ x: correctedX, y: correctedY, pageNumber: pageNumber });
             return;
         }
 
-        /*
-        const canvas = gazecanvasref.current;
-        const context = canvas.getContext('2d');
-        context.lineTo(offsetX, offsetY);
-        context.stroke();
-        tempDrawedMemory.current[pageNumber].drawArr.push({
-            type: 'draw',
-            x: offsetX,
-            y: offsetY,
-        });
-        */
+
     };
 
     const stopDrawing = () => {
