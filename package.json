@@ -1,6 +1,6 @@
 {
   "name": "react-rel-pdfviewer",
-  "version": "1.0.42",
+  "version": "1.0.43",
   "private": false,
   "babel": {
     "presets": [
