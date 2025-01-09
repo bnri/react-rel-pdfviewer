@@ -296,9 +296,10 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
     var canvas = gazecanvasref.current;
     var rect = canvas.getBoundingClientRect();
     var scaleX = canvas.width / rect.width; // X축 비율
+    var scaleY = canvas.height / rect.height; // X축 비율
     // Corrected coordinates
     var correctedX = (clientX - rect.left) * scaleX;
-    var correctedY = (clientY - rect.top) * scaleX;
+    var correctedY = (clientY - rect.top) * scaleY;
 
     // const { offsetX, offsetY } = e.nativeEvent;
 
@@ -347,9 +348,10 @@ var PDFviewModal = /*#__PURE__*/_react.default.forwardRef(function (_ref2, ref) 
       var canvas = gazecanvasref.current;
       var rect = canvas.getBoundingClientRect();
       var scaleX = canvas.width / rect.width; // X축 비율
+      var scaleY = canvas.height / rect.height; // X축 비율
       // Corrected coordinates
       var correctedX = (clientX - rect.left) * scaleX;
-      var correctedY = (clientY - rect.top) * scaleX;
+      var correctedY = (clientY - rect.top) * scaleY;
       drawIng({
         x: correctedX,
         y: correctedY,
